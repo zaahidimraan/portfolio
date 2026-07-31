@@ -7,7 +7,7 @@ export const alt = `${identity.name} — ${identity.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-/** Social card generated at build time; colors mirror the site's dark theme. */
+/** Social card generated at build time; monochrome, mirrors the hero treatment. */
 export default function OpenGraphImage() {
   return new ImageResponse(
     (
@@ -17,41 +17,50 @@ export default function OpenGraphImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          padding: "80px",
-          background: "#0c0e12",
-          color: "#e8eaed",
+          justifyContent: "space-between",
+          padding: "64px 72px",
+          background: "#0a0a0a",
+          color: "#f5f5f5",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+        <div
+          style={{
+            fontSize: "24px",
+            letterSpacing: "0.3em",
+            color: "#a2a8ae",
+            textTransform: "uppercase",
+          }}
+        >
+          {identity.location}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ width: "160px", height: "8px", background: "#f5f5f5" }} />
           <div
             style={{
-              width: "14px",
-              height: "120px",
-              background: "#8da2fb",
-              borderRadius: "7px",
+              fontSize: "128px",
+              fontWeight: 700,
+              letterSpacing: "-0.03em",
+              textTransform: "uppercase",
+              lineHeight: 1.02,
+              marginTop: "20px",
             }}
-          />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: "72px", fontWeight: 700 }}>
-              {identity.name}
-            </div>
-            <div style={{ fontSize: "36px", color: "#8da2fb", marginTop: "8px" }}>
-              {identity.role}
-            </div>
+          >
+            {identity.name}
+          </div>
+          <div style={{ fontSize: "34px", color: "#a2a8ae", marginTop: "16px" }}>
+            {identity.role}
           </div>
         </div>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginTop: "100px",
-            fontSize: "28px",
-            color: "#9aa1a9",
+            fontSize: "24px",
+            color: "#a2a8ae",
           }}
         >
-          <div>{identity.location}</div>
+          <div>{identity.email}</div>
           <div>{identity.siteUrl.replace("https://", "")}</div>
         </div>
       </div>

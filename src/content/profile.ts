@@ -62,6 +62,60 @@ export const flagships: Flagship[] = [
   },
 ];
 
+export type Stat = {
+  prefix?: string;
+  value: number;
+  decimals?: number;
+  suffix: string;
+  label: string;
+  source: string;
+};
+
+/** Headline numbers for the Impact section — each mirrors a CV bullet below. */
+export const stats: Stat[] = [
+  {
+    prefix: "~",
+    value: 99.9,
+    decimals: 1,
+    suffix: "%",
+    label: "schema compliance on real supplier contracts",
+    source: "POWWR · document-AI pipeline",
+  },
+  {
+    value: 12000,
+    suffix: "+",
+    label: "records CRM-matched per reconciliation run",
+    source: "POWWR · reconciliation",
+  },
+  {
+    prefix: "~",
+    value: 96,
+    suffix: "%",
+    label: "auto-match rate on reconciliation runs",
+    source: "POWWR · reconciliation",
+  },
+  {
+    prefix: "70–",
+    value: 95,
+    suffix: "%",
+    label: "projected extraction-cost cut from local-model cascades",
+    source: "POWWR · benchmarking",
+  },
+  {
+    value: 85,
+    suffix: "%",
+    label: "agreement with human recruiters",
+    source: "Flagship · LLM-as-a-Judge",
+  },
+  {
+    prefix: "−",
+    value: 40,
+    suffix: "%",
+    label: "false positives in resume screening",
+    source: "Flagship · LLM-as-a-Judge",
+  },
+];
+
 export type Role = {
   title: string;
   company: string;

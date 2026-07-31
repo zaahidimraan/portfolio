@@ -1,19 +1,21 @@
 export function Section({
   id,
+  number,
   title,
   children,
 }: {
   id: string;
+  number: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-20 py-14 sm:py-20">
-      <div className="mb-8 flex items-center gap-4">
-        <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-accent">
-          {title}
-        </h2>
-        <div className="h-px flex-1 bg-border" />
+    <section id={id} className="scroll-mt-20 border-t border-border py-16 sm:py-24">
+      <div className="mb-10 flex items-baseline gap-4">
+        <span aria-hidden className="font-mono text-sm text-muted">
+          {number}
+        </span>
+        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
       </div>
       {children}
     </section>

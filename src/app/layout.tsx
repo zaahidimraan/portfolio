@@ -42,8 +42,9 @@ const personJsonLd = JSON.stringify({
   address: { "@type": "PostalAddress", addressLocality: "Manchester", addressCountry: "GB" },
 });
 
-/** Runs before paint: applies stored/system theme to avoid a flash of wrong theme. */
-const themeInit = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+/** Runs before paint: applies stored/system theme (no FOUC) and flags JS
+ *  availability so scroll-reveal CSS only hides content when JS can reveal it. */
+const themeInit = `(function(){try{document.documentElement.classList.add("js");var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
 
 export default function RootLayout({
   children,
