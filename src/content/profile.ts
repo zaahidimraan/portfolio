@@ -8,6 +8,7 @@ export const identity = {
   name: "Zahid Imran",
   role: "AI Engineer — Agentic Systems, RAG, MCP",
   location: "Manchester, UK",
+  siteUrl: "https://zahid-imran.pages.dev",
   email: "zaahidimraan@gmail.com",
   github: "https://github.com/zaahidimraan",
   githubUser: "zaahidimraan",

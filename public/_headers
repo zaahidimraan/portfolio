@@ -1,0 +1,5 @@
+# Cloudflare Pages headers. The build emits the OG card as an extensionless
+# file, so its content type must be set explicitly for link-preview scrapers.
+/opengraph-image
+  Content-Type: image/png
+  Cache-Control: public, max-age=86400

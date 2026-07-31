@@ -48,3 +48,44 @@ body {
   background: var(--accent);
   color: var(--background);
 }
+
+/* Recruiters print. Force light palette, drop chrome, keep content compact. */
+@media print {
+  :root,
+  .dark {
+    --background: #ffffff;
+    --foreground: #1c1c1f;
+    --muted: #4b5054;
+    --card: #ffffff;
+    --border: #d0cec9;
+    --accent: #1f3ba6;
+    --accent-soft: #ffffff;
+  }
+
+  header {
+    display: none;
+  }
+
+  main {
+    max-width: none;
+  }
+
+  section,
+  article {
+    break-inside: avoid;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* Contact links are the one place the target matters on paper.
+     The email button's visible text is already the address, so only
+     external profile links need their URL spelled out. */
+  footer a[href^="https://"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+}
