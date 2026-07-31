@@ -69,6 +69,8 @@ export type Stat = {
   suffix: string;
   label: string;
   source: string;
+  /** Anchor of the section that substantiates this number (INT-1.3). */
+  href: string;
 };
 
 /** Headline numbers for the Impact section — each mirrors a CV bullet below. */
@@ -80,12 +82,14 @@ export const stats: Stat[] = [
     suffix: "%",
     label: "schema compliance on real supplier contracts",
     source: "POWWR · document-AI pipeline",
+    href: "#exp-powwr",
   },
   {
     value: 12000,
     suffix: "+",
     label: "records CRM-matched per reconciliation run",
     source: "POWWR · reconciliation",
+    href: "#exp-powwr",
   },
   {
     prefix: "~",
@@ -93,6 +97,7 @@ export const stats: Stat[] = [
     suffix: "%",
     label: "auto-match rate on reconciliation runs",
     source: "POWWR · reconciliation",
+    href: "#exp-powwr",
   },
   {
     prefix: "70–",
@@ -100,12 +105,14 @@ export const stats: Stat[] = [
     suffix: "%",
     label: "projected extraction-cost cut from local-model cascades",
     source: "POWWR · benchmarking",
+    href: "#exp-powwr",
   },
   {
     value: 85,
     suffix: "%",
     label: "agreement with human recruiters",
     source: "Flagship · LLM-as-a-Judge",
+    href: "#proj-autonomous-recruitment-agent-llm-as-a-judge",
   },
   {
     prefix: "−",
@@ -113,6 +120,7 @@ export const stats: Stat[] = [
     suffix: "%",
     label: "false positives in resume screening",
     source: "Flagship · LLM-as-a-Judge",
+    href: "#proj-autonomous-recruitment-agent-llm-as-a-judge",
   },
 ];
 

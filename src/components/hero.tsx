@@ -1,4 +1,5 @@
 import { identity } from "@/content/profile";
+import { StatusNow } from "./status-now";
 
 export function Hero() {
   const [firstName, lastName] = identity.name.split(" ");
@@ -45,9 +46,10 @@ export function Hero() {
           Email
         </a>
       </div>
+      <StatusNow />
       <a
         href="#impact"
-        className="no-print mt-16 inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-[0.25em] text-muted transition-colors hover:text-foreground"
+        className="no-print mt-12 inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-[0.25em] text-muted transition-colors hover:text-foreground"
       >
         <span aria-hidden className="scroll-cue">
           ↓

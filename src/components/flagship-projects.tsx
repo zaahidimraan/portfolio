@@ -1,4 +1,5 @@
 import { flagships } from "@/content/profile";
+import { projectAnchor } from "@/lib/slug";
 import { FlagshipDiagram } from "./arch-diagrams";
 import { Reveal } from "./reveal";
 
@@ -7,7 +8,10 @@ export function FlagshipProjects() {
     <div className="grid gap-6">
       {flagships.map((p, i) => (
         <Reveal key={p.title}>
-          <article className="rounded-lg border border-border bg-card p-6 transition-colors hover:border-foreground/60">
+          <article
+            id={projectAnchor(p.title)}
+            className="rounded-lg border border-border bg-card p-6 transition-colors hover:border-foreground/60"
+          >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-xl font-semibold tracking-tight">{p.title}</h3>
               {p.repoUrl && (

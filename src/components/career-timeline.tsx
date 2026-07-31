@@ -1,4 +1,5 @@
 import { education, experience } from "@/content/profile";
+import { degreeAnchor, roleAnchor } from "@/lib/slug";
 
 const MONTHS: Record<string, number> = {
   Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
@@ -27,6 +28,8 @@ function parseRange(dates: string, nowIdx: number): { start: number; end: number
 type Bar = {
   label: string;
   tooltip: string;
+  /** Anchor id of the entry this bar drills into (INT-1.2). */
+  target: string;
   start: number;
   end: number;
   row: number;
@@ -67,7 +70,8 @@ export function CareerTimeline() {
   const work = assignRows(
     experience.map((role) => ({
       label: role.company.split("·")[0].trim(),
-      tooltip: `${role.title} · ${role.company} · ${role.dates}`,
+      tooltip: `${role.title} · ${role.company} · ${role.dates}\n${role.bullets[0]}\n(click to open the full entry)`,
+      target: roleAnchor(role.company),
       kind: "work" as const,
       ...parseRange(role.dates, nowIdx),
     })),
@@ -75,7 +79,8 @@ export function CareerTimeline() {
   const edu = assignRows(
     education.map((e) => ({
       label: e.degree.split("(")[0].trim(),
-      tooltip: `${e.degree} · ${e.school} · ${e.dates}`,
+      tooltip: `${e.degree} · ${e.school} · ${e.dates}\n(click to open the full entry)`,
+      target: degreeAnchor(e.degree),
       kind: "education" as const,
       ...parseRange(e.dates, nowIdx),
     })),
@@ -102,7 +107,7 @@ export function CareerTimeline() {
     const bw = Math.max(x(bar.end) - bx, 10);
     const labelAtEnd = bx > W * 0.85;
     return (
-      <g key={bar.tooltip}>
+      <a key={bar.tooltip} href={`#${bar.target}`} aria-label={bar.tooltip} className="tl-bar">
         <title>{bar.tooltip}</title>
         <text
           x={labelAtEnd ? bx + bw : bx}
@@ -125,7 +130,7 @@ export function CareerTimeline() {
           stroke={bar.kind === "education" ? "currentColor" : "none"}
           strokeWidth={bar.kind === "education" ? 1 : 0}
         />
-      </g>
+      </a>
     );
   };
 
@@ -133,7 +138,7 @@ export function CareerTimeline() {
     <figure>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <figcaption className="font-mono text-[10px] uppercase tracking-wider text-muted">
-          Aug 2020 → today · month resolution · hover for detail
+          Aug 2020 → today · hover for detail · click a bar to open its entry
         </figcaption>
         <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-wider text-muted">
           <span className="flex items-center gap-1.5">

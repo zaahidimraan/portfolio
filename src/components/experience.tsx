@@ -1,11 +1,16 @@
 import { education, experience } from "@/content/profile";
+import { degreeAnchor, roleAnchor } from "@/lib/slug";
 
 export function Experience() {
   return (
     <div>
       <ol className="relative space-y-10 border-l border-border pl-6">
         {experience.map((role) => (
-          <li key={`${role.company}-${role.dates}`} className="relative">
+          <li
+            key={`${role.company}-${role.dates}`}
+            id={roleAnchor(role.company)}
+            className="relative"
+          >
             <span
               aria-hidden
               className="absolute -left-[30.5px] top-1.5 size-2.5 rounded-full border-2 border-accent bg-background"
@@ -31,7 +36,11 @@ export function Experience() {
       </ol>
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         {education.map((e) => (
-          <div key={e.degree} className="rounded-lg border border-border bg-card p-4">
+          <div
+            key={e.degree}
+            id={degreeAnchor(e.degree)}
+            className="rounded-lg border border-border bg-card p-4"
+          >
             <p className="font-semibold">{e.degree}</p>
             <p className="mt-1 text-sm text-muted">{e.school}</p>
             <p className="mt-2 font-mono text-xs text-muted">{e.dates}</p>

@@ -16,6 +16,26 @@ npm run build  # static export to out/
 
 Serve the export locally: `python -m http.server 4173 --directory out`
 
+Deploy (wrangler must be authenticated once via `npx wrangler login`):
+
+```bash
+npx wrangler pages deploy out --project-name=zahid-imran
+```
+
+## MCP server
+
+[`mcp-server/server.mjs`](mcp-server/server.mjs) lets any MCP client (e.g. Claude Code)
+drive the portfolio conversationally. Registered in Career HQ's `.mcp.json`.
+
+| Tool | What it does |
+|---|---|
+| `get_status` | Read the hero "Now" block (`src/content/status.ts`) |
+| `set_status` | Update focus/availability; stamps the date automatically |
+| `deploy_portfolio` | `npm run build` + wrangler deploy (≈60–90 s) |
+| `site_health` | Live checks: `/`, OG image type, CV PDF, robots, 404 |
+
+Typical flow: *"set my status to X"* → `set_status` → `deploy_portfolio` → live.
+
 ## Backlog
 
 Tickets and roadmap live in Career HQ: `D:\Projects\Career\05-backlog\portfolio-site.md`.

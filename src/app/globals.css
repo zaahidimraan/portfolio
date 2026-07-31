@@ -134,6 +134,50 @@ html.js .draw.in-view [data-draw] {
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Drill-down linking (INT-1) ---- */
+
+[id^="exp-"],
+[id^="edu-"],
+[id^="proj-"] {
+  scroll-margin-top: 5.5rem;
+}
+
+@keyframes target-flash {
+  from {
+    background-color: var(--accent-soft);
+    box-shadow: 0 0 0 10px var(--accent-soft);
+  }
+  to {
+    background-color: transparent;
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+[id^="exp-"]:target,
+[id^="edu-"]:target,
+[id^="proj-"]:target {
+  border-radius: 6px;
+  animation: target-flash 1.8s ease-out;
+}
+
+.tl-bar {
+  cursor: pointer;
+}
+
+.tl-bar:hover rect {
+  opacity: 0.8;
+}
+
+.tl-bar:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 3px;
+}
+
 /* ---- Monochrome bar fills (identity = pattern + direct label, never color) ---- */
 
 .fill-ink {
@@ -190,6 +234,12 @@ html.js .draw.in-view [data-draw] {
   }
 
   .scroll-cue {
+    animation: none;
+  }
+
+  [id^="exp-"]:target,
+  [id^="edu-"]:target,
+  [id^="proj-"]:target {
     animation: none;
   }
 }

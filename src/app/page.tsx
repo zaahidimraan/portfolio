@@ -2,9 +2,8 @@ import { CareerTimeline } from "@/components/career-timeline";
 import { Contact } from "@/components/contact";
 import { Experience } from "@/components/experience";
 import { FlagshipProjects } from "@/components/flagship-projects";
-import { GitHubGrid } from "@/components/github-grid";
+import { GitHubSection } from "@/components/github-section";
 import { Hero } from "@/components/hero";
-import { LanguageChart } from "@/components/language-chart";
 import { Nav } from "@/components/nav";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
@@ -22,13 +21,15 @@ export default async function Home() {
         <Hero />
         <Section id="impact" number="01" title="Impact in numbers">
           <StatCounters />
+          <p className="mt-8 font-mono text-[10px] uppercase tracking-wider text-muted">
+            Every number links to its source on this page — click through.
+          </p>
         </Section>
         <Section id="projects" number="02" title="Selected projects">
           <FlagshipProjects />
           <h3 className="mb-2 mt-14 text-lg font-semibold tracking-tight">More from GitHub</h3>
           <Reveal>
-            <LanguageChart repos={repos} />
-            <GitHubGrid repos={repos} />
+            <GitHubSection repos={repos} />
           </Reveal>
         </Section>
         <Section id="experience" number="03" title="Experience">
