@@ -178,6 +178,41 @@ html.js .draw.in-view [data-draw] {
   outline-offset: 3px;
 }
 
+/* ---- Cross-matrix + bullet highlighting (DTL-2/4) ---- */
+
+.matrix-dim {
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.matrix-lit {
+  background-color: var(--accent-soft);
+  border-radius: 6px;
+  box-shadow: 0 0 0 8px var(--accent-soft);
+  transition: box-shadow 0.3s ease;
+}
+
+.bullet-lit {
+  background-color: var(--accent-soft);
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.chip-flash {
+  animation: target-flash 1.8s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .matrix-dim,
+  .matrix-lit {
+    transition: none;
+  }
+
+  .chip-flash {
+    animation: none;
+  }
+}
+
 /* ---- Monochrome bar fills (identity = pattern + direct label, never color) ---- */
 
 .fill-ink {

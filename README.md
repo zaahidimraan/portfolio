@@ -32,6 +32,8 @@ drive the portfolio conversationally. Registered in Career HQ's `.mcp.json`.
 | `get_status` | Read the hero "Now" block (`src/content/status.ts`) |
 | `set_status` | Update focus/availability; stamps the date automatically |
 | `deploy_portfolio` | `npm run build` + wrangler deploy (≈60–90 s) |
+| `refresh_github` | Rebuild (fresh GitHub repo/language data) + redeploy |
+| `get_backlog` | Latest progress section from Career HQ's backlog |
 | `site_health` | Live checks: `/`, OG image type, CV PDF, robots, 404 |
 
 Typical flow: *"set my status to X"* → `set_status` → `deploy_portfolio` → live.

@@ -3,6 +3,17 @@ import { projectAnchor } from "@/lib/slug";
 import { FlagshipDiagram } from "./arch-diagrams";
 import { Reveal } from "./reveal";
 
+/** Badge label → skill-chip element id, where the skill grid has that chip (DTL-2.3). */
+const BADGE_TO_SKILL: Record<string, string> = {
+  n8n: "skill-n8n",
+  MCP: "skill-model-context-protocol-mcp",
+  "LLM-as-a-Judge": "skill-llm-as-a-judge",
+  Ragas: "skill-ragas",
+  "Arize Phoenix": "skill-arize-phoenix",
+  PostgreSQL: "skill-postgresql-pgvector",
+  "Fine-tuning": "skill-fine-tuning-lora-qlora",
+};
+
 export function FlagshipProjects() {
   return (
     <div className="grid gap-6">
@@ -37,14 +48,27 @@ export function FlagshipProjects() {
               ))}
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
-              {p.tech.map((t) => (
-                <span
-                  key={t}
-                  className="rounded bg-accent-soft px-2 py-0.5 font-mono text-xs text-foreground/90"
-                >
-                  {t}
-                </span>
-              ))}
+              {p.tech.map((t) => {
+                const chipId = BADGE_TO_SKILL[t];
+                return chipId ? (
+                  <button
+                    key={t}
+                    type="button"
+                    data-skill={chipId}
+                    title="Jump to this skill"
+                    className="cursor-pointer rounded bg-accent-soft px-2 py-0.5 font-mono text-xs text-foreground/90 transition-colors hover:bg-accent hover:text-background"
+                  >
+                    {t}
+                  </button>
+                ) : (
+                  <span
+                    key={t}
+                    className="rounded bg-accent-soft px-2 py-0.5 font-mono text-xs text-foreground/90"
+                  >
+                    {t}
+                  </span>
+                );
+              })}
             </div>
             <figure className="mt-6 border-t border-border pt-5">
               <Reveal className="draw">

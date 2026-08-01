@@ -12,6 +12,7 @@ function Box({
   h,
   title,
   sub,
+  bullet,
 }: {
   x: number;
   y: number;
@@ -19,9 +20,11 @@ function Box({
   h: number;
   title: string;
   sub?: string;
+  /** Index of the card bullet this node depicts — hover highlights it (DTL-4). */
+  bullet?: number;
 }) {
   return (
-    <g>
+    <g data-bullet={bullet} style={bullet !== undefined ? { cursor: "help" } : undefined}>
       <rect
         x={x}
         y={y}
@@ -113,14 +116,14 @@ function ExecutiveAssistantDiagram() {
       <defs>
         <ArrowMarker id="ah-ea" />
       </defs>
-      <Box x={8} y={16} w={112} h={30} title="WhatsApp" />
-      <Box x={8} y={58} w={112} h={30} title="Instagram" />
-      <Box x={8} y={100} w={112} h={30} title="Messenger" />
-      <Box x={190} y={52} w={150} h={48} title="n8n Router Agent" sub="LLM classification" />
-      <Box x={410} y={14} w={150} h={40} title="Context-aware reply" sub="routine inquiries" />
-      <Box x={410} y={66} w={150} h={44} title="Human review" sub="Telegram HITL" />
-      <Box x={190} y={140} w={150} h={44} title="Observer agent" sub="nightly briefing" />
-      <Box x={410} y={142} w={170} h={40} title="Notion · PostgreSQL" sub="interaction log" />
+      <Box x={8} y={16} w={112} h={30} title="WhatsApp" bullet={0} />
+      <Box x={8} y={58} w={112} h={30} title="Instagram" bullet={0} />
+      <Box x={8} y={100} w={112} h={30} title="Messenger" bullet={0} />
+      <Box x={190} y={52} w={150} h={48} title="n8n Router Agent" sub="LLM classification" bullet={1} />
+      <Box x={410} y={14} w={150} h={40} title="Context-aware reply" sub="routine inquiries" bullet={1} />
+      <Box x={410} y={66} w={150} h={44} title="Human review" sub="Telegram HITL" bullet={1} />
+      <Box x={190} y={140} w={150} h={44} title="Observer agent" sub="nightly briefing" bullet={2} />
+      <Box x={410} y={142} w={170} h={40} title="Notion · PostgreSQL" sub="interaction log" bullet={2} />
       <Arrow x1={120} y1={31} x2={188} y2={64} marker="ah-ea" />
       <Arrow x1={120} y1={73} x2={188} y2={76} marker="ah-ea" />
       <Arrow x1={120} y1={115} x2={188} y2={88} marker="ah-ea" />
@@ -143,11 +146,11 @@ function RecruitmentJudgeDiagram() {
       <defs>
         <ArrowMarker id="ah-judge" />
       </defs>
-      <Box x={8} y={20} w={150} h={34} title="Google Drive" sub="MCP server" />
-      <Box x={8} y={90} w={150} h={34} title="Airtable" sub="MCP server" />
-      <Box x={230} y={45} w={180} h={52} title="Judge agent" sub="rubric · per-criterion confidence" />
-      <Box x={480} y={20} w={172} h={38} title="Graded candidates" sub="85% human agreement" />
-      <Box x={480} y={90} w={172} h={44} title="Golden set · 100 resumes" sub="Ragas · Arize Phoenix" />
+      <Box x={8} y={20} w={150} h={34} title="Google Drive" sub="MCP server" bullet={2} />
+      <Box x={8} y={90} w={150} h={34} title="Airtable" sub="MCP server" bullet={2} />
+      <Box x={230} y={45} w={180} h={52} title="Judge agent" sub="rubric · per-criterion confidence" bullet={0} />
+      <Box x={480} y={20} w={172} h={38} title="Graded candidates" sub="85% human agreement" bullet={0} />
+      <Box x={480} y={90} w={172} h={44} title="Golden set · 100 resumes" sub="Ragas · Arize Phoenix" bullet={1} />
       <Arrow x1={158} y1={37} x2={228} y2={60} marker="ah-judge" />
       <Arrow x1={158} y1={107} x2={228} y2={82} marker="ah-judge" />
       <Arrow x1={410} y1={60} x2={478} y2={39} marker="ah-judge" />
@@ -182,9 +185,9 @@ function PiiRedactionDiagram() {
       <text x={118} y={32} fontSize={10} fill="currentColor" opacity={0.7} className="font-mono">
         LOCAL MACHINE — NOTHING LEAVES
       </text>
-      <Box x={120} y={60} w={110} h={36} title="Document" />
-      <Box x={270} y={54} w={160} h={48} title="Fine-tuned Phi-3" sub="PII detect + redact" />
-      <Box x={470} y={60} w={110} h={36} title="Redacted output" />
+      <Box x={120} y={60} w={110} h={36} title="Document" bullet={0} />
+      <Box x={270} y={54} w={160} h={48} title="Fine-tuned Phi-3" sub="PII detect + redact" bullet={1} />
+      <Box x={470} y={60} w={110} h={36} title="Redacted output" bullet={0} />
       <Arrow x1={230} y1={78} x2={268} y2={78} marker="ah-pii" />
       <Arrow x1={430} y1={78} x2={468} y2={78} marker="ah-pii" />
       <text

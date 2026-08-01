@@ -19,8 +19,27 @@ import { z } from "zod";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const STATUS_FILE = join(REPO_ROOT, "src", "content", "status.ts");
+const BACKLOG_FILE = "D:/Projects/Career/05-backlog/portfolio-site.md";
 const SITE_URL = "https://zahid-imran.pages.dev";
 const PAGES_PROJECT = "zahid-imran";
+
+/** Shared by deploy_portfolio and refresh_github: build (fresh GitHub fetch) + deploy. */
+function buildAndDeploy() {
+  const build = execSync("npm run build", {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+    timeout: 240_000,
+  });
+  if (!build.includes("Generating static pages")) {
+    throw new Error(`Build output unexpected — inspect manually:\n${build.slice(-800)}`);
+  }
+  const deploy = execSync(
+    `npx wrangler pages deploy out --project-name=${PAGES_PROJECT} --branch=master --commit-dirty=true`,
+    { cwd: REPO_ROOT, encoding: "utf8", timeout: 240_000 },
+  );
+  const url = deploy.match(/https:\/\/\S+\.pages\.dev/)?.[0] ?? "(url not found in output)";
+  return { url, tail: deploy.trim().split("\n").slice(-3).join("\n") };
+}
 
 function readStatus() {
   const source = readFileSync(STATUS_FILE, "utf8");
@@ -102,27 +121,52 @@ server.registerTool(
     inputSchema: {},
   },
   async () => {
-    const build = execSync("npm run build", {
-      cwd: REPO_ROOT,
-      encoding: "utf8",
-      timeout: 240_000,
-    });
-    if (!build.includes("Generating static pages")) {
-      throw new Error(`Build output unexpected — inspect manually:\n${build.slice(-800)}`);
-    }
-    const deploy = execSync(
-      `npx wrangler pages deploy out --project-name=${PAGES_PROJECT} --branch=master --commit-dirty=true`,
-      { cwd: REPO_ROOT, encoding: "utf8", timeout: 240_000 },
-    );
-    const url = deploy.match(/https:\/\/\S+\.pages\.dev/)?.[0] ?? "(url not found in output)";
+    const { url, tail } = buildAndDeploy();
     return {
       content: [
         {
           type: "text",
-          text: `Deployed. Preview: ${url}\nProduction: ${SITE_URL}\n\n${deploy.trim().split("\n").slice(-3).join("\n")}`,
+          text: `Deployed. Preview: ${url}\nProduction: ${SITE_URL}\n\n${tail}`,
         },
       ],
     };
+  },
+);
+
+server.registerTool(
+  "refresh_github",
+  {
+    description:
+      "Freshness primitive: rebuild the site (refetches the GitHub repo grid and language " +
+      "chart at build time) and redeploy. Use when repos changed. Takes ~60–90 s.",
+    inputSchema: {},
+  },
+  async () => {
+    const { url, tail } = buildAndDeploy();
+    return {
+      content: [
+        {
+          type: "text",
+          text: `GitHub data refreshed and redeployed.\nPreview: ${url}\nProduction: ${SITE_URL}\n\n${tail}`,
+        },
+      ],
+    };
+  },
+);
+
+server.registerTool(
+  "get_backlog",
+  {
+    description:
+      "Read the portfolio's latest progress from the Career HQ backlog " +
+      "(05-backlog/portfolio-site.md) — answers \"where is the portfolio at?\".",
+    inputSchema: {},
+  },
+  async () => {
+    const source = readFileSync(BACKLOG_FILE, "utf8");
+    const progress = source.match(/^## Progress[\s\S]*?(?=^## )/m)?.[0];
+    if (!progress) throw new Error("No '## Progress' section found in the backlog file.");
+    return { content: [{ type: "text", text: progress.trim() }] };
   },
 );
 

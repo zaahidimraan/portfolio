@@ -206,6 +206,39 @@ export const skillGroups: { label: string; items: string[] }[] = [
   },
 ];
 
+/**
+ * DTL-2: skill → the entries on this page that evidence it.
+ * Hand-audited against the bullets above — a skill appears here ONLY when a
+ * bullet explicitly supports it. Unmapped skills render as plain chips.
+ * Values are anchor ids (see lib/slug.ts).
+ */
+export const skillLinks: Record<string, string[]> = {
+  n8n: ["proj-omni-channel-ai-executive-assistant"],
+  "Multi-Agent Systems": ["proj-omni-channel-ai-executive-assistant"],
+  "Model Context Protocol (MCP)": ["proj-autonomous-recruitment-agent-llm-as-a-judge"],
+  "LLM-as-a-Judge": ["proj-autonomous-recruitment-agent-llm-as-a-judge"],
+  Ragas: ["proj-autonomous-recruitment-agent-llm-as-a-judge"],
+  "Arize Phoenix": ["proj-autonomous-recruitment-agent-llm-as-a-judge"],
+  "Agentic RAG": ["exp-sparkix-technologies"],
+  "Fine-Tuning (LoRA/QLoRA)": [
+    "proj-privacy-preserving-pii-redaction-pipeline",
+    "exp-horizon-tech-services",
+    "exp-grayhat",
+  ],
+  "Structured Outputs": ["exp-powwr", "exp-sparkix-technologies"],
+  "Azure OpenAI": ["exp-powwr", "exp-sparkix-technologies"],
+  "Local LLMs (Ollama)": ["proj-privacy-preserving-pii-redaction-pipeline"],
+  "LLM Cost Optimization": ["exp-powwr"],
+  "Latency (TTFT) Optimization": ["proj-omni-channel-ai-executive-assistant"],
+  "PostgreSQL (pgvector)": ["proj-omni-channel-ai-executive-assistant"],
+  Python: ["exp-sparkix-technologies", "exp-horizon-tech-services", "exp-grayhat"],
+  TypeScript: ["exp-powwr"],
+  "Next.js": ["exp-powwr"],
+  FastAPI: ["exp-sparkix-technologies"],
+  Flask: ["exp-sparkix-technologies", "exp-grayhat"],
+  ".NET (C#)": ["exp-powwr"],
+};
+
 export const certificates = [
   { name: "Claude Code: A Highly Agentic Coding Assistant", issuer: "DeepLearning.AI", date: "2026" },
   { name: "MCP: Build Rich-Context AI Apps with Anthropic", issuer: "DeepLearning.AI", date: "2026" },
