@@ -37,6 +37,7 @@ export const flagships: Flagship[] = [
       "An Observer agent logs interactions to Notion/PostgreSQL and compiles a nightly Daily Activity Briefing; n8n Queue Mode keeps responses sub-second under load.",
     ],
     tech: ["n8n", "Meta APIs", "LLM routing", "Telegram", "PostgreSQL", "Notion"],
+    repoUrl: "https://github.com/zaahidimraan/omni-channel-ai-assistant",
   },
   {
     title: "Autonomous Recruitment Agent (LLM-as-a-Judge)",
@@ -48,6 +49,7 @@ export const flagships: Flagship[] = [
       "Data ingestion standardized with Model Context Protocol (MCP) servers for Google Drive and Airtable — no brittle API glue.",
     ],
     tech: ["LLM-as-a-Judge", "Ragas", "Arize Phoenix", "MCP", "Airtable"],
+    repoUrl: "https://github.com/zaahidimraan/llm-judge-recruitment-agent",
   },
   {
     title: "Privacy-Preserving PII Redaction Pipeline",
@@ -59,6 +61,7 @@ export const flagships: Flagship[] = [
       "100% data sovereignty by design — built for strict GDPR/privacy environments.",
     ],
     tech: ["Phi-3 (SLM)", "Fine-tuning", "Edge AI", "GDPR"],
+    repoUrl: "https://github.com/zaahidimraan/local-pii-redaction-pipeline",
   },
 ];
 

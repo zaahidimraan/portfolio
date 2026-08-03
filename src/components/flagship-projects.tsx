@@ -32,7 +32,7 @@ export function FlagshipProjects() {
                   rel="noopener noreferrer"
                   className="u-link font-mono text-sm"
                 >
-                  Code ↗
+                  Case study ↗
                 </a>
               )}
             </div>

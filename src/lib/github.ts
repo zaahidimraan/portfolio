@@ -24,9 +24,14 @@ type GitHubRepo = {
  * projects grid must never ship silently (PORT-3 acceptance criteria).
  */
 export async function getRepos(): Promise<Repo[]> {
+  // GITHUB_TOKEN is optional locally; CI sets it to avoid shared-runner rate limits.
+  const headers: Record<string, string> = { Accept: "application/vnd.github+json" };
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
   const res = await fetch(
     `https://api.github.com/users/${identity.githubUser}/repos?per_page=100&sort=pushed`,
-    { headers: { Accept: "application/vnd.github+json" } },
+    { headers },
   );
   if (!res.ok) {
     throw new Error(
