@@ -22,20 +22,34 @@ export default async function Home() {
       <Nav />
       <main className="mx-auto w-full max-w-4xl flex-1 px-5">
         <Hero />
-        <Section id="impact" number="01" title="Impact in numbers">
-          <StatCounters />
-          <p className="mt-8 font-mono text-[10px] uppercase tracking-wider text-muted">
-            Every number links to its source on this page — click through.
-          </p>
+        <Section
+          id="impact"
+          number="01"
+          title="Impact in numbers"
+          intro="Measured results from production systems — every number links to its proof"
+        >
+          <Reveal>
+            <StatCounters />
+          </Reveal>
         </Section>
-        <Section id="projects" number="02" title="Selected projects">
+        <Section
+          id="projects"
+          number="02"
+          title="Selected projects"
+          intro="Three flagship builds with their architectures, plus the live GitHub picture"
+        >
           <FlagshipProjects />
           <h3 className="mb-2 mt-14 text-lg font-semibold tracking-tight">More from GitHub</h3>
           <Reveal>
             <GitHubSection repos={repos} />
           </Reveal>
         </Section>
-        <Section id="experience" number="03" title="Experience">
+        <Section
+          id="experience"
+          number="03"
+          title="Experience"
+          intro="Four roles, two degrees — click a bar to unfold the full entry"
+        >
           <Reveal>
             <CareerTimeline />
           </Reveal>
@@ -44,12 +58,22 @@ export default async function Home() {
             <Experience />
           </div>
         </Section>
-        <Section id="skills" number="04" title="Skills">
+        <Section
+          id="skills"
+          number="04"
+          title="Skills"
+          intro="Chips with a count are clickable — they light up the work that proves them"
+        >
           <Reveal>
             <Skills />
           </Reveal>
         </Section>
-        <Section id="certificates" number="05" title="Certificates">
+        <Section
+          id="certificates"
+          number="05"
+          title="Certificates"
+          intro="Recent and relevant — solid dots DeepLearning.AI, rings AWS"
+        >
           <Reveal>
             <CertStrip />
             <Certificates />

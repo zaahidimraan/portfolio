@@ -21,7 +21,7 @@ export function FlagshipProjects() {
         <Reveal key={p.title}>
           <article
             id={projectAnchor(p.title)}
-            className="rounded-lg border border-border bg-card p-6 transition-colors hover:border-foreground/60"
+            className="glow-hover rounded-lg border border-border bg-card p-6 hover:border-foreground/60"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-xl font-semibold tracking-tight">{p.title}</h3>

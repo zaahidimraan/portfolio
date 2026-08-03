@@ -109,6 +109,7 @@ export function CertStrip() {
           {dots.map(({ cert, month, level }) => (
             <circle
               key={cert.name}
+              className="cert-dot"
               cx={x(month)}
               cy={baseY - level * DOT_GAP}
               r={DOT_R}

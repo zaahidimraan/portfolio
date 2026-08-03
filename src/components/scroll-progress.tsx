@@ -37,7 +37,7 @@ export function ScrollProgress() {
     <div
       ref={barRef}
       aria-hidden
-      className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-foreground"
+      className="progress-glow absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-foreground"
     />
   );
 }

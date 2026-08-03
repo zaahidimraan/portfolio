@@ -100,14 +100,14 @@ export function GitHubSection({ repos }: { repos: Repo[] }) {
 function RepoGrid({ repos }: { repos: Repo[] }) {
   return (
     <div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="stagger grid gap-4 sm:grid-cols-2">
         {repos.map((r) => (
           <a
             key={r.name}
             href={r.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group rounded-lg border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-foreground/60"
+            className="group glow-hover rounded-lg border border-border bg-card p-4 hover:-translate-y-0.5 hover:border-foreground/60"
           >
             <div className="flex items-baseline justify-between gap-2">
               <h4 className="font-mono text-sm font-semibold">{r.name}</h4>

@@ -36,7 +36,8 @@ export function Contact() {
       </div>
       <p className="mt-10 font-mono text-xs text-muted">
         © {new Date().getFullYear()} {identity.name} · Set in Geist · Next.js static export on
-        Cloudflare Pages · no cookies, no trackers · charts are hand-drawn SVG from real data
+        Cloudflare Pages · no cookies, no trackers · charts are hand-drawn SVG from real data ·
+        deployed {new Date().toISOString().slice(0, 10)}
       </p>
     </footer>
   );

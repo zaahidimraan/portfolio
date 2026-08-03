@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { identity } from "@/content/profile";
 
@@ -7,8 +9,10 @@ export const alt = `${identity.name} — ${identity.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-/** Social card generated at build time; monochrome, mirrors the hero treatment. */
-export default function OpenGraphImage() {
+/** Social card generated at build time; monochrome, mirrors the hero (with portrait, GLW-1.5). */
+export default async function OpenGraphImage() {
+  const portrait = await readFile(join(process.cwd(), "public", "portrait-bw.png"));
+  const portraitSrc = `data:image/png;base64,${portrait.toString("base64")}`;
   return new ImageResponse(
     (
       <div
@@ -22,8 +26,17 @@ export default function OpenGraphImage() {
           background: "#0a0a0a",
           color: "#f5f5f5",
           fontFamily: "sans-serif",
+          position: "relative",
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element -- satori element, not DOM */}
+        <img
+          src={portraitSrc}
+          alt=""
+          width={480}
+          height={410}
+          style={{ position: "absolute", right: "24px", bottom: "0px", opacity: 0.9 }}
+        />
         <div
           style={{
             fontSize: "24px",
@@ -34,11 +47,11 @@ export default function OpenGraphImage() {
         >
           {identity.location}
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column", maxWidth: "720px" }}>
           <div style={{ width: "160px", height: "8px", background: "#f5f5f5" }} />
           <div
             style={{
-              fontSize: "128px",
+              fontSize: "104px",
               fontWeight: 700,
               letterSpacing: "-0.03em",
               textTransform: "uppercase",
@@ -48,19 +61,13 @@ export default function OpenGraphImage() {
           >
             {identity.name}
           </div>
-          <div style={{ fontSize: "34px", color: "#a2a8ae", marginTop: "16px" }}>
+          <div style={{ fontSize: "32px", color: "#a2a8ae", marginTop: "16px" }}>
             {identity.role}
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: "24px",
-            color: "#a2a8ae",
-          }}
-        >
+        <div style={{ display: "flex", gap: "28px", fontSize: "24px", color: "#a2a8ae" }}>
           <div>{identity.email}</div>
+          <div>·</div>
           <div>{identity.siteUrl.replace("https://", "")}</div>
         </div>
       </div>

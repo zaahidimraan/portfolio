@@ -52,7 +52,7 @@ export function StatCounters() {
   }, []);
 
   return (
-    <div ref={gridRef} className="grid grid-cols-2 gap-x-8 gap-y-10 lg:grid-cols-3">
+    <div ref={gridRef} className="stagger grid grid-cols-2 gap-x-8 gap-y-10 lg:grid-cols-3">
       {stats.map((stat, i) => {
         // per-tile stagger inside the shared clock, eased out for a settle feel
         const local = Math.min(

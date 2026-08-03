@@ -26,7 +26,7 @@ export function Skills() {
 
   return (
     <div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="stagger grid gap-4 sm:grid-cols-2">
         {skillGroups.map((g) => (
           <div key={g.label} className="rounded-lg border border-border bg-card p-4">
             <h3 className="font-mono text-xs uppercase tracking-wider text-muted">{g.label}</h3>
@@ -81,7 +81,7 @@ export function Skills() {
 
 export function Certificates() {
   return (
-    <ul className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+    <ul className="stagger grid gap-x-8 gap-y-3 sm:grid-cols-2">
       {certificates.map((c) => (
         <li key={c.name} className="flex items-baseline justify-between gap-3 text-sm">
           <span className="text-foreground/85">{c.name}</span>
