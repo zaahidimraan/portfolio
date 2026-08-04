@@ -31,7 +31,11 @@ export function Skills() {
           <div key={g.label} className="rounded-lg border border-border bg-card p-4">
             <h3 className="font-mono text-xs uppercase tracking-wider text-muted">{g.label}</h3>
             <div className="mt-3 flex flex-wrap gap-2">
-              {g.items.map((item) => {
+              {/* Most-evidenced first — real ordering from skillLinks, never a
+                  fabricated proficiency level. */}
+              {[...g.items]
+                .sort((a, b) => (skillLinks[b]?.length ?? 0) - (skillLinks[a]?.length ?? 0))
+                .map((item) => {
                 const links = skillLinks[item];
                 if (!links) {
                   return (
@@ -59,7 +63,10 @@ export function Skills() {
                     }`}
                   >
                     {item}
-                    <span className={isActive ? "opacity-80" : "opacity-50"}>
+                    <span
+                      className={isActive ? "opacity-80" : "opacity-50"}
+                      aria-label={`evidenced in ${links.length} ${links.length === 1 ? "place" : "places"}`}
+                    >
                       {" "}
                       ·{links.length}
                     </span>

@@ -7,6 +7,7 @@ export type Repo = {
   stars: number;
   url: string;
   pushedAt: string;
+  createdAt: string;
 };
 
 type GitHubRepo = {
@@ -16,6 +17,7 @@ type GitHubRepo = {
   stargazers_count: number;
   html_url: string;
   pushed_at: string;
+  created_at: string;
   fork: boolean;
 };
 
@@ -29,8 +31,12 @@ export async function getRepos(): Promise<Repo[]> {
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
+  // Static export can't use `no-store` (it forces the route dynamic), and
+  // Next caches build-time fetches by URL — so vary the URL per build to
+  // guarantee each deploy ships the live repo list. GitHub ignores the param.
+  const bust = process.env.BUILD_ID ?? Date.now().toString();
   const res = await fetch(
-    `https://api.github.com/users/${identity.githubUser}/repos?per_page=100&sort=pushed`,
+    `https://api.github.com/users/${identity.githubUser}/repos?per_page=100&sort=pushed&_=${bust}`,
     { headers },
   );
   if (!res.ok) {
@@ -48,5 +54,6 @@ export async function getRepos(): Promise<Repo[]> {
       stars: r.stargazers_count,
       url: r.html_url,
       pushedAt: r.pushed_at,
+      createdAt: r.created_at,
     }));
 }

@@ -144,8 +144,10 @@ html.js .draw.in-view [data-draw] {
   background: var(--border);
 }
 
+/* Photo keeps its original colour — the single chromatic accent in an
+   otherwise monochrome page, so it draws the eye first (Zahid, 2026-08-04). */
 .portrait-img {
-  filter: contrast(1.06);
+  filter: none;
 }
 
 .glow-hover {
@@ -246,6 +248,59 @@ html.js .reveal.in-view .cert-dot:nth-of-type(5) { transition-delay: 0.24s; }
 html.js .reveal.in-view .cert-dot:nth-of-type(6) { transition-delay: 0.3s; }
 html.js .reveal.in-view .cert-dot:nth-of-type(7) { transition-delay: 0.36s; }
 html.js .reveal.in-view .cert-dot:nth-of-type(n + 8) { transition-delay: 0.42s; }
+
+/* Native scroll-driven reveals where supported: the browser drives these on the
+   compositor, so the IntersectionObserver fallback above never has to run. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .stagger > * {
+      animation: rise-in 0.6s ease both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+/* Data-flow packets travelling the architecture diagrams (GPU-only). */
+@keyframes packet-run {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+.packet {
+  offset-rotate: 0deg;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .draw.in-view .packet {
+    animation: packet-run 2.4s linear infinite 1.2s;
+    opacity: 1;
+  }
+}
+
+/* Pure-monochrome pages lean on hairlines and shadows that forced-colors can
+   drop entirely — restore explicit borders there. */
+@media (forced-colors: active) {
+  .fill-ink,
+  .fill-half,
+  .portrait-wrap::before {
+    forced-color-adjust: none;
+  }
+
+  .glow-hover:hover,
+  .glow-hover-sm:hover {
+    outline: 2px solid CanvasText;
+  }
+
+  .tech-matrix a {
+    outline: 1px solid CanvasText;
+  }
+}
 
 /* ---- Mono scrollbar (GLW-4) ---- */
 

@@ -1,0 +1,6 @@
+name = "ask-zahid"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+# No bindings: the server is pure compute over compiled-in profile data.
+# No storage, no KV, no logs of who asked what.

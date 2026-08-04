@@ -65,6 +65,62 @@ export const flagships: Flagship[] = [
   },
 ];
 
+export type SideProject = {
+  title: string;
+  outcome: string;
+  bullets: string[];
+  tech: string[];
+  /** Public repo, where one exists. */
+  repoUrl?: string;
+};
+
+/**
+ * Projects beyond the three flagships — all from the master CV's PROJECTS
+ * section. Rendered as a compact grid under the flagship cards.
+ */
+export const sideProjects: SideProject[] = [
+  {
+    title: "Agentic Travel Intelligence Dashboard",
+    outcome:
+      "An agent that queries, filters and ranks hotels on its own — then feeds a live BI dashboard.",
+    bullets: [
+      "Self-directed agentic workflow using the Google Maps API and function calling to rank hotels against complex constraints (price, rating, proximity).",
+      "ETL pipeline transforming raw API JSON into structured business intelligence for a real-time PowerBI dashboard.",
+    ],
+    tech: ["Function calling", "Google Maps API", "ETL", "PowerBI"],
+  },
+  {
+    title: "Speech Enhancement with Transformers",
+    outcome: "Audio restoration at 14 dB SI-SNR and 2.25 PESQ, served in real time.",
+    bullets: [
+      "Fine-tuned a Transformer architecture for audio restoration, reaching 14 dB SI-SNR and 2.25 PESQ.",
+      "Deployed on Streamlit Cloud with an inference pipeline tuned for real-time audio streams at minimal latency.",
+    ],
+    tech: ["PyTorch", "Transformers", "SpeechBrain", "Streamlit"],
+    repoUrl: "https://github.com/zaahidimraan/NoiseRemoverGAN",
+  },
+  {
+    title: "Localized Text-to-Speech (XTTS-v2)",
+    outcome: "A TTS voice that finally sounds right in Asian English accents.",
+    bullets: [
+      "Fine-tuned XTTS-v2 on a custom Asian-English accent dataset via transfer learning, improving prosody and naturalness for underrepresented dialects.",
+      "Built an automated audio preprocessing pipeline (clean, normalize, segment) for high-fidelity convergence.",
+    ],
+    tech: ["XTTS-v2", "Transfer learning", "Audio pipelines"],
+    repoUrl: "https://github.com/zaahidimraan/XTTS-v2",
+  },
+  {
+    title: "FOG Prediction Pipeline (MLOps)",
+    outcome: "A full training-to-deployment loop that runs itself on every commit.",
+    bullets: [
+      "End-to-end MLOps pipeline with GitHub Actions and Docker automating collection, preprocessing, training and deployment.",
+      "MLflow for experiment tracking and model registry, DVC for data versioning — every run reproducible.",
+    ],
+    tech: ["MLflow", "DVC", "Docker", "GitHub Actions"],
+    repoUrl: "https://github.com/zaahidimraan/AirQaulityChecker_MLops",
+  },
+];
+
 export type Stat = {
   prefix?: string;
   value: number;
@@ -125,6 +181,28 @@ export const stats: Stat[] = [
     source: "Flagship · LLM-as-a-Judge",
     href: "#proj-autonomous-recruitment-agent-llm-as-a-judge",
   },
+  {
+    prefix: "15–",
+    value: 30,
+    suffix: "%",
+    label: "fewer input tokens per document from caching and compaction",
+    source: "POWWR · cost engineering",
+    href: "#exp-powwr",
+  },
+  {
+    value: 14,
+    suffix: " dB",
+    label: "SI-SNR on transformer speech restoration",
+    source: "Project · speech enhancement",
+    href: "#projects",
+  },
+  {
+    value: 4,
+    suffix: "%",
+    label: "word-error-rate cut fine-tuning Whisper on Urdu",
+    source: "GrayHat · final year project",
+    href: "#exp-grayhat",
+  },
 ];
 
 export type Role = {
@@ -144,6 +222,7 @@ export const experience: Role[] = [
       "Engineered a deterministic verification layer — grounding, plausibility bounds, self-consistency — reaching ~99.9% schema compliance with zero extra LLM calls.",
       "Co-developed the in-house pipeline-orchestration platform (Angular, .NET, Dagster) replacing a commercial RPA product; new integrations went from weeks to days.",
       "Reconciliation pipelines CRM-match 12,000+ records per run at ~96% auto-match; benchmarking local-model cascades projected to cut extraction costs 70–95%.",
+      "Lead trainer for the company-wide Claude rollout — agentic workflows, model selection, token economics and MCP connectors; prompt caching and token compaction already cut input tokens 15–30% per document.",
     ],
   },
   {
@@ -178,18 +257,22 @@ export const education = [
     degree: "MSc Data Science (Distinction)",
     school: "University of Salford, Manchester",
     dates: "Jan 2025 – Mar 2026",
+    detail:
+      "Advanced Databases · Big Data Tools & Techniques · Machine Learning and Data Mining · Applied Statistics and Data Visualization",
   },
   {
-    degree: "BSc Computer Science",
+    degree: "BSc Computer Science (GPA 3.16/4)",
     school: "FAST NUCES, Pakistan",
     dates: "Aug 2020 – Jun 2024",
+    detail:
+      "Artificial Intelligence · Statistical Modeling · Deep Learning · MLOps · Generative AI · Cloud Computing · Distributed Data Engineering",
   },
 ] as const;
 
 export const skillGroups: { label: string; items: string[] }[] = [
   {
     label: "Agentic Orchestration",
-    items: ["n8n", "LangGraph", "Model Context Protocol (MCP)", "Claude Code", "Multi-Agent Systems"],
+    items: ["n8n", "LangGraph", "Model Context Protocol (MCP)", "Claude Code", "Multi-Agent Systems", "ReAct / Plan-and-Execute", "Function Calling"],
   },
   {
     label: "GenAI & LLMs",
@@ -197,15 +280,15 @@ export const skillGroups: { label: string; items: string[] }[] = [
   },
   {
     label: "Evaluation & Ops",
-    items: ["Ragas", "Arize Phoenix", "Latency (TTFT) Optimization", "LLM Cost Optimization", "Prompt Caching"],
+    items: ["Ragas", "Arize Phoenix", "Latency (TTFT) Optimization", "LLM Cost Optimization", "Prompt Caching", "MLflow", "DVC"],
   },
   {
     label: "Data & Vector Engineering",
-    items: ["Qdrant", "Pinecone", "PostgreSQL (pgvector)", "Redis (Semantic Caching)"],
+    items: ["Qdrant", "Pinecone", "PostgreSQL (pgvector)", "Redis (Semantic Caching)", "Airtable"],
   },
   {
     label: "Core Development",
-    items: ["Python", "TypeScript", "Next.js", "FastAPI", "Flask", ".NET (C#)", "Docker", "AWS Lambda"],
+    items: ["Python", "TypeScript", "Next.js", "FastAPI", "Flask", ".NET (C#)", "Docker", "AWS Lambda", "PyTorch"],
   },
 ];
 
@@ -234,6 +317,11 @@ export const skillLinks: Record<string, string[]> = {
   "LLM Cost Optimization": ["exp-powwr"],
   "Latency (TTFT) Optimization": ["proj-omni-channel-ai-executive-assistant"],
   "PostgreSQL (pgvector)": ["proj-omni-channel-ai-executive-assistant"],
+  "Function Calling": ["proj-agentic-travel-intelligence-dashboard"],
+  MLflow: ["proj-fog-prediction-pipeline-mlops"],
+  DVC: ["proj-fog-prediction-pipeline-mlops"],
+  PyTorch: ["exp-horizon-tech-services", "proj-speech-enhancement-with-transformers"],
+  Docker: ["proj-fog-prediction-pipeline-mlops"],
   Python: ["exp-sparkix-technologies", "exp-horizon-tech-services", "exp-grayhat"],
   TypeScript: ["exp-powwr"],
   "Next.js": ["exp-powwr"],
@@ -242,16 +330,32 @@ export const skillLinks: Record<string, string[]> = {
   ".NET (C#)": ["exp-powwr"],
 };
 
-export const certificates = [
-  { name: "Claude Code: A Highly Agentic Coding Assistant", issuer: "DeepLearning.AI", date: "2026" },
-  { name: "MCP: Build Rich-Context AI Apps with Anthropic", issuer: "DeepLearning.AI", date: "2026" },
-  { name: "AI Agentic Design Patterns with AutoGen", issuer: "DeepLearning.AI", date: "Jan 2026" },
-  { name: "Pretraining LLM", issuer: "DeepLearning.AI", date: "Jan 2026" },
-  { name: "Prompt Compression and Query Optimization", issuer: "DeepLearning.AI", date: "Jan 2026" },
-  { name: "Agentic AI", issuer: "DeepLearning.AI", date: "Dec 2025" },
-  { name: "Building Agentic RAG with LlamaIndex", issuer: "DeepLearning.AI", date: "Dec 2025" },
-  { name: "AWS Academy: Microservices & CI/CD Pipeline Builder", issuer: "AWS", date: "Apr 2024" },
-] as const;
+export type Certificate = {
+  name: string;
+  issuer: string;
+  date: string;
+  /** Grouping used by the certificate chart's legend. */
+  track: "Agentic AI" | "Core GenAI" | "Cloud & MLOps";
+};
+
+/** All 15 certificates from the master CV, newest first. */
+export const certificates: Certificate[] = [
+  { name: "Claude Code: A Highly Agentic Coding Assistant", issuer: "DeepLearning.AI", date: "Feb 2026", track: "Agentic AI" },
+  { name: "MCP: Build Rich-Context AI Apps with Anthropic", issuer: "DeepLearning.AI", date: "Feb 2026", track: "Agentic AI" },
+  { name: "AI Agentic Design Patterns with AutoGen", issuer: "DeepLearning.AI", date: "Jan 2026", track: "Agentic AI" },
+  { name: "Pretraining LLM", issuer: "DeepLearning.AI", date: "Jan 2026", track: "Core GenAI" },
+  { name: "Prompt Compression and Query Optimization", issuer: "DeepLearning.AI", date: "Jan 2026", track: "Core GenAI" },
+  { name: "Agentic AI", issuer: "DeepLearning.AI", date: "Dec 2025", track: "Agentic AI" },
+  { name: "Building Agentic RAG with LlamaIndex", issuer: "DeepLearning.AI", date: "Dec 2025", track: "Agentic AI" },
+  { name: "Building AI Voice Agents for Production", issuer: "DeepLearning.AI", date: "Jan 2025", track: "Agentic AI" },
+  { name: "Building Live Voice Agents with Google's ADK", issuer: "DeepLearning.AI", date: "Dec 2024", track: "Agentic AI" },
+  { name: "Vector Databases: From Embeddings to Applications", issuer: "DeepLearning.AI", date: "Aug 2024", track: "Core GenAI" },
+  { name: "LangChain for LLM Application Development", issuer: "DeepLearning.AI", date: "Jul 2024", track: "Core GenAI" },
+  { name: "Preprocessing Unstructured Data for LLM Applications", issuer: "DeepLearning.AI", date: "Jun 2024", track: "Core GenAI" },
+  { name: "Open Source Models with Hugging Face", issuer: "DeepLearning.AI", date: "May 2024", track: "Cloud & MLOps" },
+  { name: "AWS Academy: Microservices & CI/CD Pipeline Builder", issuer: "AWS", date: "Apr 2024", track: "Cloud & MLOps" },
+  { name: "Generative AI with Large Language Models", issuer: "Coursera", date: "Nov 2023", track: "Core GenAI" },
+];
 
 /**
  * Repos hidden from the auto-built GitHub grid: profile README, the old
@@ -259,6 +363,10 @@ export const certificates = [
  * Forks are excluded automatically in lib/github.ts.
  */
 export const repoDenylist = new Set([
+  // Flagship case studies already have their own cards above the grid.
+  "omni-channel-ai-assistant",
+  "llm-judge-recruitment-agent",
+  "local-pii-redaction-pipeline",
   "zaahidimraan",
   "Zahid--GenerativeAIEngineer",
   "HTML_CSS_BOOTSTRAP",

@@ -44,6 +44,7 @@ export function Experience() {
             <p className="font-semibold">{e.degree}</p>
             <p className="mt-1 text-sm text-muted">{e.school}</p>
             <p className="mt-2 font-mono text-xs text-muted">{e.dates}</p>
+            <p className="mt-3 text-xs leading-relaxed text-muted">{e.detail}</p>
           </div>
         ))}
       </div>

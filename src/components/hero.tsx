@@ -75,7 +75,7 @@ export function Hero() {
           style={seq(500)}
         >
           <img
-            src="/portrait-bw.png"
+            src="/portrait.png"
             alt="Portrait of Zahid Imran"
             width={577}
             height={493}

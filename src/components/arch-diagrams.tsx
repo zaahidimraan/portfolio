@@ -75,17 +75,26 @@ function Arrow({
   marker: string;
 }) {
   return (
-    <line
-      x1={x1}
-      y1={y1}
-      x2={x2}
-      y2={y2}
-      stroke="currentColor"
-      strokeWidth={1.25}
-      markerEnd={`url(#${marker})`}
-      data-draw
-      pathLength={1}
-    />
+    <>
+      <line
+        x1={x1}
+        y1={y1}
+        x2={x2}
+        y2={y2}
+        stroke="currentColor"
+        strokeWidth={1.25}
+        markerEnd={`url(#${marker})`}
+        data-draw
+        pathLength={1}
+      />
+      {/* Packet riding the wire — shows flow direction once the arrow is drawn. */}
+      <circle
+        className="packet"
+        r={2.5}
+        fill="currentColor"
+        style={{ offsetPath: `path("M ${x1} ${y1} L ${x2} ${y2}")` }}
+      />
+    </>
   );
 }
 

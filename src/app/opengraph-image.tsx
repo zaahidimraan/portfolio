@@ -11,7 +11,7 @@ export const contentType = "image/png";
 
 /** Social card generated at build time; monochrome, mirrors the hero (with portrait, GLW-1.5). */
 export default async function OpenGraphImage() {
-  const portrait = await readFile(join(process.cwd(), "public", "portrait-bw.png"));
+  const portrait = await readFile(join(process.cwd(), "public", "portrait.png"));
   const portraitSrc = `data:image/png;base64,${portrait.toString("base64")}`;
   return new ImageResponse(
     (
