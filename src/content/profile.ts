@@ -280,9 +280,9 @@ export const education = [
       "Advanced Databases · Big Data Tools & Techniques · Machine Learning and Data Mining · Applied Statistics and Data Visualization",
   },
   {
-    // Grade deliberately omitted: the master CV says 3.16/4 and LinkedIn says
-    // 3.11 CGPA. Until the transcript settles it, publish neither.
-    degree: "BSc Computer Science",
+    // 3.16/4 confirmed by Zahid against the transcript, 2026-08-04.
+    // (LinkedIn shows 3.11 CGPA and is the incorrect one — needs fixing there.)
+    degree: "BSc Computer Science (GPA 3.16/4)",
     school: "FAST NUCES, Pakistan",
     dates: "Aug 2020 – Jun 2024",
     detail:

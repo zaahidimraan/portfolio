@@ -124,7 +124,10 @@ const TOOLS: ToolDefinition[] = [
         metrics: PROFILE.metrics,
       };
       for (const [section, entries] of Object.entries(sections)) {
-        const found = entries.filter((entry) => matches(entry, query));
+        // A query naming the section itself ("volunteering") should return the
+        // whole section, not nothing.
+        const wholeSection = section.toLowerCase().includes(query.toLowerCase());
+        const found = wholeSection ? entries : entries.filter((entry) => matches(entry, query));
         if (found.length) hits[section] = found;
       }
       const skillHits = PROFILE.skills
