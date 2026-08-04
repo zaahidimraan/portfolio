@@ -110,6 +110,25 @@ export const sideProjects: SideProject[] = [
     repoUrl: "https://github.com/zaahidimraan/XTTS-v2",
   },
   {
+    title: "DubLingo — Urdu→Arabic Drama Dubbing",
+    outcome:
+      "Automating the dubbing of Urdu drama into Arabic, so the work reaches an audience it never had.",
+    bullets: [
+      "Built with the UrduX Lab team during the Grayhat internship: LLM-driven translation feeding an automated dubbing pipeline.",
+      "Paired with a Whisper model fine-tuned on Urdu that cut word error rate by 4%.",
+    ],
+    tech: ["LLMs", "Whisper", "Python", "Speech pipelines"],
+  },
+  {
+    title: "Emotion Detection from Voice",
+    outcome: "Reading emotion from speech at 72% accuracy across four model architectures.",
+    bullets: [
+      "Compared CNN, ANN, LSTM and hybrid CNN+LSTM models on the same speech-emotion task.",
+      "The hybrid architecture reached 72% accuracy — the strongest of the four.",
+    ],
+    tech: ["CNN", "LSTM", "Deep Learning", "PyTorch"],
+  },
+  {
     title: "FOG Prediction Pipeline (MLOps)",
     outcome: "A full training-to-deployment loop that runs itself on every commit.",
     bullets: [
@@ -261,7 +280,9 @@ export const education = [
       "Advanced Databases · Big Data Tools & Techniques · Machine Learning and Data Mining · Applied Statistics and Data Visualization",
   },
   {
-    degree: "BSc Computer Science (GPA 3.16/4)",
+    // Grade deliberately omitted: the master CV says 3.16/4 and LinkedIn says
+    // 3.11 CGPA. Until the transcript settles it, publish neither.
+    degree: "BSc Computer Science",
     school: "FAST NUCES, Pakistan",
     dates: "Aug 2020 – Jun 2024",
     detail:
@@ -276,7 +297,7 @@ export const skillGroups: { label: string; items: string[] }[] = [
   },
   {
     label: "GenAI & LLMs",
-    items: ["Agentic RAG", "LLM-as-a-Judge", "Fine-Tuning (LoRA/QLoRA)", "Structured Outputs", "Azure OpenAI", "Local LLMs (Ollama)", "Prompt Compression"],
+    items: ["Agentic RAG", "LLM-as-a-Judge", "Fine-Tuning (LoRA/QLoRA)", "Structured Outputs", "Azure OpenAI", "Local LLMs (Ollama)", "Prompt Compression", "Voice Agents"],
   },
   {
     label: "Evaluation & Ops",
@@ -318,6 +339,9 @@ export const skillLinks: Record<string, string[]> = {
   "Latency (TTFT) Optimization": ["proj-omni-channel-ai-executive-assistant"],
   "PostgreSQL (pgvector)": ["proj-omni-channel-ai-executive-assistant"],
   "Function Calling": ["proj-agentic-travel-intelligence-dashboard"],
+  "Voice Agents": ["exp-horizon-tech-services", "proj-localized-text-to-speech-xtts-v2"],
+  CNN: ["proj-emotion-detection-from-voice"],
+  LSTM: ["proj-emotion-detection-from-voice"],
   MLflow: ["proj-fog-prediction-pipeline-mlops"],
   DVC: ["proj-fog-prediction-pipeline-mlops"],
   PyTorch: ["exp-horizon-tech-services", "proj-speech-enhancement-with-transformers"],
@@ -330,6 +354,22 @@ export const skillLinks: Record<string, string[]> = {
   ".NET (C#)": ["exp-powwr"],
 };
 
+/** Community roles held alongside the BSc (source: LinkedIn volunteering). */
+export const volunteering = [
+  {
+    role: "Developer",
+    org: "FAST Blockchain Society",
+    dates: "Nov 2022 – May 2024",
+    detail: "Built and maintained the society's projects across a year and a half.",
+  },
+  {
+    role: "Sponsorship Coordinator",
+    org: "FAST Computing Society",
+    dates: "Nov 2022 – May 2024",
+    detail: "Secured and managed sponsor relationships for society events.",
+  },
+] as const;
+
 export type Certificate = {
   name: string;
   issuer: string;
@@ -341,6 +381,7 @@ export type Certificate = {
 /** All 15 certificates from the master CV, newest first. */
 export const certificates: Certificate[] = [
   { name: "Claude Code: A Highly Agentic Coding Assistant", issuer: "DeepLearning.AI", date: "Feb 2026", track: "Agentic AI" },
+  { name: "Evaluating AI Agents", issuer: "DeepLearning.AI", date: "Jan 2026", track: "Agentic AI" },
   { name: "MCP: Build Rich-Context AI Apps with Anthropic", issuer: "DeepLearning.AI", date: "Feb 2026", track: "Agentic AI" },
   { name: "AI Agentic Design Patterns with AutoGen", issuer: "DeepLearning.AI", date: "Jan 2026", track: "Agentic AI" },
   { name: "Pretraining LLM", issuer: "DeepLearning.AI", date: "Jan 2026", track: "Core GenAI" },

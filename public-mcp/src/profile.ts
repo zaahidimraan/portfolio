@@ -15,6 +15,7 @@ import {
   sideProjects,
   skillGroups,
   stats,
+  volunteering,
 } from "../../src/content/profile";
 
 export const SITE_URL = identity.siteUrl;
@@ -72,6 +73,8 @@ export const PROFILE = {
   })),
 
   certificates,
+
+  volunteering,
 
   metrics: stats.map((s) => ({
     value: `${s.prefix ?? ""}${s.value}${s.suffix}`,

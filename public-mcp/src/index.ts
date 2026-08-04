@@ -120,6 +120,7 @@ const TOOLS: ToolDefinition[] = [
         projects: PROFILE.projects,
         certificates: PROFILE.certificates,
         education: PROFILE.education,
+        volunteering: PROFILE.volunteering,
         metrics: PROFILE.metrics,
       };
       for (const [section, entries] of Object.entries(sections)) {
