@@ -8,7 +8,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = "D:\\Projects\\Career\\00-master-cv\\Zahid-Imran-CV.pdf";
+// This repo lives inside Career HQ, so the master CV is one level up.
+// Resolved relatively so moving or cloning the tree can't break the link.
+const source = join(root, "..", "00-master-cv", "Zahid-Imran-CV.pdf");
 const target = join(root, "public", "Zahid-Imran-CV.pdf");
 
 if (existsSync(source)) {
