@@ -1,7 +1,12 @@
 /**
  * Single source of all personal facts on this site.
- * Rule: every claim here must mirror the master CV (Career HQ, 00-master-cv).
- * Do not add numbers or titles that are not on the CV.
+ *
+ * Rule 1: every claim here must mirror the master CV (Career HQ, 00-master-cv).
+ *         Do not add numbers or titles that are not on the CV.
+ * Rule 2 (HARD, 2026-08-04): nothing derived from POWWR internal work is
+ *         published — no metrics, no architecture, no internal initiatives.
+ *         Employer name, role title and generic capability only.
+ *         Full contract in ../../AGENTS.md.
  */
 
 export const identity = {
@@ -15,7 +20,7 @@ export const identity = {
   linkedin: "https://www.linkedin.com/in/zahid-imran/",
   cvPath: "/Zahid-Imran-CV.pdf",
   blurb:
-    "I build production AI systems that have to be right: document-AI pipelines with deterministic verification, agentic workflows with human-in-the-loop control, and LLM evaluation that keeps models honest. Currently at POWWR, where my extraction platform holds ~99.9% schema compliance on real supplier contracts.",
+    "I build production AI systems that have to be right: document-AI pipelines with deterministic verification, agentic workflows with human-in-the-loop control, and LLM evaluation that keeps models honest. Currently an AI Engineer at POWWR in Manchester, working on document AI, agentic tooling and the cost engineering that makes both viable at scale.",
 } as const;
 
 export type Flagship = {
@@ -151,40 +156,15 @@ export type Stat = {
   href: string;
 };
 
-/** Headline numbers for the Impact section — each mirrors a CV bullet below. */
+/**
+ * Headline numbers for the Impact section.
+ *
+ * HARD RULE (2026-08-04): no figure derived from POWWR data appears here or
+ * anywhere else public — POWWR has not permitted publication of its work
+ * detail. Every stat below comes from Zahid's own projects or prior roles
+ * already documented on his CV. See ../../AGENTS.md.
+ */
 export const stats: Stat[] = [
-  {
-    prefix: "~",
-    value: 99.9,
-    decimals: 1,
-    suffix: "%",
-    label: "schema compliance on real supplier contracts",
-    source: "POWWR · document-AI pipeline",
-    href: "#exp-powwr",
-  },
-  {
-    value: 12000,
-    suffix: "+",
-    label: "records CRM-matched per reconciliation run",
-    source: "POWWR · reconciliation",
-    href: "#exp-powwr",
-  },
-  {
-    prefix: "~",
-    value: 96,
-    suffix: "%",
-    label: "auto-match rate on reconciliation runs",
-    source: "POWWR · reconciliation",
-    href: "#exp-powwr",
-  },
-  {
-    prefix: "70–",
-    value: 95,
-    suffix: "%",
-    label: "projected extraction-cost cut from local-model cascades",
-    source: "POWWR · benchmarking",
-    href: "#exp-powwr",
-  },
   {
     value: 85,
     suffix: "%",
@@ -201,12 +181,12 @@ export const stats: Stat[] = [
     href: "#proj-autonomous-recruitment-agent-llm-as-a-judge",
   },
   {
-    prefix: "15–",
-    value: 30,
-    suffix: "%",
-    label: "fewer input tokens per document from caching and compaction",
-    source: "POWWR · cost engineering",
-    href: "#exp-powwr",
+    value: 2.25,
+    decimals: 2,
+    suffix: " PESQ",
+    label: "perceptual quality on transformer speech restoration",
+    source: "Project · speech enhancement",
+    href: "#projects",
   },
   {
     value: 14,
@@ -233,15 +213,15 @@ export type Role = {
 
 export const experience: Role[] = [
   {
-    title: "AI Engineer (Innovation Team)",
+    title: "AI Engineer",
     company: "POWWR",
     dates: "Mar 2026 – Present",
     bullets: [
-      "Built an end-to-end document-AI pipeline (Next.js, TypeScript, Azure OpenAI GPT-4o, Docling) converting supplier energy price files into validated contracts with strict JSON-schema extraction.",
-      "Engineered a deterministic verification layer — grounding, plausibility bounds, self-consistency — reaching ~99.9% schema compliance with zero extra LLM calls.",
-      "Co-developed the in-house pipeline-orchestration platform (Angular, .NET, Dagster) replacing a commercial RPA product; new integrations went from weeks to days.",
-      "Reconciliation pipelines CRM-match 12,000+ records per run at ~96% auto-match; benchmarking local-model cascades projected to cut extraction costs 70–95%.",
-      "Lead trainer for the company-wide Claude rollout — agentic workflows, model selection, token economics and MCP connectors; prompt caching and token compaction already cut input tokens 15–30% per document.",
+      "Build production document-AI pipelines that turn unstructured business documents into validated, structured records.",
+      "Design deterministic verification around model output — grounding to source text, plausibility bounds, self-consistency — so extractions can be trusted without additional model calls.",
+      "Work on internal automation and data-reconciliation tooling, and on evaluation practice for AI features heading into production.",
+      "Research cost-efficient inference: token accounting, prompt caching, context compaction, and local/open-weight model cascades.",
+      "Lead AI enablement for engineering colleagues — agentic workflows, model selection, token economics and MCP connectors.",
     ],
   },
   {
@@ -333,7 +313,9 @@ export const skillLinks: Record<string, string[]> = {
     "exp-grayhat",
   ],
   "Structured Outputs": ["exp-powwr", "exp-sparkix-technologies"],
-  "Azure OpenAI": ["exp-powwr", "exp-sparkix-technologies"],
+  // Azure OpenAI was evidenced by a POWWR stack detail that is no longer
+  // published; Sparkix's cloud-deployment bullet still carries it.
+  "Azure OpenAI": ["exp-sparkix-technologies"],
   "Local LLMs (Ollama)": ["proj-privacy-preserving-pii-redaction-pipeline"],
   "LLM Cost Optimization": ["exp-powwr"],
   "Latency (TTFT) Optimization": ["proj-omni-channel-ai-executive-assistant"],
@@ -347,11 +329,12 @@ export const skillLinks: Record<string, string[]> = {
   PyTorch: ["exp-horizon-tech-services", "proj-speech-enhancement-with-transformers"],
   Docker: ["proj-fog-prediction-pipeline-mlops"],
   Python: ["exp-sparkix-technologies", "exp-horizon-tech-services", "exp-grayhat"],
-  TypeScript: ["exp-powwr"],
-  "Next.js": ["exp-powwr"],
+  // TypeScript / Next.js / .NET were evidenced only by POWWR stack detail that
+  // is no longer published. Left unmapped rather than claimed without visible
+  // proof — the site's own rule is that a counted chip must light up its work.
+  TypeScript: ["proj-fog-prediction-pipeline-mlops"],
   FastAPI: ["exp-sparkix-technologies"],
   Flask: ["exp-sparkix-technologies", "exp-grayhat"],
-  ".NET (C#)": ["exp-powwr"],
 };
 
 /** Community roles held alongside the BSc (source: LinkedIn volunteering). */

@@ -24,7 +24,7 @@ export const PROFILE = {
   identity: {
     name: identity.name,
     role: identity.role,
-    currentEmployer: "POWWR (Innovation Team), since March 2026",
+    currentEmployer: "POWWR, since March 2026",
     location: identity.location,
     summary: identity.blurb,
     email: identity.email,
