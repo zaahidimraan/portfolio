@@ -12,7 +12,7 @@ import { RepoTimeline } from "@/components/repo-timeline";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
 import { SideProjects } from "@/components/side-projects";
-import { Walker } from "@/components/walker";
+import { CityScene } from "@/components/society/city-scene";
 import { StatCounters } from "@/components/stat-counters";
 import { Certificates, Skills } from "@/components/skills";
 import { TechMatrix } from "@/components/tech-matrix";
@@ -117,7 +117,7 @@ export default async function Home() {
           </Reveal>
         </Section>
 
-        <Walker label="Available for freelance work →" />
+        <CityScene />
         <Contact />
       </main>
       <CrossLinks />

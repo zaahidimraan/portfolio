@@ -422,6 +422,564 @@ html.js .reveal.in-view .cert-dot:nth-of-type(n + 8) { transition-delay: 0.42s; 
   }
 }
 
+/* ================= The society (SOC-1..4) =================
+   One custom property drives every animation's play state and speed, so
+   pausing the whole town is a single style change and resumes in place. */
+
+.society {
+  --soc-speed: 1;
+  --soc-run: running;
+  margin-top: 3rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.society[data-playing="false"] {
+  --soc-run: paused;
+}
+
+.society-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.society-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.soc-btn {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.2rem 0.55rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.soc-btn:hover {
+  color: var(--background);
+  background: var(--foreground);
+  border-color: var(--foreground);
+}
+
+.soc-btn-on {
+  color: var(--background);
+  background: var(--foreground);
+  border-color: var(--foreground);
+}
+
+.society-stage {
+  position: relative;
+  height: 190px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.society-caption {
+  margin-top: 0.6rem;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+/* ---- skyline ---- */
+
+.soc-skyline {
+  position: absolute;
+  inset: 0 0 26px 0;
+  pointer-events: none;
+}
+
+.soc-skyline-svg {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 150px;
+}
+
+.soc-building {
+  fill: var(--foreground);
+  opacity: 0.1;
+}
+
+.soc-crane,
+.soc-crane-cable {
+  stroke: var(--foreground);
+  stroke-width: 2;
+  opacity: 0.25;
+}
+
+.soc-crane-cable {
+  stroke-width: 1;
+}
+
+.soc-crane-load {
+  fill: var(--foreground);
+  opacity: 0.25;
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: soc-crane-lift calc(9s / var(--soc-speed)) ease-in-out infinite;
+  animation-play-state: var(--soc-run);
+}
+
+@keyframes soc-crane-lift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(58px);
+  }
+}
+
+.soc-window {
+  fill: var(--foreground);
+  opacity: 0.06;
+}
+
+/* After dark a subset of windows glow and flicker on their own schedule. */
+.society[data-night="true"] .soc-window-lit {
+  opacity: 0.55;
+  animation: soc-window-flicker calc(11s / var(--soc-speed)) steps(1, end) infinite;
+  animation-play-state: var(--soc-run);
+}
+
+@keyframes soc-window-flicker {
+  0%,
+  62%,
+  100% {
+    opacity: 0.55;
+  }
+  64%,
+  74% {
+    opacity: 0.12;
+  }
+}
+
+/* sun by day, moon by night — crosses the sky slowly */
+.soc-celestial {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--foreground);
+  opacity: 0.16;
+  animation: soc-celestial-arc calc(120s / var(--soc-speed)) linear infinite;
+  animation-play-state: var(--soc-run);
+}
+
+.society[data-night="true"] .soc-celestial {
+  background: transparent;
+  box-shadow: inset -7px 3px 0 0 var(--foreground);
+  opacity: 0.4;
+}
+
+@keyframes soc-celestial-arc {
+  from {
+    transform: translate(-40px, 30px);
+  }
+  50% {
+    transform: translate(50vw, -6px);
+  }
+  to {
+    transform: translate(105vw, 30px);
+  }
+}
+
+/* ---- road ---- */
+
+.soc-road {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 26px;
+  border-top: 1px solid var(--border);
+}
+
+.soc-road-dashes {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--border) 0 18px,
+    transparent 18px 36px
+  );
+}
+
+/* ---- citizens ---- */
+
+.soc-citizen {
+  position: absolute;
+  bottom: 26px;
+  color: var(--foreground);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+  transition: filter 0.2s ease;
+}
+
+.soc-citizen:hover,
+.soc-citizen:focus-visible {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--foreground) 45%, transparent));
+}
+
+.soc-selected {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--foreground) 65%, transparent));
+}
+
+/* Depth: further lanes sit higher, smaller and fainter. */
+.soc-lane-far {
+  bottom: 74px;
+  transform: scale(0.62);
+  opacity: 0.45;
+}
+
+.soc-lane-mid {
+  bottom: 44px;
+  transform: scale(0.8);
+  opacity: 0.72;
+}
+
+.soc-svg {
+  width: 26px;
+  height: 44px;
+  overflow: visible;
+}
+
+.soc-cycle .soc-svg {
+  width: 42px;
+}
+
+.soc-engineer .soc-svg,
+.soc-rest .soc-svg {
+  width: 42px;
+}
+
+.soc-build .soc-svg {
+  width: 36px;
+  height: 48px;
+}
+
+.soc-fly .soc-svg {
+  width: 92px;
+  height: 26px;
+}
+
+.soc-dog .soc-svg {
+  width: 24px;
+  height: 18px;
+}
+
+/* Freezing one citizen stops only their animations. */
+.soc-frozen,
+.soc-frozen * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* travelling citizens */
+  .soc-walk,
+  .soc-cycle,
+  .soc-dog {
+    animation: soc-travel var(--soc-dur) linear infinite;
+    animation-delay: var(--soc-delay);
+    animation-play-state: var(--soc-run);
+  }
+
+  .soc-fly {
+    animation: soc-fly-across var(--soc-dur) linear infinite;
+    animation-delay: var(--soc-delay);
+    animation-play-state: var(--soc-run);
+  }
+
+  /* limbs and props */
+  .soc-limb,
+  .soc-bob,
+  .soc-wheel,
+  .soc-nod,
+  .soc-zzz,
+  .soc-banner {
+    animation-duration: var(--soc-dur);
+    animation-iteration-count: infinite;
+    animation-play-state: var(--soc-run);
+  }
+
+  .soc-walk .soc-limb,
+  .soc-dog .soc-limb {
+    animation-name: soc-swing;
+    animation-duration: 0.85s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .soc-walk .soc-bob,
+  .soc-dog .soc-bob {
+    animation-name: soc-step-bob;
+    animation-duration: 0.85s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .soc-leg-b,
+  .soc-arm-f,
+  .soc-paw-b {
+    animation-delay: -0.425s;
+  }
+
+  .soc-wheel {
+    animation-name: soc-spin;
+    animation-duration: 0.7s;
+    animation-timing-function: linear;
+  }
+
+  .soc-pedal-a,
+  .soc-pedal-b {
+    animation-name: soc-spin;
+    animation-duration: 0.7s;
+    animation-timing-function: linear;
+  }
+
+  .soc-pedal-b {
+    animation-delay: -0.35s;
+  }
+
+  .soc-type {
+    animation-name: soc-tap;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .soc-hammer {
+    animation-name: soc-hammer-swing;
+    animation-duration: 1.1s;
+    animation-timing-function: ease-in;
+  }
+
+  .soc-point {
+    animation-name: soc-point-sweep;
+    animation-duration: 3.4s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .soc-nod {
+    animation-name: soc-nod-move;
+    animation-duration: 4.5s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .soc-tail {
+    animation-name: soc-wag;
+    animation-duration: 0.35s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .soc-banner {
+    animation-name: soc-banner-wave;
+    animation-duration: 1.4s;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* the resting figure sleeps after dark */
+  .soc-zzz {
+    opacity: 0;
+  }
+
+  .society[data-night="true"] .soc-zzz {
+    opacity: 1;
+    animation-name: soc-snore;
+    animation-duration: 3s;
+    animation-timing-function: ease-out;
+  }
+}
+
+.soc-limb,
+.soc-nod,
+.soc-tail,
+.soc-wheel,
+.soc-banner {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+.soc-wheel,
+.soc-pedal-a,
+.soc-pedal-b {
+  transform-origin: center;
+}
+
+.soc-hammer,
+.soc-point,
+.soc-type {
+  transform-origin: 12px 14px;
+}
+
+@keyframes soc-travel {
+  from {
+    transform: translateX(0) scaleX(1);
+  }
+  49% {
+    transform: translateX(78vw) scaleX(1);
+  }
+  50% {
+    transform: translateX(78vw) scaleX(-1);
+  }
+  99% {
+    transform: translateX(0) scaleX(-1);
+  }
+  to {
+    transform: translateX(0) scaleX(1);
+  }
+}
+
+@keyframes soc-fly-across {
+  from {
+    transform: translateX(-15vw);
+  }
+  to {
+    transform: translateX(115vw);
+  }
+}
+
+@keyframes soc-swing {
+  0%,
+  100% {
+    transform: rotate(23deg);
+  }
+  50% {
+    transform: rotate(-23deg);
+  }
+}
+
+@keyframes soc-step-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25%,
+  75% {
+    transform: translateY(-1.4px);
+  }
+}
+
+@keyframes soc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes soc-tap {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-7deg);
+  }
+}
+
+@keyframes soc-hammer-swing {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-52deg);
+  }
+  65% {
+    transform: rotate(9deg);
+  }
+}
+
+@keyframes soc-point-sweep {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  40%,
+  60% {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes soc-nod-move {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(2px) rotate(6deg);
+  }
+}
+
+@keyframes soc-wag {
+  0%,
+  100% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes soc-banner-wave {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(2.5deg) translateY(1.5px);
+  }
+}
+
+@keyframes soc-snore {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(0.9);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translate(3px, -5px) scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+/* The whole town is decoration: remove it when motion is unwelcome. */
+@media (prefers-reduced-motion: reduce) {
+  .society-stage,
+  .society-controls {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .society-stage {
+    height: 150px;
+  }
+
+  .soc-lane-far {
+    display: none;
+  }
+}
+
 /* ---- Mono scrollbar (GLW-4) ---- */
 
 html {
