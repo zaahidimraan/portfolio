@@ -302,6 +302,126 @@ html.js .reveal.in-view .cert-dot:nth-of-type(n + 8) { transition-delay: 0.42s; 
   }
 }
 
+/* ---- Walking figure (E16) — transform-only, compositor-friendly ---- */
+
+.walker-lane {
+  position: relative;
+  height: 46px;
+  margin-top: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.walker {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 24px;
+  height: 44px;
+  color: var(--foreground);
+  will-change: transform;
+}
+
+.walker-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.walker-label {
+  position: absolute;
+  right: 0;
+  bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Patrol: walk right, turn, walk back, turn. Percentages hold the flip
+   instantaneous so the figure appears to pivot on the spot. */
+@keyframes walker-patrol {
+  0% {
+    transform: translateX(0) scaleX(1);
+  }
+  48% {
+    transform: translateX(calc(100vw - 60px)) scaleX(1);
+  }
+  50% {
+    transform: translateX(calc(100vw - 60px)) scaleX(-1);
+  }
+  98% {
+    transform: translateX(0) scaleX(-1);
+  }
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+}
+
+/* Limb swing. Front/back pairs run in antiphase via negative delay. */
+@keyframes walker-swing {
+  0%,
+  100% {
+    transform: rotate(24deg);
+  }
+  50% {
+    transform: rotate(-24deg);
+  }
+}
+
+/* Subtle vertical bob on each step, at twice the stride frequency. */
+@keyframes walker-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25%,
+  75% {
+    transform: translateY(-1.5px);
+  }
+}
+
+.walker-arm,
+.walker-leg {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .walker {
+    animation: walker-patrol 34s linear infinite;
+  }
+
+  .walker-svg {
+    animation: walker-bob 0.9s ease-in-out infinite;
+  }
+
+  .walker-leg,
+  .walker-arm {
+    animation: walker-swing 0.9s ease-in-out infinite;
+  }
+
+  /* Antiphase: back limbs are half a stride behind the front ones. */
+  .walker-leg-back,
+  .walker-arm-front {
+    animation-delay: -0.45s;
+  }
+
+  /* Arms swing slightly less than legs. */
+  .walker-arm {
+    animation-name: walker-swing;
+    scale: 0.8;
+  }
+}
+
+/* Reduced motion: the lane and figure add nothing static, so remove them. */
+@media (prefers-reduced-motion: reduce) {
+  .walker-lane {
+    display: none;
+  }
+}
+
 /* ---- Mono scrollbar (GLW-4) ---- */
 
 html {

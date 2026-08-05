@@ -12,17 +12,23 @@ import { RepoTimeline } from "@/components/repo-timeline";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
 import { SideProjects } from "@/components/side-projects";
+import { Walker } from "@/components/walker";
 import { StatCounters } from "@/components/stat-counters";
 import { Certificates, Skills } from "@/components/skills";
 import { TechMatrix } from "@/components/tech-matrix";
 import { TimelinePanel } from "@/components/timeline-panel";
 import { getRepos } from "@/lib/github";
+import { homeSchema } from "@/lib/seo";
 
 export default async function Home() {
   const repos = await getRepos();
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeSchema()) }}
+      />
       <Nav />
       <main className="mx-auto w-full max-w-4xl flex-1 px-5">
         <Hero />
@@ -111,6 +117,7 @@ export default async function Home() {
           </Reveal>
         </Section>
 
+        <Walker label="Available for freelance work →" />
         <Contact />
       </main>
       <CrossLinks />

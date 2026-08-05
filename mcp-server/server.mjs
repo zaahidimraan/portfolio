@@ -155,6 +155,52 @@ server.registerTool(
 );
 
 server.registerTool(
+  "get_enquiries",
+  {
+    description:
+      "Read enquiries submitted through the /services form on the portfolio. Use when Zahid asks " +
+      "who has been in touch, or to triage new work requests. Reads the Cloudflare D1 database " +
+      "directly via wrangler.",
+    inputSchema: {
+      limit: z
+        .number()
+        .int()
+        .min(1)
+        .max(50)
+        .optional()
+        .describe("How many of the most recent enquiries to return (default 10)."),
+      unhandled_only: z
+        .boolean()
+        .optional()
+        .describe("Only return enquiries not yet marked handled (default false)."),
+    },
+  },
+  async ({ limit = 10, unhandled_only = false }) => {
+    const where = unhandled_only ? "WHERE handled = 0" : "";
+    const sql =
+      `SELECT id, created_at, name, email, company, budget, service, message, handled ` +
+      `FROM enquiries ${where} ORDER BY created_at DESC LIMIT ${Number(limit)}`;
+
+    const raw = execSync(
+      `npx wrangler d1 execute zahid-enquiries --remote --json --command "${sql.replace(/"/g, '\\"')}"`,
+      { cwd: join(REPO_ROOT, "enquiry-worker"), encoding: "utf8", timeout: 120_000 },
+    );
+
+    // wrangler prints banner lines before the JSON payload.
+    const start = raw.indexOf("[");
+    if (start === -1) throw new Error(`Unexpected wrangler output:\n${raw.slice(-500)}`);
+    const rows = JSON.parse(raw.slice(start))[0]?.results ?? [];
+
+    if (!rows.length) {
+      return { content: [{ type: "text", text: "No enquiries yet." }] };
+    }
+    return {
+      content: [{ type: "text", text: `${rows.length} enquiry(ies):\n\n${JSON.stringify(rows, null, 2)}` }],
+    };
+  },
+);
+
+server.registerTool(
   "get_backlog",
   {
     description:

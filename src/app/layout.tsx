@@ -17,34 +17,46 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const TITLE = "Zahid Imran — AI Engineer, Manchester | Agentic AI, RAG & MCP";
+const DESCRIPTION =
+  "AI Engineer in Manchester building agentic systems, RAG pipelines and MCP servers, with LLM evaluation that keeps models honest. See the work, or connect an AI client and ask.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(identity.siteUrl),
-  title: `${identity.name} — AI Engineer`,
-  description: `${identity.role}. ${identity.location}. Production document-AI, agentic workflows, LLM evaluation.`,
+  title: { default: TITLE, template: `%s — ${identity.name}` },
+  description: DESCRIPTION,
+  applicationName: `${identity.name} — Portfolio`,
+  authors: [{ name: identity.name, url: identity.siteUrl }],
+  creator: identity.name,
+  keywords: [
+    "AI Engineer",
+    "Manchester",
+    "agentic AI",
+    "RAG",
+    "Model Context Protocol",
+    "MCP server",
+    "LLM evaluation",
+    "document AI",
+    "freelance AI engineer UK",
+    "LangGraph",
+    "n8n",
+  ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: `${identity.name} — AI Engineer`,
-    description: `${identity.role}. ${identity.location}.`,
-    type: "website",
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "profile",
     url: identity.siteUrl,
+    siteName: `${identity.name} — Portfolio`,
+    locale: "en_GB",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: `${identity.name} — AI Engineer`,
-    description: `${identity.role}. ${identity.location}.`,
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
 };
-
-/** Person schema for search engines; facts come from profile.ts (CV-mirror rule). */
-const personJsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: identity.name,
-  jobTitle: "AI Engineer",
-  email: `mailto:${identity.email}`,
-  url: identity.siteUrl,
-  sameAs: [identity.github, identity.linkedin],
-  address: { "@type": "PostalAddress", addressLocality: "Manchester", addressCountry: "GB" },
-});
 
 /** Runs before paint: applies stored/system theme (no FOUC) and flags JS
  *  availability so scroll-reveal CSS only hides content when JS can reveal it. */
@@ -63,10 +75,6 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: personJsonLd }}
-        />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

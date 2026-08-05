@@ -74,14 +74,19 @@ export function Hero() {
           className="portrait-wrap hero-seq relative mx-auto w-52 sm:w-64 lg:w-72"
           style={seq(500)}
         >
-          <img
-            src="/portrait.png"
-            alt="Portrait of Zahid Imran"
-            width={577}
-            height={493}
-            fetchPriority="high"
-            className="portrait-img relative h-auto w-full"
-          />
+          {/* WebP is 91% smaller than the PNG and this is the LCP element. */}
+          <picture>
+            <source srcSet="/portrait.webp" type="image/webp" />
+            <img
+              src="/portrait.png"
+              alt="Zahid Imran, AI Engineer based in Manchester, UK"
+              width={577}
+              height={493}
+              fetchPriority="high"
+              decoding="async"
+              className="portrait-img relative h-auto w-full"
+            />
+          </picture>
         </div>
       </div>
       <div className="hero-seq" style={seq(580)}>

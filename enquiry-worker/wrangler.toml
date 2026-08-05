@@ -1,0 +1,8 @@
+name = "zahid-enquiries"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zahid-enquiries"
+database_id = "50e66177-5a6c-445c-8e3d-7d8923a816c4"

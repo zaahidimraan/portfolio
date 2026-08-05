@@ -30,5 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "//": "Workers are compiled and type-checked by wrangler against the Cloudflare runtime types, not by Next.",
+  "exclude": ["node_modules", "enquiry-worker", "public-mcp"]
 }
