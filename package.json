@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/sync-cv.mjs",
+    "prebuild": "tsx scripts/build-cv.ts && node scripts/audit-cv-pdf.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -18,11 +18,14 @@
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdfkit": "^0.17.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "pdfkit": "^0.19.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.7",
     "typescript": "^5",
     "zod": "^4.4.3"
   }

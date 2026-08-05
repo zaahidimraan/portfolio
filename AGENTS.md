@@ -35,4 +35,20 @@ Fails either → generalise it.
 the same rules apply to the MCP server payload in `public-mcp/` — it is exactly
 as public as the page.
 
+## The published CV is generated, not copied
+
+`public/Zahid-Imran-CV.pdf` is **built from `src/content/profile.ts`** by
+`scripts/build-cv.ts` on every `npm run build`. It is deliberately *not* an
+export of the master CV in Career HQ — that document is private and contains
+POWWR work detail.
+
+Consequences:
+- To change the public CV, edit `profile.ts`. Never drop a PDF into `public/`;
+  the next build overwrites it.
+- The public CV omits the phone number by design (it is on the open web).
+- Two independent gates run at build time and **fail the build** on a breach:
+  `build-cv.ts` audits the text as it composes, and `scripts/audit-cv-pdf.mjs`
+  re-reads the finished PDF and checks again. Both were tested against the real
+  pre-scrub CV lines and block all of them.
+
 Full backlog and status: `../05-backlog/portfolio-site.md`.
