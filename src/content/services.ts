@@ -12,6 +12,8 @@ export type Service = {
   deliverables: string[];
   /** Anchor on the homepage that demonstrates this capability. */
   proof: { label: string; href: string };
+  /** Tool mark shown on the card (SOC-10). Decorative. */
+  tool: "gears" | "funnel" | "plug" | "scales" | "gauge";
 };
 
 export const services: Service[] = [
@@ -24,6 +26,7 @@ export const services: Service[] = [
       "Human-in-the-loop approval paths for anything high-stakes",
       "Observability so you can see what the agent did and why",
     ],
+    tool: "gears",
     proof: {
       label: "Omni-channel assistant",
       href: "/#proj-omni-channel-ai-executive-assistant",
@@ -38,6 +41,7 @@ export const services: Service[] = [
       "Strict schema extraction with validation at the boundary",
       "Deterministic verification — grounding, plausibility bounds, self-consistency",
     ],
+    tool: "funnel",
     proof: { label: "Document AI experience", href: "/#experience" },
   },
   {
@@ -49,6 +53,7 @@ export const services: Service[] = [
       "Tool design that an agent can actually use without hand-holding",
       "Deployment on your infrastructure, with the access boundaries written down",
     ],
+    tool: "plug",
     proof: { label: "A live MCP server you can connect to", href: "/#mcp" },
   },
   {
@@ -60,6 +65,7 @@ export const services: Service[] = [
       "Evaluation harness that runs on every change, with the numbers tracked",
       "LLM-as-a-Judge scoring validated against human review",
     ],
+    tool: "scales",
     proof: {
       label: "LLM-as-a-Judge project",
       href: "/#proj-autonomous-recruitment-agent-llm-as-a-judge",
@@ -74,6 +80,7 @@ export const services: Service[] = [
       "Prompt caching, context compaction and model-tier routing",
       "Local / open-weight model options where they hold up",
     ],
+    tool: "gauge",
     proof: { label: "Local-first PII redaction", href: "/#proj-privacy-preserving-pii-redaction-pipeline" },
   },
 ];

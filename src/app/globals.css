@@ -1109,6 +1109,113 @@ html.js .reveal.in-view .cert-dot:nth-of-type(n + 8) { transition-delay: 0.42s; 
   transform: translateY(2px);
 }
 
+/* ---- the workshop (SOC-10) ---- */
+
+.workshop {
+  margin-top: 2.5rem;
+  color: var(--foreground);
+  max-width: 34rem;
+}
+
+.workshop-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.workshop-window {
+  fill: transparent;
+}
+
+.workshop[data-night="true"] .workshop-window {
+  fill: currentColor;
+  opacity: 0.5;
+}
+
+.workshop-arm,
+.workshop-smoke,
+.workshop-sparks {
+  transform-box: fill-box;
+}
+
+.workshop-arm {
+  transform-origin: 0% 0%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .workshop-arm {
+    animation: workshop-strike 1.6s ease-in infinite;
+  }
+
+  .workshop-smoke {
+    animation: workshop-drift 5s ease-in-out infinite;
+  }
+
+  .workshop-sparks {
+    animation: workshop-spark 1.6s ease-out infinite;
+  }
+}
+
+@keyframes workshop-strike {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-26deg);
+  }
+  70% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes workshop-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(5px, -7px);
+    opacity: 0.55;
+  }
+}
+
+@keyframes workshop-spark {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  62% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6px, -6px) scale(0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workshop {
+    display: none;
+  }
+}
+
+.tool-glyph {
+  width: 19px;
+  height: 19px;
+  flex: none;
+  color: var(--muted);
+}
+
+/* The guide's lantern glows after dark (SOC-11). */
+.guide-lantern {
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--foreground) 70%, transparent));
+}
+
 /* ---- footer signpost ---- */
 
 .signpost {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { citizens, OFFICE_WINDOWS, type Citizen } from "@/content/society";
+import { toggleNight, useNight } from "@/lib/use-night";
 import { FIGURES } from "./figures";
 
 type Speed = 0.5 | 1 | 2;
@@ -24,21 +25,10 @@ function seeded(i: number): number {
 export function CityScene() {
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState<Speed>(1);
-  const [night, setNight] = useState<boolean | null>(null);
+  const night = useNight();
   const [selected, setSelected] = useState<Citizen | null>(null);
   const [frozen, setFrozen] = useState<Set<string>>(new Set());
   const sceneRef = useRef<HTMLDivElement>(null);
-
-  // Follow the site theme, and take the visitor's real local hour as the
-  // opening state — arriving at 11pm should show a city at night.
-  useEffect(() => {
-    const root = document.documentElement;
-    const sync = () => setNight(root.classList.contains("dark"));
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
 
   const isNight = night ?? false;
 
@@ -89,16 +79,7 @@ export function CityScene() {
           ))}
           <button
             type="button"
-            onClick={() => {
-              const root = document.documentElement;
-              const next = !root.classList.contains("dark");
-              root.classList.toggle("dark", next);
-              try {
-                localStorage.setItem("theme", next ? "dark" : "light");
-              } catch {
-                /* private mode — the scene still flips, it just won't persist */
-              }
-            }}
+            onClick={() => toggleNight()}
             className="soc-btn"
           >
             {isNight ? "☀ Daytime" : "☾ Nightfall"}

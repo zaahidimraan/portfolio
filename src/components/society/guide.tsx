@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useNight } from "@/lib/use-night";
 
 const DISTRICTS: { id: string; label: string }[] = [
   { id: "top", label: "The gate" },
@@ -24,6 +25,8 @@ const DISTRICTS: { id: string; label: string }[] = [
 export function Guide() {
   const guideRef = useRef<HTMLDivElement>(null);
   const [district, setDistrict] = useState(DISTRICTS[0].label);
+  // Same town clock as the citizens and the workshop (SOC-11).
+  const night = useNight();
 
   useEffect(() => {
     const guide = guideRef.current;
@@ -80,7 +83,7 @@ export function Guide() {
   }, []);
 
   return (
-    <div className="guide-strip no-print" aria-hidden="true">
+    <div className="guide-strip no-print" aria-hidden="true" data-night={night ? "true" : "false"}>
       <div className="guide" ref={guideRef} data-moving="false">
         <svg viewBox="0 0 24 30" className="guide-svg" focusable="false">
           <circle cx="12" cy="5" r="3" fill="currentColor" />
@@ -97,6 +100,13 @@ export function Guide() {
           <g className="guide-limb guide-leg-f">
             <line x1="12" y1="18" x2="12" y2="27" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </g>
+          {/* After dark the guide carries a lantern. */}
+          {night && (
+            <g className="guide-lantern">
+              <line x1="12" y1="12" x2="18" y2="14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+              <circle cx="18.6" cy="15.6" r="2.1" fill="currentColor" />
+            </g>
+          )}
         </svg>
       </div>
       <span className="guide-label font-mono">{district}</span>
