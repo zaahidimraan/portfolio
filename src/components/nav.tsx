@@ -1,6 +1,7 @@
 import { identity } from "@/content/profile";
 import { NavLinks } from "./nav-links";
 import { ScrollProgress } from "./scroll-progress";
+import { Guide } from "./society/guide";
 import { ThemeToggle } from "./theme-toggle";
 
 export function Nav() {
@@ -23,6 +24,7 @@ export function Nav() {
         </div>
       </nav>
       <ScrollProgress />
+      <Guide />
     </header>
   );
 }

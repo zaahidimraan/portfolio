@@ -1,15 +1,19 @@
 import { identity } from "@/content/profile";
+import { Fingerpost } from "./society/glyphs";
 
 export function Contact() {
   return (
     <footer id="contact" className="border-t border-border py-14">
-      <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-accent">
-        Contact
-      </h2>
-      <p className="mt-4 max-w-xl leading-relaxed text-foreground/90">
-        Open to AI engineering roles and interesting agentic-systems problems.
-        The fastest way to reach me is email.
-      </p>
+      <div className="footer-signpost">
+        <Fingerpost />
+        <div>
+          <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-accent">Contact</h2>
+          <p className="mt-3 max-w-xl leading-relaxed text-foreground/90">
+            End of the street. Open to AI engineering roles and interesting agentic-systems
+            problems — the fastest way to reach me is email.
+          </p>
+        </div>
+      </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <a
           href={`mailto:${identity.email}`}

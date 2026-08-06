@@ -1,4 +1,5 @@
 import { certificates, type Certificate } from "@/content/profile";
+import { ChartInspector } from "./society/chart-workers";
 
 const MONTHS: Record<string, number> = {
   Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
@@ -132,6 +133,8 @@ export function CertStrip() {
               </g>
             );
           })}
+          {/* A reader studying the shelves — decoration, clear of the lanes. */}
+          <ChartInspector x={PAD_L - 78} y={H - 8} />
         </svg>
       </div>
       <p className="mt-2 flex flex-wrap gap-4 font-mono text-[10px] uppercase tracking-wider text-muted">

@@ -35,6 +35,7 @@ export default async function Home() {
 
         <Section
           id="impact"
+          glyph="records"
           number="01"
           title="Impact in numbers"
           intro="Measured results from production systems — every number links to its proof"
@@ -46,6 +47,7 @@ export default async function Home() {
 
         <Section
           id="projects"
+          glyph="workshop"
           number="02"
           title="Selected projects"
           intro="Three flagship builds with their architectures, then everything else"
@@ -64,6 +66,7 @@ export default async function Home() {
 
         <Section
           id="experience"
+          glyph="road"
           number="03"
           title="Experience"
           intro="Click any bar to open the full entry — concurrent roles show in parallel"
@@ -79,6 +82,7 @@ export default async function Home() {
 
         <Section
           id="skills"
+          glyph="toolshed"
           number="04"
           title="Skills"
           intro="Chips with a count are clickable — they light up the work that proves them"
@@ -96,6 +100,7 @@ export default async function Home() {
 
         <Section
           id="certificates"
+          glyph="library"
           number="05"
           title="Certificates"
           intro="Fifteen certificates across three tracks — the lanes show where the focus went"
@@ -108,6 +113,7 @@ export default async function Home() {
 
         <Section
           id="mcp"
+          glyph="telegraph"
           number="06"
           title="Ask my portfolio"
           intro="A live MCP server — connect an AI client and question my CV directly"

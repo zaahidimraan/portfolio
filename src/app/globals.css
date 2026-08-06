@@ -980,6 +980,204 @@ html.js .reveal.in-view .cert-dot:nth-of-type(n + 8) { transition-delay: 0.42s; 
   }
 }
 
+/* ================= Town-wide layer (SOC-6..10) ================= */
+
+/* ---- the guide who follows your scroll ---- */
+
+.guide-strip {
+  position: relative;
+  height: 30px;
+  margin: 0 auto;
+  max-width: 56rem;
+  padding: 0 1.25rem;
+  pointer-events: none;
+}
+
+.guide {
+  position: absolute;
+  bottom: 0;
+  left: 1.25rem;
+  width: 22px;
+  height: 28px;
+  color: var(--foreground);
+  opacity: 0.6;
+  will-change: transform;
+}
+
+.guide-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.guide-label {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 7px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.guide-limb {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+/* The walk cycle only runs while the reader is actually scrolling. */
+@media (prefers-reduced-motion: no-preference) {
+  .guide[data-moving="true"] .guide-limb {
+    animation: soc-swing 0.5s ease-in-out infinite;
+  }
+
+  .guide[data-moving="true"] .guide-leg-b,
+  .guide[data-moving="true"] .guide-arm-f {
+    animation-delay: -0.25s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (max-width: 640px) {
+  .guide-strip {
+    display: none;
+  }
+}
+
+/* ---- workers living inside the charts ---- */
+
+.cw {
+  opacity: 0.55;
+}
+
+.cw-limb {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cw-pace {
+    animation: cw-pace var(--cw-dur, 18s) ease-in-out var(--cw-delay, 0s) infinite;
+  }
+
+  .cw-pace .cw-limb {
+    animation: soc-swing 0.75s ease-in-out infinite;
+  }
+
+  .cw-leg-b {
+    animation-delay: -0.375s;
+  }
+
+  .cw-point {
+    animation: soc-point-sweep 4s ease-in-out infinite;
+    transform-origin: 0 -9px;
+  }
+
+  .cw-tap {
+    animation: soc-hammer-swing 1.6s ease-in infinite;
+    transform-origin: 0 -8.4px;
+  }
+}
+
+@keyframes cw-pace {
+  0%,
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+  48% {
+    transform: translateX(var(--cw-travel)) scaleX(1);
+  }
+  52% {
+    transform: translateX(var(--cw-travel)) scaleX(-1);
+  }
+  98% {
+    transform: translateX(0) scaleX(-1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw {
+    display: none;
+  }
+}
+
+/* ---- district glyphs ---- */
+
+.town-glyph {
+  width: 17px;
+  height: 19px;
+  flex: none;
+  color: var(--muted);
+  transform: translateY(2px);
+}
+
+/* ---- footer signpost ---- */
+
+.signpost {
+  width: 34px;
+  height: 38px;
+  color: var(--muted);
+  flex: none;
+}
+
+.footer-signpost {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+/* ---- 404: off the map ---- */
+
+.lost-scene {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  color: var(--foreground);
+  margin: 0.5rem 0 0.5rem;
+}
+
+.lost-figure {
+  width: 30px;
+  height: 54px;
+}
+
+.lost-arm {
+  transform-box: fill-box;
+  transform-origin: top left;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lost-arm {
+    animation: lost-look 3.6s ease-in-out infinite;
+  }
+
+  .lost-figure {
+    animation: lost-turn 7.2s ease-in-out infinite;
+  }
+}
+
+@keyframes lost-look {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-13deg);
+  }
+}
+
+@keyframes lost-turn {
+  0%,
+  45% {
+    transform: scaleX(1);
+  }
+  50%,
+  95% {
+    transform: scaleX(-1);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
 /* ---- Mono scrollbar (GLW-4) ---- */
 
 html {
