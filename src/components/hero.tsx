@@ -1,4 +1,5 @@
 import { identity } from "@/content/profile";
+import { District } from "./society/districts";
 import { StatusNow } from "./status-now";
 
 const seq = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
@@ -92,6 +93,7 @@ export function Hero() {
       <div className="hero-seq" style={seq(580)}>
         <StatusNow />
       </div>
+      <District name="gate" />
       <a
         href="#impact"
         className="hero-seq no-print mt-12 inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-[0.25em] text-muted transition-colors hover:text-foreground"

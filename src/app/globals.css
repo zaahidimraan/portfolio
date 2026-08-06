@@ -1109,6 +1109,295 @@ html.js .reveal.in-view .cert-dot:nth-of-type(n + 8) { transition-delay: 0.42s; 
   transform: translateY(2px);
 }
 
+/* ================= Districts: every section is alive (E21) =================
+   One band per section. Animations run only while the band is near the
+   viewport AND the town is playing, so a long page never animates more than
+   the couple of districts you can actually see. */
+
+.district {
+  position: relative;
+  margin-top: 2.5rem;
+  color: var(--foreground);
+  pointer-events: none;
+  /* Skip layout and paint entirely while off screen. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 80px;
+}
+
+.district-svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+  overflow: visible;
+  opacity: 0.5;
+}
+
+.district[data-night="true"] .district-svg {
+  opacity: 0.62;
+}
+
+/* The gate on every district animation: paused unless visible and playing. */
+.district[data-active="false"] * {
+  animation-play-state: paused !important;
+}
+
+.d-limb,
+.d-carry,
+.d-hammer,
+.d-reach,
+.d-shelve,
+.d-key,
+.d-post,
+.d-cog,
+.d-load,
+.d-tally,
+.d-tool,
+.d-climb {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+.d-cog,
+.d-load {
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .d-walker {
+    animation: d-travel var(--d-dur, 26s) linear var(--d-delay, 0s) infinite;
+  }
+
+  .d-limb {
+    animation: soc-swing 0.85s ease-in-out infinite;
+  }
+
+  .d-leg-b,
+  .d-arm-a {
+    animation-delay: -0.425s;
+  }
+
+  .d-cog {
+    animation: soc-spin calc(4s / var(--soc-speed, 1)) linear var(--d-delay, 0s) infinite;
+  }
+
+  .d-load {
+    animation: d-lift calc(8s / var(--soc-speed, 1)) ease-in-out infinite;
+  }
+
+  .d-hammer {
+    animation: soc-hammer-swing calc(1.2s / var(--soc-speed, 1)) ease-in infinite;
+    transform-origin: 0 -24px;
+  }
+
+  .d-carry,
+  .d-post {
+    animation: d-sway calc(2.6s / var(--soc-speed, 1)) ease-in-out infinite;
+    transform-origin: 0 -23px;
+  }
+
+  .d-reach,
+  .d-shelve {
+    animation: d-reach calc(3.2s / var(--soc-speed, 1)) ease-in-out infinite;
+    transform-origin: 0 -23px;
+  }
+
+  .d-key {
+    animation: d-tap calc(0.7s / var(--soc-speed, 1)) ease-in-out infinite;
+    transform-origin: -4px -26px;
+  }
+
+  .d-tally {
+    animation: d-grow calc(9s / var(--soc-speed, 1)) ease-in-out infinite;
+    transform-origin: left center;
+  }
+
+  .d-tool {
+    animation: d-tool-set calc(5s / var(--soc-speed, 1)) ease-in-out var(--d-delay, 0s) infinite;
+    transform-origin: top center;
+  }
+
+  .d-climb {
+    animation: d-climb calc(11s / var(--soc-speed, 1)) ease-in-out infinite;
+  }
+
+  .d-pulse {
+    offset-path: path("M200 26 Q560 46 1020 26");
+    animation: d-pulse-run calc(4.2s / var(--soc-speed, 1)) linear var(--d-delay, 0s) infinite;
+  }
+
+  .d-bird {
+    animation: d-fly calc(var(--d-dur, 34s) / var(--soc-speed, 1)) linear infinite;
+  }
+}
+
+@keyframes d-travel {
+  0% {
+    transform: translateX(0) scaleX(1);
+  }
+  48% {
+    transform: translateX(var(--d-travel, 200px)) scaleX(1);
+  }
+  50% {
+    transform: translateX(var(--d-travel, 200px)) scaleX(-1);
+  }
+  98% {
+    transform: translateX(0) scaleX(-1);
+  }
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+}
+
+@keyframes d-lift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(18px);
+  }
+}
+
+@keyframes d-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-9deg);
+  }
+}
+
+@keyframes d-reach {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  45%,
+  55% {
+    transform: rotate(-22deg);
+  }
+}
+
+@keyframes d-tap {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-11deg);
+  }
+}
+
+@keyframes d-grow {
+  0%,
+  100% {
+    transform: scaleX(0.45);
+  }
+  55%,
+  70% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes d-tool-set {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(7deg);
+  }
+}
+
+@keyframes d-climb {
+  0%,
+  100% {
+    transform: translate(786px, 34px);
+  }
+  50% {
+    transform: translate(789px, 20px);
+  }
+}
+
+@keyframes d-pulse-run {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  10%,
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes d-fly {
+  0% {
+    transform: translate(-60px, 16px);
+  }
+  50% {
+    transform: translate(600px, 4px);
+  }
+  100% {
+    transform: translate(1260px, 16px);
+  }
+}
+
+@media (max-width: 640px) {
+  .district-svg {
+    height: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .district {
+    display: none;
+  }
+}
+
+/* ---- floating town control (TWN-4) ---- */
+
+.town-control {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+.town-control[data-open="false"] .town-control-items {
+  display: none;
+}
+
+.town-control-items {
+  display: flex;
+  gap: 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .town-control {
+    display: none;
+  }
+}
+
+@media print {
+  .town-control {
+    display: none;
+  }
+}
+
 /* ---- the workshop (SOC-10) ---- */
 
 .workshop {

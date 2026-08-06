@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { TownControl } from "@/components/society/town-control";
+import { TownProvider } from "@/components/society/town-context";
 import { identity } from "@/content/profile";
 import "./globals.css";
 
@@ -76,7 +78,12 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <TownProvider>
+          {children}
+          <TownControl />
+        </TownProvider>
+      </body>
     </html>
   );
 }

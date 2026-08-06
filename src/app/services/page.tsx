@@ -56,6 +56,7 @@ export default function ServicesPage() {
 
         <Section
           id="services"
+          district="workshops"
           number="01"
           title="What I do"
           intro="Five things, each with a piece of work behind it"
@@ -93,6 +94,7 @@ export default function ServicesPage() {
 
         <Section
           id="engagements"
+          district="road"
           number="02"
           title="How we'd work"
           intro="Pick the shape that fits — scope and price agreed before anything starts"
@@ -122,6 +124,7 @@ export default function ServicesPage() {
 
         <Section
           id="enquire"
+          district="hall"
           number="03"
           title="Leave a note at the workshop"
           intro="A couple of sentences is plenty — I reply to everything within a couple of days"
@@ -131,7 +134,13 @@ export default function ServicesPage() {
           </Reveal>
         </Section>
 
-        <Section id="faq" number="04" title="Questions" intro="The ones I get asked most">
+        <Section
+          id="faq"
+          district="library"
+          number="04"
+          title="Questions"
+          intro="The ones I get asked most"
+        >
           <div className="stagger grid gap-5">
             {servicesFaqs.map((faq) => (
               <div key={faq.q} className="border-t border-border pt-4">

@@ -1,3 +1,4 @@
+import { District, type DistrictName } from "./society/districts";
 import { TownGlyph, type GlyphName } from "./society/glyphs";
 
 export function Section({
@@ -6,6 +7,7 @@ export function Section({
   title,
   intro,
   glyph,
+  district,
   children,
 }: {
   id: string;
@@ -15,6 +17,8 @@ export function Section({
   intro?: string;
   /** Town building this district is marked by (SOC-8). Decorative. */
   glyph?: GlyphName;
+  /** Working district animating at the foot of this section (E21). */
+  district?: DistrictName;
   children: React.ReactNode;
 }) {
   return (
@@ -30,6 +34,7 @@ export function Section({
         <p className="mb-10 font-mono text-[11px] uppercase tracking-wider text-muted">{intro}</p>
       )}
       {children}
+      {district && <District name={district} />}
     </section>
   );
 }

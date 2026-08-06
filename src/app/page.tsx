@@ -35,6 +35,7 @@ export default async function Home() {
 
         <Section
           id="impact"
+          district="records"
           glyph="records"
           number="01"
           title="Impact in numbers"
@@ -47,6 +48,7 @@ export default async function Home() {
 
         <Section
           id="projects"
+          district="workshops"
           glyph="workshop"
           number="02"
           title="Selected projects"
@@ -66,6 +68,7 @@ export default async function Home() {
 
         <Section
           id="experience"
+          district="road"
           glyph="road"
           number="03"
           title="Experience"
@@ -82,6 +85,7 @@ export default async function Home() {
 
         <Section
           id="skills"
+          district="toolshed"
           glyph="toolshed"
           number="04"
           title="Skills"
@@ -100,6 +104,7 @@ export default async function Home() {
 
         <Section
           id="certificates"
+          district="library"
           glyph="library"
           number="05"
           title="Certificates"
@@ -113,6 +118,7 @@ export default async function Home() {
 
         <Section
           id="mcp"
+          district="telegraph"
           glyph="telegraph"
           number="06"
           title="Ask my portfolio"
