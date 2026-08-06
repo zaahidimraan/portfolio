@@ -52,6 +52,7 @@ export const flagships: Flagship[] = [
       "Judge agent grades candidates against a strict rubric with per-criterion confidence scores, instead of generic summaries.",
       "Validated on a golden dataset of 100 human-reviewed resumes using Ragas and Arize Phoenix.",
       "Data ingestion standardized with Model Context Protocol (MCP) servers for Google Drive and Airtable — no brittle API glue.",
+      "The judging core is open source and runnable: rubric grading, position-bias measurement, self-consistency and human-agreement scoring, with 37 tests that pass offline.",
     ],
     tech: ["LLM-as-a-Judge", "Ragas", "Arize Phoenix", "MCP", "Airtable"],
     repoUrl: "https://github.com/zaahidimraan/llm-judge-recruitment-agent",
