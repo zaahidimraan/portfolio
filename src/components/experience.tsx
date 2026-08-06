@@ -6,7 +6,11 @@ export function Experience() {
   return (
     <div>
       <ol className="exp-list relative space-y-10 border-l border-border pl-6">
-        <BannerPlane />
+        {/* Its own clipping track: putting overflow:hidden on the list itself
+            cropped the timeline dots, which sit outside its left edge. */}
+        <span aria-hidden className="exp-plane-track">
+          <BannerPlane />
+        </span>
         {experience.map((role) => (
           <li
             key={`${role.company}-${role.dates}`}

@@ -24,8 +24,13 @@ export function Logo({ className = "logo" }: { className?: string }) {
       <rect x="4.6" y="22.6" width="4.8" height="4.8" fill="currentColor" />
       {/* the node travelling the trace */}
       <circle className="logo-node" cx="15" cy="16" r="3.1" fill="currentColor" />
-      {/* I rule */}
-      <path d="M33 6 V26" stroke="currentColor" strokeWidth="2.6" strokeLinecap="square" />
+      {/* I — with real crossbars. Without them a bare stem reads as a pipe
+          character sitting between the mark and the wordmark, not a letter. */}
+      <g fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="square">
+        <path d="M30 7 H38" />
+        <path d="M34 7 V25" />
+        <path d="M30 25 H38" />
+      </g>
     </svg>
   );
 }

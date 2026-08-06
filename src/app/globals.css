@@ -622,15 +622,9 @@ html {
   opacity: 0.92;
 }
 
-.cast-limb,
-.cast-scarf {
+.cast-limb {
   transform-box: fill-box;
   transform-origin: top center;
-}
-
-.cast-scarf {
-  transform-origin: right center;
-  opacity: 0.7;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -672,10 +666,6 @@ html {
   .cast-actor[data-mode="jump"] .cast-arm-b {
     transform: rotate(30deg);
   }
-
-  .cast-scarf {
-    animation: cast-flutter 1.5s ease-in-out infinite;
-  }
 }
 
 @keyframes cast-leap {
@@ -713,16 +703,6 @@ html {
   }
 }
 
-@keyframes cast-flutter {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(-13deg);
-  }
-}
-
 /* The street a number gets when you point at it (CAST-2.4). */
 .cast-street {
   position: absolute;
@@ -751,14 +731,15 @@ html {
 
 /* ---- projects: climbers and three different arrivals (CAST-3) ---- */
 
-/* The 30px window above the card is what hides the climber's legs, so it
-   genuinely rises from behind the edge rather than being drawn cropped. */
+/* The card's left border is the rope. The track spans the card's height so
+   the climb has real distance to cover, and the figure straddles the border
+   line rather than floating in the margin beside it. */
 .card-climber {
   position: absolute;
-  right: 2.25rem;
-  top: -30px;
-  width: 22px;
-  height: 30px;
+  left: -12px;
+  top: 0;
+  width: 24px;
+  height: 100%;
   overflow: hidden;
   color: var(--foreground);
   pointer-events: none;
@@ -766,21 +747,21 @@ html {
 
 .card-climber svg {
   display: block;
-  width: 22px;
-  height: 30px;
-  transform: translateY(30px);
+  width: 24px;
+  height: 34px;
+  opacity: 0;
 }
 
 .climb-arm-a,
 .climb-arm-b {
   transform-box: fill-box;
-  transform-origin: bottom right;
+  transform-origin: bottom center;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .flagship-card:hover .card-climber svg,
   .flagship-card:focus-within .card-climber svg {
-    animation: climb-up 1.5s cubic-bezier(0.4, 0, 0.3, 1) forwards;
+    animation: climb-up 3.4s cubic-bezier(0.45, 0, 0.4, 1) forwards;
   }
 
   .flagship-card:hover .climb-arm-a,
@@ -795,10 +776,16 @@ html {
 }
 
 @keyframes climb-up {
-  from {
-    transform: translateY(30px);
+  0% {
+    opacity: 0;
+    transform: translateY(calc(100% + 34px));
   }
-  to {
+  8%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -806,10 +793,10 @@ html {
 @keyframes climb-reach {
   0%,
   100% {
-    transform: rotate(0deg);
+    transform: translateY(0);
   }
   50% {
-    transform: rotate(-16deg);
+    transform: translateY(-4px);
   }
 }
 
@@ -825,23 +812,38 @@ html {
   overflow: visible;
 }
 
+/* In the margin immediately outside the card's right edge. Inside the card
+   they landed on top of the copy and the "Case study" link; further out they
+   read as standing on nothing. Hugging the edge keeps them attached to the
+   card without ever touching its text.
+
+   Hidden below 1280px, where that margin does not exist — they are
+   decoration, so dropping them is the correct degradation. */
+.card-visitor {
+  display: none;
+  left: calc(100% + 10px);
+}
+
+@media (min-width: 1280px) {
+  .card-visitor {
+    display: block;
+  }
+}
+
 .visitor-sling {
-  top: -30px;
-  right: 5.5rem;
+  top: 0.5rem;
   width: 46px;
   height: 74px;
 }
 
 .visitor-jet {
-  bottom: -14px;
-  right: 1.5rem;
+  bottom: 1rem;
   width: 40px;
   height: 74px;
 }
 
 .visitor-leap {
-  top: 40%;
-  left: -34px;
+  top: 38%;
   width: 56px;
   height: 66px;
 }
@@ -864,7 +866,7 @@ html {
   /* 1 — swings in on its line */
   .flagship-card:hover .visitor-sling,
   .flagship-card:focus-within .visitor-sling {
-    animation: visitor-in 260ms ease-out forwards;
+    animation: sling-drop 520ms cubic-bezier(0.3, 0.9, 0.4, 1) forwards;
   }
 
   .flagship-card:hover .sling-body,
@@ -897,9 +899,14 @@ html {
   }
 }
 
-@keyframes visitor-in {
+@keyframes sling-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-46px);
+  }
   to {
     opacity: 0.9;
+    transform: none;
   }
 }
 
@@ -948,7 +955,7 @@ html {
 @keyframes leap-in {
   from {
     opacity: 0;
-    transform: translate(-70px, 34px) rotate(-14deg);
+    transform: translate(90px, 34px) rotate(12deg);
   }
   to {
     opacity: 0.9;
@@ -968,12 +975,14 @@ html {
 
 /* ---- GitHub bars as a runway (CAST-4) ---- */
 
+/* Above the bar, not on it: the widest bar is solid ink, and a plane drawn
+   over it disappeared entirely and collided with the count label. */
 .runway-plane {
   position: absolute;
-  right: 0;
+  right: 2.75rem;
   width: 54px;
   height: 22px;
-  margin-top: -3px;
+  margin-top: -19px;
   color: var(--foreground);
   pointer-events: none;
   opacity: 0.85;
@@ -1020,8 +1029,14 @@ html {
 
 /* ---- experience: the banner plane (CAST-5.2) ---- */
 
-.exp-list {
+.exp-plane-track {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 26px;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .exp-plane {
@@ -1059,7 +1074,7 @@ html {
   }
   100% {
     opacity: 0;
-    transform: translateX(calc(100vw + 140px));
+    transform: translateX(1200px);
   }
 }
 

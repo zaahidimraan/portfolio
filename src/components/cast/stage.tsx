@@ -43,12 +43,20 @@ const HEIGHT = 40;
 function readSpot(el: HTMLElement): Spot {
   const r = el.getBoundingClientRect();
   const mode = (el.dataset.perch as Mode) || "jump";
+
+  // The sticky nav's perches sit too high to stand on top of — the figure would
+  // be clipped by the viewport, and clamping it down just drops it on top of the
+  // button. Stand it on the header's bottom rule instead, clear to the left of
+  // the chip, so it reads as waiting beside the nav rather than colliding with it.
+  const header = el.closest("header");
+  if (header) {
+    const h = header.getBoundingClientRect();
+    return { x: r.left - HALF_W - 8, y: h.bottom, mode, street: null };
+  }
+
   return {
     x: r.left + r.width / 2,
-    // Feet on the element's top edge — unless it sits so high in the viewport
-    // that the figure would be cut off by it (the sticky nav chip does), in
-    // which case drop just far enough to keep the whole character visible.
-    y: Math.max(r.top, HEIGHT + 4),
+    y: r.top,
     mode,
     street: mode === "walk" ? { left: r.left, top: r.top, width: r.width } : null,
   };
@@ -221,8 +229,6 @@ function Figure() {
   };
   return (
     <svg viewBox="0 0 26 40" className="cast-figure" focusable="false">
-      {/* scarf — trails behind whichever way it is facing */}
-      <path className="cast-scarf" d="M11 12 q-7 2 -9 7" strokeWidth="1.8" {...line} />
       <circle cx="13" cy="7" r="4.4" fill="currentColor" />
       <line x1="13" y1="11.4" x2="13" y2="25" strokeWidth="2.6" {...line} />
       <g className="cast-limb cast-arm-a">

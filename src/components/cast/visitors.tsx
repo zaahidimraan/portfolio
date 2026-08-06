@@ -15,26 +15,29 @@
 const line = { stroke: "currentColor", fill: "none", strokeLinecap: "round" as const };
 
 /**
- * Rises from behind the card's top edge, hand over hand.
+ * Climbs the card's own left border, hand over hand.
  *
- * The clipping wrapper is what sells it: the figure travels inside a 28px
- * window sitting above the card, so its lower half is genuinely hidden by the
- * edge rather than merely drawn short.
+ * The first attempt had it rising from *behind* the card's top edge, and that
+ * failed on a real screen: card and page are both near-white and the edge is a
+ * 1px hairline, so there is no "behind" — the figure just appeared floating in
+ * blank space above the card. Gripping the border instead gives it a visible
+ * rope to climb, and the motion is anchored to something the eye can see.
  */
 export function CardClimber() {
   return (
     <span className="card-climber" aria-hidden>
-      <svg viewBox="0 0 22 30" focusable="false">
-        <circle cx="11" cy="7" r="3.6" fill="currentColor" />
-        <line x1="11" y1="10.6" x2="11" y2="21" strokeWidth="2.2" {...line} />
+      <svg viewBox="0 0 24 34" focusable="false">
+        <circle cx="12" cy="8" r="3.6" fill="currentColor" />
+        <line x1="12" y1="11.6" x2="12" y2="23" strokeWidth="2.2" {...line} />
+        {/* both hands on the rope, one above the other */}
         <g className="climb-arm-a">
-          <line x1="11" y1="13" x2="3" y2="8" strokeWidth="1.8" {...line} />
+          <line x1="12" y1="14" x2="12" y2="4" strokeWidth="1.8" {...line} />
         </g>
         <g className="climb-arm-b">
-          <line x1="11" y1="13" x2="19" y2="8" strokeWidth="1.8" {...line} />
+          <line x1="12" y1="16" x2="12" y2="9" strokeWidth="1.8" {...line} />
         </g>
-        <line x1="11" y1="21" x2="6" y2="30" strokeWidth="2" {...line} />
-        <line x1="11" y1="21" x2="16" y2="30" strokeWidth="2" {...line} />
+        <line x1="12" y1="23" x2="6" y2="33" strokeWidth="2" {...line} />
+        <line x1="12" y1="23" x2="17" y2="31" strokeWidth="2" {...line} />
       </svg>
     </span>
   );
