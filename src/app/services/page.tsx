@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { EnquiryForm } from "@/components/enquiry-form";
 import { Nav } from "@/components/nav";
 import { Reveal } from "@/components/reveal";
@@ -150,18 +151,18 @@ export default function ServicesPage() {
             experience first — or just read the work.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a
+            <Link
               href="/"
               className="glow-hover-sm rounded-md bg-accent px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-85"
             >
               See the work
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#mcp"
               className="glow-hover-sm rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-background"
             >
               Ask my MCP server
-            </a>
+            </Link>
             <a
               href={identity.cvPath}
               download

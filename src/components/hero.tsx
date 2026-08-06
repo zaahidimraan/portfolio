@@ -19,21 +19,21 @@ export function Hero() {
             ◆ {identity.location}
           </p>
           <h1 className="display-name mt-5">
-            <span className="hero-seq block" style={seq(80)}>
+            <span className="hero-seq-text block" style={seq(80)}>
               {firstName}
             </span>
-            <span className="hero-seq display-outline block" style={seq(170)}>
+            <span className="hero-seq-text display-outline block" style={seq(170)}>
               {lastName}
             </span>
           </h1>
           <p
-            className="hero-seq mt-6 text-xl font-medium tracking-tight sm:text-2xl"
+            className="hero-seq-text mt-6 text-xl font-medium tracking-tight sm:text-2xl"
             style={seq(260)}
           >
             {identity.role}
           </p>
           <p
-            className="hero-seq mt-6 max-w-2xl leading-relaxed text-foreground/90"
+            className="hero-seq-text mt-6 max-w-2xl leading-relaxed text-foreground/90"
             style={seq(340)}
           >
             {identity.blurb}

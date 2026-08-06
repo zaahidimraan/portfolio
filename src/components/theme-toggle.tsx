@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+/** The theme lives on <html>, set before paint by the inline script in the
+ *  layout. That makes it external state, so subscribe to it rather than
+ *  copying it into React with an effect. */
+function subscribe(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  return () => observer.disconnect();
+}
+
+const isDark = () => document.documentElement.classList.contains("dark");
 
 export function ThemeToggle() {
-  const [dark, setDark] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
-  }, []);
+  // null on the server, so SSR markup matches the pre-hydration DOM.
+  const dark = useSyncExternalStore(subscribe, isDark, () => null);
 
   function toggle() {
     const next = !document.documentElement.classList.contains("dark");
@@ -17,7 +25,6 @@ export function ThemeToggle() {
     } catch {
       /* private mode — theme just won't persist */
     }
-    setDark(next);
   }
 
   return (

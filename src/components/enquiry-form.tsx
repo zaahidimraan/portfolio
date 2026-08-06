@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { identity } from "@/content/profile";
 import { services } from "@/content/services";
 
@@ -13,8 +14,13 @@ const FIELD =
 
 export function EnquiryForm() {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
-  // Bots submit instantly; the server rejects anything faster than a few seconds.
-  const openedAt = useRef(Date.now());
+  // Bots submit instantly; the server rejects anything faster than a few
+  // seconds. Stamped after mount — calling Date.now() while rendering is
+  // impure and makes the component non-deterministic.
+  const openedAt = useRef(0);
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,9 +68,9 @@ export function EnquiryForm() {
         <p className="text-lg font-semibold">Message received</p>
         <p className="mt-2 text-sm text-muted">
           {status.message} In the meantime, everything I&apos;ve built is on{" "}
-          <a href="/" className="u-link text-foreground">
+          <Link href="/" className="u-link text-foreground">
             the homepage
-          </a>
+          </Link>
           .
         </p>
       </div>

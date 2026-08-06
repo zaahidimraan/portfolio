@@ -186,8 +186,24 @@ html.js .draw.in-view [data-draw] {
   }
 }
 
+/* Rise without fading. The hero copy is the LCP element, and an element at
+   opacity 0 has not painted — so fading it in charges its entire delay plus
+   fade straight to Largest Contentful Paint. Measured at 2.88s LCP with the
+   fade, of which 84% was render delay, on a page whose FCP is ~1.0s. Moving
+   it without fading lets it paint on the first frame; the staggered entrance
+   still reads. */
+@keyframes rise-only {
+  from {
+    transform: translateY(14px);
+  }
+}
+
 .hero-seq {
   animation: rise-in 0.6s ease var(--d, 0ms) backwards;
+}
+
+.hero-seq-text {
+  animation: rise-only 0.6s ease var(--d, 0ms) backwards;
 }
 
 html.js .reveal .stagger > * {
@@ -525,6 +541,22 @@ html {
 
 .fill-half {
   background: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+/* ---- below-the-fold layout skipping (TWN-5) ----
+   Measured: 693ms of style+layout on the main thread, holding LCP at 2.9s on
+   a page whose assets are all in by ~105ms. The cost is laying out the whole
+   document at once — the tech matrix alone is ~250 cells, plus four SVG
+   charts. content-visibility lets the browser skip work for sections that
+   are nowhere near the viewport.
+
+   `auto` on contain-intrinsic-size makes the browser remember each section's
+   real size once measured, so the scrollbar stops jumping on later loads.
+   The hero is deliberately excluded: it is above the fold and holds the LCP
+   element, so skipping it would be self-defeating. */
+main > section[id]:not(#top) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }
 
 /* ================= THE CAST (E22) =================
@@ -1240,7 +1272,8 @@ html {
     animation: none;
   }
 
-  .hero-seq {
+  .hero-seq,
+  .hero-seq-text {
     animation: none;
   }
 

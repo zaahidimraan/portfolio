@@ -79,10 +79,17 @@ export function TechMatrix() {
                           className="mx-auto block size-3 rounded-[2px] bg-foreground transition-transform hover:scale-150"
                         />
                       ) : (
-                        <span
-                          aria-label={`${row.tech} not used in ${c.full}`}
-                          className="mx-auto block size-3 rounded-[2px] border border-border"
-                        />
+                        <>
+                          {/* The table's row and column headers already say
+                              which technology and which place; the cell only
+                              has to carry its value. aria-label is prohibited
+                              on a bare span (generic role) anyway. */}
+                          <span className="sr-only">Not used</span>
+                          <span
+                            aria-hidden
+                            className="mx-auto block size-3 rounded-[2px] border border-border"
+                          />
+                        </>
                       )}
                     </td>
                   );
