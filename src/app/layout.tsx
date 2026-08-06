@@ -61,6 +61,20 @@ export const metadata: Metadata = {
 
 /** Runs before paint: applies stored/system theme (no FOUC) and flags JS
  *  availability so scroll-reveal CSS only hides content when JS can reveal it. */
+/**
+ * Cloudflare Web Analytics (PORT-6.4).
+ *
+ * Off unless NEXT_PUBLIC_CF_BEACON_TOKEN is set at build time, so the site
+ * ships zero third-party requests by default. The token is public by design —
+ * it identifies the site, not the account — which is why it can live in a
+ * NEXT_PUBLIC_ var and in the repo's CI config.
+ *
+ * Deliberately wired through this flag rather than Cloudflare's dashboard
+ * auto-injection: the footer's privacy line reads from the same flag, so the
+ * copy can never claim "no analytics" while a beacon is running.
+ */
+export const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN ?? "";
+
 const themeInit = `(function(){try{document.documentElement.classList.add("js");var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
 
 export default function RootLayout({
@@ -80,6 +94,13 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <Stage />
+        {cfBeaconToken && (
+          <script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+          />
+        )}
       </body>
     </html>
   );
