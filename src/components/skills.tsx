@@ -21,7 +21,36 @@ export function Skills() {
       el.classList.toggle("matrix-lit", targets?.has(el.id) ?? false);
       el.classList.toggle("matrix-dim", targets !== null && !targets.has(el.id));
     });
-    return () => entities.forEach((el) => el.classList.remove("matrix-lit", "matrix-dim"));
+
+    // The work a chip proves is almost always far off screen — measured at
+    // ~7,800px away for the first chip. Firing the current the moment you
+    // click means it plays where nobody can see it and is long finished by
+    // the time you scroll there. So arm it instead, and let it run as each
+    // lit entry actually arrives in view.
+    const lit = [...entities].filter((el) => el.classList.contains("matrix-lit"));
+    if (!lit.length) return () => entities.forEach((el) => el.classList.remove("matrix-lit", "matrix-dim"));
+
+    const surge = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          // Remove-reflow-add is what restarts a CSS animation.
+          el.classList.remove("matrix-surge");
+          void el.offsetWidth;
+          el.classList.add("matrix-surge");
+        }
+      },
+      { threshold: 0.15 },
+    );
+    lit.forEach((el) => surge.observe(el));
+
+    return () => {
+      surge.disconnect();
+      entities.forEach((el) =>
+        el.classList.remove("matrix-lit", "matrix-dim", "matrix-surge"),
+      );
+    };
   }, [active]);
 
   return (

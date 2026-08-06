@@ -1031,7 +1031,7 @@ html {
 
 .exp-plane-track {
   position: absolute;
-  top: -20px;
+  top: -26px;
   left: 0;
   right: 0;
   height: 26px;
@@ -1039,9 +1039,11 @@ html {
   pointer-events: none;
 }
 
+/* top:0, not a negative offset — the track is already lifted above the list,
+   so pushing the plane up again put 16 of its 24px outside the clip. */
 .exp-plane {
   position: absolute;
-  top: -16px;
+  top: 0;
   left: 0;
   width: 128px;
   height: 24px;
@@ -1085,16 +1087,19 @@ html {
 .repo-card::after {
   content: "";
   position: absolute;
-  inset: -1px;
+  inset: -2px;
   border-radius: inherit;
-  padding: 1px;
+  padding: 2px;
   pointer-events: none;
   opacity: 0;
+  /* A wider, glowing arc: on hover the whole border already brightens, so a
+     thin same-colour sweep on top of it barely registered. */
   background: conic-gradient(
     from var(--blip, 0deg),
-    currentColor 0deg 20deg,
-    transparent 20deg 360deg
+    currentColor 0deg 34deg,
+    transparent 34deg 360deg
   );
+  filter: drop-shadow(0 0 4px currentColor);
   mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -1110,8 +1115,8 @@ html {
 @media (prefers-reduced-motion: no-preference) {
   .repo-card:hover::after,
   .repo-card:focus-visible::after {
-    opacity: 0.9;
-    animation: repo-blip 1.15s linear infinite;
+    opacity: 1;
+    animation: repo-blip 1.6s linear infinite;
   }
 }
 
@@ -1165,9 +1170,9 @@ html {
 .matrix-lit::before {
   content: "";
   position: absolute;
-  left: -1px;
+  left: -2px;
   top: 0;
-  width: 2px;
+  width: 3px;
   height: 100%;
   background: currentColor;
   opacity: 0;
@@ -1175,9 +1180,11 @@ html {
   transform-origin: top center;
 }
 
+/* Armed by the click, fired by the scroll — .matrix-surge is added when the
+   entry actually reaches the viewport. */
 @media (prefers-reduced-motion: no-preference) {
-  .matrix-lit::before {
-    animation: skill-current 1s cubic-bezier(0.3, 0.7, 0.3, 1);
+  .matrix-surge::before {
+    animation: skill-current 1.1s cubic-bezier(0.3, 0.7, 0.3, 1);
   }
 }
 
