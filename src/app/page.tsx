@@ -12,7 +12,6 @@ import { RepoTimeline } from "@/components/repo-timeline";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
 import { SideProjects } from "@/components/side-projects";
-import { CityScene } from "@/components/society/city-scene";
 import { StatCounters } from "@/components/stat-counters";
 import { Certificates, Skills } from "@/components/skills";
 import { TechMatrix } from "@/components/tech-matrix";
@@ -35,8 +34,6 @@ export default async function Home() {
 
         <Section
           id="impact"
-          district="records"
-          glyph="records"
           number="01"
           title="Impact in numbers"
           intro="Measured results from production systems — every number links to its proof"
@@ -48,8 +45,6 @@ export default async function Home() {
 
         <Section
           id="projects"
-          district="workshops"
-          glyph="workshop"
           number="02"
           title="Selected projects"
           intro="Three flagship builds with their architectures, then everything else"
@@ -68,8 +63,6 @@ export default async function Home() {
 
         <Section
           id="experience"
-          district="road"
-          glyph="road"
           number="03"
           title="Experience"
           intro="Click any bar to open the full entry — concurrent roles show in parallel"
@@ -85,8 +78,6 @@ export default async function Home() {
 
         <Section
           id="skills"
-          district="toolshed"
-          glyph="toolshed"
           number="04"
           title="Skills"
           intro="Chips with a count are clickable — they light up the work that proves them"
@@ -104,8 +95,6 @@ export default async function Home() {
 
         <Section
           id="certificates"
-          district="library"
-          glyph="library"
           number="05"
           title="Certificates"
           intro="Fifteen certificates across three tracks — the lanes show where the focus went"
@@ -118,8 +107,6 @@ export default async function Home() {
 
         <Section
           id="mcp"
-          district="telegraph"
-          glyph="telegraph"
           number="06"
           title="Ask my portfolio"
           intro="A live MCP server — connect an AI client and question my CV directly"
@@ -129,7 +116,6 @@ export default async function Home() {
           </Reveal>
         </Section>
 
-        <CityScene />
         <Contact />
       </main>
       <CrossLinks />

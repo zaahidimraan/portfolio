@@ -1,5 +1,4 @@
 import { identity } from "@/content/profile";
-import { District } from "./society/districts";
 import { StatusNow } from "./status-now";
 
 const seq = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
@@ -43,6 +42,8 @@ export function Hero() {
             <a
               href={identity.cvPath}
               download
+              data-perch="jump"
+              data-perch-home="primary"
               className="glow-hover-sm rounded-md bg-accent px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-85"
             >
               Download CV
@@ -51,6 +52,7 @@ export function Hero() {
               href={identity.github}
               target="_blank"
               rel="noopener noreferrer"
+              data-perch="jump"
               className="glow-hover-sm rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-background"
             >
               GitHub ↗
@@ -59,12 +61,14 @@ export function Hero() {
               href={identity.linkedin}
               target="_blank"
               rel="noopener noreferrer"
+              data-perch="jump"
               className="glow-hover-sm rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-background"
             >
               LinkedIn ↗
             </a>
             <a
               href={`mailto:${identity.email}`}
+              data-perch="jump"
               className="glow-hover-sm rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-background"
             >
               Email
@@ -93,7 +97,6 @@ export function Hero() {
       <div className="hero-seq" style={seq(580)}>
         <StatusNow />
       </div>
-      <District name="gate" />
       <a
         href="#impact"
         className="hero-seq no-print mt-12 inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-[0.25em] text-muted transition-colors hover:text-foreground"

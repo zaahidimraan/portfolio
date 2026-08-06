@@ -90,7 +90,8 @@ export function Certificates() {
   return (
     <ul className="stagger grid gap-x-8 gap-y-3 sm:grid-cols-2">
       {certificates.map((c) => (
-        <li key={c.name} className="flex items-baseline justify-between gap-3 text-sm">
+        <li key={c.name} className="cert-row relative flex items-baseline justify-between gap-3 text-sm">
+          <span aria-hidden className="cert-stamp" />
           <span className="text-foreground/85">{c.name}</span>
           <span className="shrink-0 font-mono text-xs text-muted">
             {c.issuer} · {c.date}

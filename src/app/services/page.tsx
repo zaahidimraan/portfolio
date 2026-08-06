@@ -3,7 +3,6 @@ import { EnquiryForm } from "@/components/enquiry-form";
 import { Nav } from "@/components/nav";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
-import { ToolGlyph, Workshop } from "@/components/society/workshop";
 import { identity } from "@/content/profile";
 import { engagementModels, process, services } from "@/content/services";
 import { servicesFaqs, servicesSchema } from "@/lib/seo";
@@ -51,12 +50,10 @@ export default function ServicesPage() {
             Everything I offer below is something you can already see working on this site. No
             capability listed here is one I can&apos;t point at.
           </p>
-          <Workshop />
         </section>
 
         <Section
           id="services"
-          district="workshops"
           number="01"
           title="What I do"
           intro="Five things, each with a piece of work behind it"
@@ -65,8 +62,7 @@ export default function ServicesPage() {
             {services.map((service) => (
               <Reveal key={service.title}>
                 <article className="glow-hover rounded-lg border border-border bg-card p-6 hover:border-foreground/60">
-                  <h2 className="flex items-center gap-2.5 text-xl font-semibold tracking-tight">
-                    <ToolGlyph name={service.tool} />
+                  <h2 className="text-xl font-semibold tracking-tight">
                     {service.title}
                   </h2>
                   <p className="mt-2 font-medium text-foreground/90">{service.summary}</p>
@@ -94,7 +90,6 @@ export default function ServicesPage() {
 
         <Section
           id="engagements"
-          district="road"
           number="02"
           title="How we'd work"
           intro="Pick the shape that fits — scope and price agreed before anything starts"
@@ -124,7 +119,6 @@ export default function ServicesPage() {
 
         <Section
           id="enquire"
-          district="hall"
           number="03"
           title="Leave a note at the workshop"
           intro="A couple of sentences is plenty — I reply to everything within a couple of days"
@@ -136,7 +130,6 @@ export default function ServicesPage() {
 
         <Section
           id="faq"
-          district="library"
           number="04"
           title="Questions"
           intro="The ones I get asked most"

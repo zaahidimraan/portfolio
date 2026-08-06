@@ -302,1223 +302,6 @@ html.js .reveal.in-view .cert-dot:nth-of-type(n + 8) { transition-delay: 0.42s; 
   }
 }
 
-/* ---- Walking figure (E16) — transform-only, compositor-friendly ---- */
-
-.walker-lane {
-  position: relative;
-  height: 46px;
-  margin-top: 2.5rem;
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.walker {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 24px;
-  height: 44px;
-  color: var(--foreground);
-  will-change: transform;
-}
-
-.walker-svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.walker-label {
-  position: absolute;
-  right: 0;
-  bottom: 6px;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-/* Patrol: walk right, turn, walk back, turn. Percentages hold the flip
-   instantaneous so the figure appears to pivot on the spot. */
-@keyframes walker-patrol {
-  0% {
-    transform: translateX(0) scaleX(1);
-  }
-  48% {
-    transform: translateX(calc(100vw - 60px)) scaleX(1);
-  }
-  50% {
-    transform: translateX(calc(100vw - 60px)) scaleX(-1);
-  }
-  98% {
-    transform: translateX(0) scaleX(-1);
-  }
-  100% {
-    transform: translateX(0) scaleX(1);
-  }
-}
-
-/* Limb swing. Front/back pairs run in antiphase via negative delay. */
-@keyframes walker-swing {
-  0%,
-  100% {
-    transform: rotate(24deg);
-  }
-  50% {
-    transform: rotate(-24deg);
-  }
-}
-
-/* Subtle vertical bob on each step, at twice the stride frequency. */
-@keyframes walker-bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  25%,
-  75% {
-    transform: translateY(-1.5px);
-  }
-}
-
-.walker-arm,
-.walker-leg {
-  transform-box: fill-box;
-  transform-origin: top center;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .walker {
-    animation: walker-patrol 34s linear infinite;
-  }
-
-  .walker-svg {
-    animation: walker-bob 0.9s ease-in-out infinite;
-  }
-
-  .walker-leg,
-  .walker-arm {
-    animation: walker-swing 0.9s ease-in-out infinite;
-  }
-
-  /* Antiphase: back limbs are half a stride behind the front ones. */
-  .walker-leg-back,
-  .walker-arm-front {
-    animation-delay: -0.45s;
-  }
-
-  /* Arms swing slightly less than legs. */
-  .walker-arm {
-    animation-name: walker-swing;
-    scale: 0.8;
-  }
-}
-
-/* Reduced motion: the lane and figure add nothing static, so remove them. */
-@media (prefers-reduced-motion: reduce) {
-  .walker-lane {
-    display: none;
-  }
-}
-
-/* ================= The society (SOC-1..4) =================
-   One custom property drives every animation's play state and speed, so
-   pausing the whole town is a single style change and resumes in place. */
-
-.society {
-  --soc-speed: 1;
-  --soc-run: running;
-  margin-top: 3rem;
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-}
-
-.society[data-playing="false"] {
-  --soc-run: paused;
-}
-
-.society-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.society-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.soc-btn {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 0.2rem 0.55rem;
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.soc-btn:hover {
-  color: var(--background);
-  background: var(--foreground);
-  border-color: var(--foreground);
-}
-
-.soc-btn-on {
-  color: var(--background);
-  background: var(--foreground);
-  border-color: var(--foreground);
-}
-
-.society-stage {
-  position: relative;
-  height: 190px;
-  margin-top: 0.75rem;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.society-caption {
-  margin-top: 0.6rem;
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  min-height: 1.2em;
-}
-
-/* ---- skyline ---- */
-
-.soc-skyline {
-  position: absolute;
-  inset: 0 0 26px 0;
-  pointer-events: none;
-}
-
-.soc-skyline-svg {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 150px;
-}
-
-.soc-building {
-  fill: var(--foreground);
-  opacity: 0.1;
-}
-
-.soc-crane,
-.soc-crane-cable {
-  stroke: var(--foreground);
-  stroke-width: 2;
-  opacity: 0.25;
-}
-
-.soc-crane-cable {
-  stroke-width: 1;
-}
-
-.soc-crane-load {
-  fill: var(--foreground);
-  opacity: 0.25;
-  transform-box: fill-box;
-  transform-origin: top center;
-  animation: soc-crane-lift calc(9s / var(--soc-speed)) ease-in-out infinite;
-  animation-play-state: var(--soc-run);
-}
-
-@keyframes soc-crane-lift {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(58px);
-  }
-}
-
-.soc-window {
-  fill: var(--foreground);
-  opacity: 0.06;
-}
-
-/* After dark a subset of windows glow and flicker on their own schedule. */
-.society[data-night="true"] .soc-window-lit {
-  opacity: 0.55;
-  animation: soc-window-flicker calc(11s / var(--soc-speed)) steps(1, end) infinite;
-  animation-play-state: var(--soc-run);
-}
-
-@keyframes soc-window-flicker {
-  0%,
-  62%,
-  100% {
-    opacity: 0.55;
-  }
-  64%,
-  74% {
-    opacity: 0.12;
-  }
-}
-
-/* sun by day, moon by night — crosses the sky slowly */
-.soc-celestial {
-  position: absolute;
-  top: 14px;
-  left: 0;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--foreground);
-  opacity: 0.16;
-  animation: soc-celestial-arc calc(120s / var(--soc-speed)) linear infinite;
-  animation-play-state: var(--soc-run);
-}
-
-.society[data-night="true"] .soc-celestial {
-  background: transparent;
-  box-shadow: inset -7px 3px 0 0 var(--foreground);
-  opacity: 0.4;
-}
-
-@keyframes soc-celestial-arc {
-  from {
-    transform: translate(-40px, 30px);
-  }
-  50% {
-    transform: translate(50vw, -6px);
-  }
-  to {
-    transform: translate(105vw, 30px);
-  }
-}
-
-/* ---- road ---- */
-
-.soc-road {
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 26px;
-  border-top: 1px solid var(--border);
-}
-
-.soc-road-dashes {
-  position: absolute;
-  top: 12px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: repeating-linear-gradient(
-    to right,
-    var(--border) 0 18px,
-    transparent 18px 36px
-  );
-}
-
-/* ---- citizens ---- */
-
-.soc-citizen {
-  position: absolute;
-  bottom: 26px;
-  color: var(--foreground);
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  line-height: 0;
-  transition: filter 0.2s ease;
-}
-
-.soc-citizen:hover,
-.soc-citizen:focus-visible {
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--foreground) 45%, transparent));
-}
-
-.soc-selected {
-  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--foreground) 65%, transparent));
-}
-
-/* Depth: further lanes sit higher, smaller and fainter. */
-.soc-lane-far {
-  bottom: 74px;
-  transform: scale(0.62);
-  opacity: 0.45;
-}
-
-.soc-lane-mid {
-  bottom: 44px;
-  transform: scale(0.8);
-  opacity: 0.72;
-}
-
-.soc-svg {
-  width: 26px;
-  height: 44px;
-  overflow: visible;
-}
-
-.soc-cycle .soc-svg {
-  width: 42px;
-}
-
-.soc-engineer .soc-svg,
-.soc-rest .soc-svg {
-  width: 42px;
-}
-
-.soc-build .soc-svg {
-  width: 36px;
-  height: 48px;
-}
-
-.soc-fly .soc-svg {
-  width: 92px;
-  height: 26px;
-}
-
-.soc-dog .soc-svg {
-  width: 24px;
-  height: 18px;
-}
-
-/* Freezing one citizen stops only their animations. */
-.soc-frozen,
-.soc-frozen * {
-  animation-play-state: paused !important;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* travelling citizens */
-  .soc-walk,
-  .soc-cycle,
-  .soc-dog {
-    animation: soc-travel var(--soc-dur) linear infinite;
-    animation-delay: var(--soc-delay);
-    animation-play-state: var(--soc-run);
-  }
-
-  .soc-fly {
-    animation: soc-fly-across var(--soc-dur) linear infinite;
-    animation-delay: var(--soc-delay);
-    animation-play-state: var(--soc-run);
-  }
-
-  /* limbs and props */
-  .soc-limb,
-  .soc-bob,
-  .soc-wheel,
-  .soc-nod,
-  .soc-zzz,
-  .soc-banner {
-    animation-duration: var(--soc-dur);
-    animation-iteration-count: infinite;
-    animation-play-state: var(--soc-run);
-  }
-
-  .soc-walk .soc-limb,
-  .soc-dog .soc-limb {
-    animation-name: soc-swing;
-    animation-duration: 0.85s;
-    animation-timing-function: ease-in-out;
-  }
-
-  .soc-walk .soc-bob,
-  .soc-dog .soc-bob {
-    animation-name: soc-step-bob;
-    animation-duration: 0.85s;
-    animation-timing-function: ease-in-out;
-  }
-
-  .soc-leg-b,
-  .soc-arm-f,
-  .soc-paw-b {
-    animation-delay: -0.425s;
-  }
-
-  .soc-wheel {
-    animation-name: soc-spin;
-    animation-duration: 0.7s;
-    animation-timing-function: linear;
-  }
-
-  .soc-pedal-a,
-  .soc-pedal-b {
-    animation-name: soc-spin;
-    animation-duration: 0.7s;
-    animation-timing-function: linear;
-  }
-
-  .soc-pedal-b {
-    animation-delay: -0.35s;
-  }
-
-  .soc-type {
-    animation-name: soc-tap;
-    animation-duration: 0.5s;
-    animation-timing-function: ease-in-out;
-  }
-
-  .soc-hammer {
-    animation-name: soc-hammer-swing;
-    animation-duration: 1.1s;
-    animation-timing-function: ease-in;
-  }
-
-  .soc-point {
-    animation-name: soc-point-sweep;
-    animation-duration: 3.4s;
-    animation-timing-function: ease-in-out;
-  }
-
-  .soc-nod {
-    animation-name: soc-nod-move;
-    animation-duration: 4.5s;
-    animation-timing-function: ease-in-out;
-  }
-
-  .soc-tail {
-    animation-name: soc-wag;
-    animation-duration: 0.35s;
-    animation-timing-function: ease-in-out;
-  }
-
-  .soc-banner {
-    animation-name: soc-banner-wave;
-    animation-duration: 1.4s;
-    animation-timing-function: ease-in-out;
-  }
-
-  /* the resting figure sleeps after dark */
-  .soc-zzz {
-    opacity: 0;
-  }
-
-  .society[data-night="true"] .soc-zzz {
-    opacity: 1;
-    animation-name: soc-snore;
-    animation-duration: 3s;
-    animation-timing-function: ease-out;
-  }
-}
-
-.soc-limb,
-.soc-nod,
-.soc-tail,
-.soc-wheel,
-.soc-banner {
-  transform-box: fill-box;
-  transform-origin: top center;
-}
-
-.soc-wheel,
-.soc-pedal-a,
-.soc-pedal-b {
-  transform-origin: center;
-}
-
-.soc-hammer,
-.soc-point,
-.soc-type {
-  transform-origin: 12px 14px;
-}
-
-@keyframes soc-travel {
-  from {
-    transform: translateX(0) scaleX(1);
-  }
-  49% {
-    transform: translateX(78vw) scaleX(1);
-  }
-  50% {
-    transform: translateX(78vw) scaleX(-1);
-  }
-  99% {
-    transform: translateX(0) scaleX(-1);
-  }
-  to {
-    transform: translateX(0) scaleX(1);
-  }
-}
-
-@keyframes soc-fly-across {
-  from {
-    transform: translateX(-15vw);
-  }
-  to {
-    transform: translateX(115vw);
-  }
-}
-
-@keyframes soc-swing {
-  0%,
-  100% {
-    transform: rotate(23deg);
-  }
-  50% {
-    transform: rotate(-23deg);
-  }
-}
-
-@keyframes soc-step-bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  25%,
-  75% {
-    transform: translateY(-1.4px);
-  }
-}
-
-@keyframes soc-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes soc-tap {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(-7deg);
-  }
-}
-
-@keyframes soc-hammer-swing {
-  0%,
-  55%,
-  100% {
-    transform: rotate(0deg);
-  }
-  30% {
-    transform: rotate(-52deg);
-  }
-  65% {
-    transform: rotate(9deg);
-  }
-}
-
-@keyframes soc-point-sweep {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  40%,
-  60% {
-    transform: rotate(-16deg);
-  }
-}
-
-@keyframes soc-nod-move {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(2px) rotate(6deg);
-  }
-}
-
-@keyframes soc-wag {
-  0%,
-  100% {
-    transform: rotate(-16deg);
-  }
-  50% {
-    transform: rotate(18deg);
-  }
-}
-
-@keyframes soc-banner-wave {
-  0%,
-  100% {
-    transform: rotate(0deg) translateY(0);
-  }
-  50% {
-    transform: rotate(2.5deg) translateY(1.5px);
-  }
-}
-
-@keyframes soc-snore {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(0.9);
-    opacity: 0.15;
-  }
-  50% {
-    transform: translate(3px, -5px) scale(1.15);
-    opacity: 0.85;
-  }
-}
-
-/* The whole town is decoration: remove it when motion is unwelcome. */
-@media (prefers-reduced-motion: reduce) {
-  .society-stage,
-  .society-controls {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .society-stage {
-    height: 150px;
-  }
-
-  .soc-lane-far {
-    display: none;
-  }
-}
-
-/* ================= Town-wide layer (SOC-6..10) ================= */
-
-/* ---- the guide who follows your scroll ---- */
-
-.guide-strip {
-  position: relative;
-  height: 30px;
-  margin: 0 auto;
-  max-width: 56rem;
-  padding: 0 1.25rem;
-  pointer-events: none;
-}
-
-.guide {
-  position: absolute;
-  bottom: 0;
-  left: 1.25rem;
-  width: 22px;
-  height: 28px;
-  color: var(--foreground);
-  opacity: 0.6;
-  will-change: transform;
-}
-
-.guide-svg {
-  width: 100%;
-  height: 100%;
-}
-
-.guide-label {
-  position: absolute;
-  right: 1.25rem;
-  bottom: 7px;
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.guide-limb {
-  transform-box: fill-box;
-  transform-origin: top center;
-}
-
-/* The walk cycle only runs while the reader is actually scrolling. */
-@media (prefers-reduced-motion: no-preference) {
-  .guide[data-moving="true"] .guide-limb {
-    animation: soc-swing 0.5s ease-in-out infinite;
-  }
-
-  .guide[data-moving="true"] .guide-leg-b,
-  .guide[data-moving="true"] .guide-arm-f {
-    animation-delay: -0.25s;
-  }
-}
-
-@media (prefers-reduced-motion: reduce), (max-width: 640px) {
-  .guide-strip {
-    display: none;
-  }
-}
-
-/* ---- workers living inside the charts ---- */
-
-.cw {
-  opacity: 0.55;
-}
-
-.cw-limb {
-  transform-box: fill-box;
-  transform-origin: top center;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cw-pace {
-    animation: cw-pace var(--cw-dur, 18s) ease-in-out var(--cw-delay, 0s) infinite;
-  }
-
-  .cw-pace .cw-limb {
-    animation: soc-swing 0.75s ease-in-out infinite;
-  }
-
-  .cw-leg-b {
-    animation-delay: -0.375s;
-  }
-
-  .cw-point {
-    animation: soc-point-sweep 4s ease-in-out infinite;
-    transform-origin: 0 -9px;
-  }
-
-  .cw-tap {
-    animation: soc-hammer-swing 1.6s ease-in infinite;
-    transform-origin: 0 -8.4px;
-  }
-}
-
-@keyframes cw-pace {
-  0%,
-  100% {
-    transform: translateX(0) scaleX(1);
-  }
-  48% {
-    transform: translateX(var(--cw-travel)) scaleX(1);
-  }
-  52% {
-    transform: translateX(var(--cw-travel)) scaleX(-1);
-  }
-  98% {
-    transform: translateX(0) scaleX(-1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cw {
-    display: none;
-  }
-}
-
-/* ---- district glyphs ---- */
-
-.town-glyph {
-  width: 17px;
-  height: 19px;
-  flex: none;
-  color: var(--muted);
-  transform: translateY(2px);
-}
-
-/* ================= Districts: every section is alive (E21) =================
-   One band per section. Animations run only while the band is near the
-   viewport AND the town is playing, so a long page never animates more than
-   the couple of districts you can actually see. */
-
-.district {
-  position: relative;
-  margin-top: 2.5rem;
-  color: var(--foreground);
-  pointer-events: none;
-  /* Skip layout and paint entirely while off screen. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 80px;
-}
-
-.district-svg {
-  display: block;
-  width: 100%;
-  height: 80px;
-  overflow: visible;
-  opacity: 0.5;
-}
-
-.district[data-night="true"] .district-svg {
-  opacity: 0.62;
-}
-
-/* The gate on every district animation: paused unless visible and playing. */
-.district[data-active="false"] * {
-  animation-play-state: paused !important;
-}
-
-.d-limb,
-.d-carry,
-.d-hammer,
-.d-reach,
-.d-shelve,
-.d-key,
-.d-post,
-.d-cog,
-.d-load,
-.d-tally,
-.d-tool,
-.d-climb {
-  transform-box: fill-box;
-  transform-origin: top center;
-}
-
-.d-cog,
-.d-load {
-  transform-origin: center;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .d-walker {
-    animation: d-travel var(--d-dur, 26s) linear var(--d-delay, 0s) infinite;
-  }
-
-  .d-limb {
-    animation: soc-swing 0.85s ease-in-out infinite;
-  }
-
-  .d-leg-b,
-  .d-arm-a {
-    animation-delay: -0.425s;
-  }
-
-  .d-cog {
-    animation: soc-spin calc(4s / var(--soc-speed, 1)) linear var(--d-delay, 0s) infinite;
-  }
-
-  .d-load {
-    animation: d-lift calc(8s / var(--soc-speed, 1)) ease-in-out infinite;
-  }
-
-  .d-hammer {
-    animation: soc-hammer-swing calc(1.2s / var(--soc-speed, 1)) ease-in infinite;
-    transform-origin: 0 -24px;
-  }
-
-  .d-carry,
-  .d-post {
-    animation: d-sway calc(2.6s / var(--soc-speed, 1)) ease-in-out infinite;
-    transform-origin: 0 -23px;
-  }
-
-  .d-reach,
-  .d-shelve {
-    animation: d-reach calc(3.2s / var(--soc-speed, 1)) ease-in-out infinite;
-    transform-origin: 0 -23px;
-  }
-
-  .d-key {
-    animation: d-tap calc(0.7s / var(--soc-speed, 1)) ease-in-out infinite;
-    transform-origin: -4px -26px;
-  }
-
-  .d-tally {
-    animation: d-grow calc(9s / var(--soc-speed, 1)) ease-in-out infinite;
-    transform-origin: left center;
-  }
-
-  .d-tool {
-    animation: d-tool-set calc(5s / var(--soc-speed, 1)) ease-in-out var(--d-delay, 0s) infinite;
-    transform-origin: top center;
-  }
-
-  .d-climb {
-    animation: d-climb calc(11s / var(--soc-speed, 1)) ease-in-out infinite;
-  }
-
-  .d-pulse {
-    offset-path: path("M200 26 Q560 46 1020 26");
-    animation: d-pulse-run calc(4.2s / var(--soc-speed, 1)) linear var(--d-delay, 0s) infinite;
-  }
-
-  .d-bird {
-    animation: d-fly calc(var(--d-dur, 34s) / var(--soc-speed, 1)) linear infinite;
-  }
-}
-
-@keyframes d-travel {
-  0% {
-    transform: translateX(0) scaleX(1);
-  }
-  48% {
-    transform: translateX(var(--d-travel, 200px)) scaleX(1);
-  }
-  50% {
-    transform: translateX(var(--d-travel, 200px)) scaleX(-1);
-  }
-  98% {
-    transform: translateX(0) scaleX(-1);
-  }
-  100% {
-    transform: translateX(0) scaleX(1);
-  }
-}
-
-@keyframes d-lift {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(18px);
-  }
-}
-
-@keyframes d-sway {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(-9deg);
-  }
-}
-
-@keyframes d-reach {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  45%,
-  55% {
-    transform: rotate(-22deg);
-  }
-}
-
-@keyframes d-tap {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(-11deg);
-  }
-}
-
-@keyframes d-grow {
-  0%,
-  100% {
-    transform: scaleX(0.45);
-  }
-  55%,
-  70% {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes d-tool-set {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-3px) rotate(7deg);
-  }
-}
-
-@keyframes d-climb {
-  0%,
-  100% {
-    transform: translate(786px, 34px);
-  }
-  50% {
-    transform: translate(789px, 20px);
-  }
-}
-
-@keyframes d-pulse-run {
-  0% {
-    offset-distance: 0%;
-    opacity: 0;
-  }
-  10%,
-  85% {
-    opacity: 0.85;
-  }
-  100% {
-    offset-distance: 100%;
-    opacity: 0;
-  }
-}
-
-@keyframes d-fly {
-  0% {
-    transform: translate(-60px, 16px);
-  }
-  50% {
-    transform: translate(600px, 4px);
-  }
-  100% {
-    transform: translate(1260px, 16px);
-  }
-}
-
-@media (max-width: 640px) {
-  .district-svg {
-    height: 56px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .district {
-    display: none;
-  }
-}
-
-/* ---- floating town control (TWN-4) ---- */
-
-.town-control {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.35rem 0.45rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--background) 88%, transparent);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--foreground) 8%, transparent);
-}
-
-.town-control[data-open="false"] .town-control-items {
-  display: none;
-}
-
-.town-control-items {
-  display: flex;
-  gap: 0.25rem;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .town-control {
-    display: none;
-  }
-}
-
-@media print {
-  .town-control {
-    display: none;
-  }
-}
-
-/* ---- the workshop (SOC-10) ---- */
-
-.workshop {
-  margin-top: 2.5rem;
-  color: var(--foreground);
-  max-width: 34rem;
-}
-
-.workshop-svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.workshop-window {
-  fill: transparent;
-}
-
-.workshop[data-night="true"] .workshop-window {
-  fill: currentColor;
-  opacity: 0.5;
-}
-
-.workshop-arm,
-.workshop-smoke,
-.workshop-sparks {
-  transform-box: fill-box;
-}
-
-.workshop-arm {
-  transform-origin: 0% 0%;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .workshop-arm {
-    animation: workshop-strike 1.6s ease-in infinite;
-  }
-
-  .workshop-smoke {
-    animation: workshop-drift 5s ease-in-out infinite;
-  }
-
-  .workshop-sparks {
-    animation: workshop-spark 1.6s ease-out infinite;
-  }
-}
-
-@keyframes workshop-strike {
-  0%,
-  60%,
-  100% {
-    transform: rotate(0deg);
-  }
-  35% {
-    transform: rotate(-26deg);
-  }
-  70% {
-    transform: rotate(5deg);
-  }
-}
-
-@keyframes workshop-drift {
-  0%,
-  100% {
-    transform: translate(0, 0);
-    opacity: 1;
-  }
-  50% {
-    transform: translate(5px, -7px);
-    opacity: 0.55;
-  }
-}
-
-@keyframes workshop-spark {
-  0%,
-  55% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.6);
-  }
-  62% {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(6px, -6px) scale(0.4);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .workshop {
-    display: none;
-  }
-}
-
-.tool-glyph {
-  width: 19px;
-  height: 19px;
-  flex: none;
-  color: var(--muted);
-}
-
-/* The guide's lantern glows after dark (SOC-11). */
-.guide-lantern {
-  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--foreground) 70%, transparent));
-}
-
-/* ---- footer signpost ---- */
-
-.signpost {
-  width: 34px;
-  height: 38px;
-  color: var(--muted);
-  flex: none;
-}
-
-.footer-signpost {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
 
 /* ---- 404: off the map ---- */
 
@@ -1744,6 +527,669 @@ html {
   background: color-mix(in srgb, var(--foreground) 45%, transparent);
 }
 
+/* ================= THE CAST (E22) =================
+   Every rule below fires because the visitor did something. Nothing here
+   loops on its own — that was the fault of the town this replaced.
+   All motion is transform/opacity only, and the whole layer is switched off
+   under `prefers-reduced-motion` further down this stylesheet. */
+
+/* ---- the mark (CAST-1) ---- */
+
+.logo {
+  width: 30px;
+  height: 24px;
+  flex: none;
+  overflow: visible;
+}
+
+.logo-trace {
+  stroke-dasharray: 25;
+  stroke-dashoffset: 0;
+}
+
+.logo-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mark-link:hover .logo-trace,
+  .mark-link:focus-visible .logo-trace {
+    animation: logo-draw 620ms ease-out;
+  }
+
+  .mark-link:hover .logo-node,
+  .mark-link:focus-visible .logo-node {
+    animation: logo-run 620ms ease-in-out;
+  }
+}
+
+@keyframes logo-draw {
+  from {
+    stroke-dashoffset: 25;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes logo-run {
+  0% {
+    transform: translate(8px, -9px) scale(0.5);
+  }
+  60% {
+    transform: translate(-8px, 9px) scale(1.25);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* ---- the companion (CAST-2) ----
+   A fixed layer, so viewport coordinates from getBoundingClientRect() can be
+   used directly with no scroll-offset arithmetic to drift out of sync. */
+
+.cast-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+  color: var(--foreground);
+}
+
+.cast-actor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 40px;
+  will-change: transform;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.33, 0.02, 0.24, 1);
+}
+
+/* Walking is a steady tread; the eased curve reads as sliding. */
+.cast-actor[data-mode="walk"] {
+  transition-timing-function: linear;
+}
+
+.cast-figure {
+  width: 26px;
+  height: 40px;
+  overflow: visible;
+  opacity: 0.92;
+}
+
+.cast-limb,
+.cast-scarf {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+.cast-scarf {
+  transform-origin: right center;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The leap: a real arc, replayed from the top on every move because the
+     wrapper is remounted with a fresh React key. */
+  .cast-actor[data-mode="jump"] .cast-arc {
+    animation: cast-leap cubic-bezier(0.3, 0, 0.4, 1) both;
+  }
+
+  .cast-actor[data-mode="hop"] .cast-arc {
+    animation: cast-hop ease-out both;
+  }
+
+  /* Legs only cycle while there is ground to cover. */
+  .cast-actor[data-mode="walk"] .cast-limb {
+    animation: cast-step 0.44s ease-in-out infinite;
+  }
+
+  .cast-actor[data-mode="walk"] .cast-leg-b,
+  .cast-actor[data-mode="walk"] .cast-arm-a {
+    animation-delay: -0.22s;
+  }
+
+  /* Airborne: legs tuck instead of striding. */
+  .cast-actor[data-mode="jump"] .cast-leg-a,
+  .cast-actor[data-mode="hop"] .cast-leg-a {
+    transform: rotate(24deg);
+  }
+
+  .cast-actor[data-mode="jump"] .cast-leg-b,
+  .cast-actor[data-mode="hop"] .cast-leg-b {
+    transform: rotate(-14deg);
+  }
+
+  .cast-actor[data-mode="jump"] .cast-arm-a {
+    transform: rotate(-38deg);
+  }
+
+  .cast-actor[data-mode="jump"] .cast-arm-b {
+    transform: rotate(30deg);
+  }
+
+  .cast-scarf {
+    animation: cast-flutter 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes cast-leap {
+  0% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-38px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes cast-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-16px);
+  }
+  65% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes cast-step {
+  0%,
+  100% {
+    transform: rotate(21deg);
+  }
+  50% {
+    transform: rotate(-21deg);
+  }
+}
+
+@keyframes cast-flutter {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-13deg);
+  }
+}
+
+/* The street a number gets when you point at it (CAST-2.4). */
+.cast-street {
+  position: absolute;
+  height: 2px;
+  background: currentColor;
+  color: var(--foreground);
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cast-street {
+    animation: cast-pave 460ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+}
+
+@keyframes cast-pave {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.55;
+  }
+}
+
+/* ---- projects: climbers and three different arrivals (CAST-3) ---- */
+
+/* The 30px window above the card is what hides the climber's legs, so it
+   genuinely rises from behind the edge rather than being drawn cropped. */
+.card-climber {
+  position: absolute;
+  right: 2.25rem;
+  top: -30px;
+  width: 22px;
+  height: 30px;
+  overflow: hidden;
+  color: var(--foreground);
+  pointer-events: none;
+}
+
+.card-climber svg {
+  display: block;
+  width: 22px;
+  height: 30px;
+  transform: translateY(30px);
+}
+
+.climb-arm-a,
+.climb-arm-b {
+  transform-box: fill-box;
+  transform-origin: bottom right;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flagship-card:hover .card-climber svg,
+  .flagship-card:focus-within .card-climber svg {
+    animation: climb-up 1.5s cubic-bezier(0.4, 0, 0.3, 1) forwards;
+  }
+
+  .flagship-card:hover .climb-arm-a,
+  .flagship-card:focus-within .climb-arm-a {
+    animation: climb-reach 0.75s ease-in-out infinite;
+  }
+
+  .flagship-card:hover .climb-arm-b,
+  .flagship-card:focus-within .climb-arm-b {
+    animation: climb-reach 0.75s ease-in-out -0.375s infinite;
+  }
+}
+
+@keyframes climb-up {
+  from {
+    transform: translateY(30px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes climb-reach {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-16deg);
+  }
+}
+
+.card-visitor {
+  position: absolute;
+  color: var(--foreground);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.card-visitor svg {
+  display: block;
+  overflow: visible;
+}
+
+.visitor-sling {
+  top: -30px;
+  right: 5.5rem;
+  width: 46px;
+  height: 74px;
+}
+
+.visitor-jet {
+  bottom: -14px;
+  right: 1.5rem;
+  width: 40px;
+  height: 74px;
+}
+
+.visitor-leap {
+  top: 40%;
+  left: -34px;
+  width: 56px;
+  height: 66px;
+}
+
+.sling-body,
+.leap-cape,
+.jet-flame {
+  transform-box: fill-box;
+}
+
+.sling-body {
+  transform-origin: 50% -38%;
+}
+
+.leap-cape {
+  transform-origin: right center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 1 — swings in on its line */
+  .flagship-card:hover .visitor-sling,
+  .flagship-card:focus-within .visitor-sling {
+    animation: visitor-in 260ms ease-out forwards;
+  }
+
+  .flagship-card:hover .sling-body,
+  .flagship-card:focus-within .sling-body {
+    animation: sling-swing 2.6s ease-in-out infinite;
+  }
+
+  /* 2 — rockets up from under the card */
+  .flagship-card:hover .visitor-jet,
+  .flagship-card:focus-within .visitor-jet {
+    animation:
+      jet-launch 620ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards,
+      jet-hover 2.2s ease-in-out 620ms infinite;
+  }
+
+  .flagship-card:hover .jet-flame,
+  .flagship-card:focus-within .jet-flame {
+    animation: jet-burn 0.24s steps(2, end) infinite;
+  }
+
+  /* 3 — leaps in from the left */
+  .flagship-card:hover .visitor-leap,
+  .flagship-card:focus-within .visitor-leap {
+    animation: leap-in 680ms cubic-bezier(0.25, 0.8, 0.35, 1) forwards;
+  }
+
+  .flagship-card:hover .leap-cape,
+  .flagship-card:focus-within .leap-cape {
+    animation: cape-billow 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes visitor-in {
+  to {
+    opacity: 0.9;
+  }
+}
+
+@keyframes sling-swing {
+  0%,
+  100% {
+    transform: rotate(15deg);
+  }
+  50% {
+    transform: rotate(-15deg);
+  }
+}
+
+@keyframes jet-launch {
+  from {
+    opacity: 0;
+    transform: translateY(46px);
+  }
+  to {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+}
+
+@keyframes jet-hover {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes jet-burn {
+  0% {
+    opacity: 0.9;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0.45;
+    transform: scaleY(0.68);
+  }
+}
+
+@keyframes leap-in {
+  from {
+    opacity: 0;
+    transform: translate(-70px, 34px) rotate(-14deg);
+  }
+  to {
+    opacity: 0.9;
+    transform: none;
+  }
+}
+
+@keyframes cape-billow {
+  0%,
+  100% {
+    transform: skewX(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewX(9deg) scaleX(1.09);
+  }
+}
+
+/* ---- GitHub bars as a runway (CAST-4) ---- */
+
+.runway-plane {
+  position: absolute;
+  right: 0;
+  width: 54px;
+  height: 22px;
+  margin-top: -3px;
+  color: var(--foreground);
+  pointer-events: none;
+  opacity: 0.85;
+  /* Taxiing: the plane tracks whichever row you point at. */
+  transition: top 460ms cubic-bezier(0.3, 0.05, 0.25, 1);
+}
+
+.runway-plane svg {
+  width: 54px;
+  height: 22px;
+  overflow: visible;
+}
+
+/* Centre-line markings appear on the bar being approached. */
+.runway-row:hover .runway-bar,
+.runway-row:focus-visible .runway-bar {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--background) 0 7px,
+    transparent 7px 15px
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .runway-plane {
+    animation: plane-land 1.1s cubic-bezier(0.25, 0.6, 0.3, 1) both;
+  }
+}
+
+@keyframes plane-land {
+  from {
+    opacity: 0;
+    transform: translate(64px, -46px) rotate(9deg);
+  }
+  70% {
+    opacity: 0.85;
+    transform: translate(6px, -3px) rotate(1deg);
+  }
+  to {
+    opacity: 0.85;
+    transform: none;
+  }
+}
+
+/* ---- experience: the banner plane (CAST-5.2) ---- */
+
+.exp-list {
+  overflow: hidden;
+}
+
+.exp-plane {
+  position: absolute;
+  top: -16px;
+  left: 0;
+  width: 128px;
+  height: 24px;
+  color: var(--foreground);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.exp-plane svg {
+  width: 128px;
+  height: 24px;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Flies the length of the list while you are reading it. */
+  .exp-list:hover .exp-plane {
+    animation: exp-fly 3.4s linear;
+  }
+}
+
+@keyframes exp-fly {
+  0% {
+    opacity: 0;
+    transform: translateX(-140px);
+  }
+  8%,
+  92% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc(100vw + 140px));
+  }
+}
+
+/* ---- repos: a signal blip runs the card border (CAST-6.2) ---- */
+
+/* A conic sweep masked to the border box reads as a pulse running the
+   perimeter, with no extra DOM and nothing to keep in sync. */
+.repo-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  opacity: 0;
+  background: conic-gradient(
+    from var(--blip, 0deg),
+    currentColor 0deg 20deg,
+    transparent 20deg 360deg
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+@property --blip {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .repo-card:hover::after,
+  .repo-card:focus-visible::after {
+    opacity: 0.9;
+    animation: repo-blip 1.15s linear infinite;
+  }
+}
+
+@keyframes repo-blip {
+  from {
+    --blip: 0deg;
+  }
+  to {
+    --blip: 360deg;
+  }
+}
+
+/* ---- certificates: a stamp presses down (CAST-6.3) ---- */
+
+.cert-stamp {
+  position: absolute;
+  left: -1.35rem;
+  top: 0.1rem;
+  width: 15px;
+  height: 15px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  color: var(--muted);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cert-row:hover .cert-stamp {
+    animation: cert-press 420ms cubic-bezier(0.3, 1.4, 0.5, 1) forwards;
+  }
+}
+
+@keyframes cert-press {
+  from {
+    opacity: 0;
+    transform: scale(2.6) rotate(-16deg);
+  }
+  to {
+    opacity: 0.85;
+    transform: scale(1) rotate(-9deg);
+  }
+}
+
+/* ---- skills: current runs into the work that proves the chip (CAST-6.1) ---- */
+
+.matrix-lit {
+  position: relative;
+}
+
+.matrix-lit::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .matrix-lit::before {
+    animation: skill-current 1s cubic-bezier(0.3, 0.7, 0.3, 1);
+  }
+}
+
+@keyframes skill-current {
+  0% {
+    opacity: 0.9;
+    transform: scaleY(0);
+  }
+  55% {
+    opacity: 0.9;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+}
+
+/* ---- 404 signpost ---- */
+
+.signpost-404 {
+  width: 34px;
+  height: 38px;
+  color: var(--muted);
+  flex: none;
+}
+
 /* ---- Motion off ---- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1790,6 +1236,17 @@ html {
 }
 
 /* Recruiters print. Force ink-on-paper, drop chrome, keep content compact. */
+@media (prefers-reduced-motion: reduce) {
+  .cast-stage,
+  .card-climber,
+  .card-visitor,
+  .runway-plane,
+  .exp-plane,
+  .cert-stamp {
+    display: none;
+  }
+}
+
 @media print {
   :root,
   .dark {

@@ -1,5 +1,4 @@
 import type { Repo } from "@/lib/github";
-import { ChartBuilder } from "./society/chart-workers";
 
 const W = 960;
 const PAD_L = 150;
@@ -76,8 +75,6 @@ export function RepoTimeline({ repos }: { repos: Repo[] }) {
               </g>
             );
           })}
-          {/* Still building — decoration beside the most recent repo. */}
-          <ChartBuilder x={PAD_L - 26} y={H - 10} />
           {dated.map((repo, i) => {
             const y = 12 + i * ROW_H;
             const bx = x(toMonths(repo.start));

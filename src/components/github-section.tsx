@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { identity } from "@/content/profile";
 import type { Repo } from "@/lib/github";
+import { RunwayPlane } from "./cast/visitors";
 
 const PATTERNS = ["fill-ink", "fill-hatch", "fill-dots", "fill-hatch2", "fill-cross", "fill-half"];
 const MAX_ROWS = 6;
@@ -14,6 +15,9 @@ const MAX_ROWS = 6;
  */
 export function GitHubSection({ repos }: { repos: Repo[] }) {
   const [selected, setSelected] = useState<string | null>(null);
+  /** Which bar the plane is parked on — the longest one until you point at another. */
+  const [planeTop, setPlaneTop] = useState(0);
+  const runwayRef = useRef<HTMLDivElement>(null);
 
   const entries = useMemo(() => {
     const counts = new Map<string, number>();
@@ -46,7 +50,8 @@ export function GitHubSection({ repos }: { repos: Repo[] }) {
   return (
     <div>
       <figure className="my-8">
-        <div>
+        <div ref={runwayRef} className="runway relative">
+          <RunwayPlane top={planeTop} />
           {entries.map(([language, count], i) => {
             const active = selected === language;
             const dimmed = selected !== null && !active;
@@ -56,7 +61,9 @@ export function GitHubSection({ repos }: { repos: Repo[] }) {
                 type="button"
                 aria-pressed={active}
                 onClick={() => toggle(language)}
-                className={`grid w-full cursor-pointer grid-cols-[6.5rem_1fr] items-center gap-3 rounded py-1.5 text-left transition-opacity ${
+                onPointerEnter={(e) => setPlaneTop(e.currentTarget.offsetTop)}
+                onFocus={(e) => setPlaneTop(e.currentTarget.offsetTop)}
+                className={`runway-row grid w-full cursor-pointer grid-cols-[6.5rem_1fr] items-center gap-3 rounded py-1.5 text-left transition-opacity ${
                   dimmed ? "opacity-40" : ""
                 }`}
               >
@@ -68,7 +75,7 @@ export function GitHubSection({ repos }: { repos: Repo[] }) {
                 <span className="flex items-center gap-2">
                   <span
                     aria-hidden
-                    className={`${PATTERNS[i % PATTERNS.length]} h-3.5 rounded-[2px]`}
+                    className={`${PATTERNS[i % PATTERNS.length]} runway-bar h-3.5 rounded-[2px]`}
                     style={{ width: `max(${(count / max) * 100}%, 8px)` }}
                   />
                   <span className="tnum shrink-0 font-mono text-xs text-muted">{count}</span>
@@ -79,7 +86,8 @@ export function GitHubSection({ repos }: { repos: Repo[] }) {
         </div>
         <figcaption className="mt-3 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-wider text-muted">
           <span>
-            Primary language of {total} public repos · fetched at build · click a bar to filter
+            Primary language of {total} public repos · fetched at build · click a bar to filter ·
+            the plane taxis to whichever you point at
           </span>
           {selected !== null && (
             <button
@@ -107,7 +115,7 @@ function RepoGrid({ repos }: { repos: Repo[] }) {
             href={r.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group glow-hover rounded-lg border border-border bg-card p-4 hover:-translate-y-0.5 hover:border-foreground/60"
+            className="repo-card group glow-hover relative rounded-lg border border-border bg-card p-4 hover:-translate-y-0.5 hover:border-foreground/60"
           >
             <div className="flex items-baseline justify-between gap-2">
               <h4 className="font-mono text-sm font-semibold">{r.name}</h4>

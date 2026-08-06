@@ -1,5 +1,4 @@
 import { education, experience } from "@/content/profile";
-import { Surveyor } from "./society/chart-workers";
 import { degreeAnchor, roleAnchor } from "@/lib/slug";
 
 const MONTHS: Record<string, number> = {
@@ -198,20 +197,6 @@ export function CareerTimeline() {
           })}
           {work.map((bar) => renderBar(bar, yWork(bar.row)))}
           {edu.map((bar) => renderBar(bar, yEdu(bar.row)))}
-          {/* A surveyor pacing the longest role bar — decoration only. */}
-          {(() => {
-            const longest = work.reduce((a, b) => (b.end - b.start > a.end - a.start ? b : a));
-            const bx = x(longest.start);
-            const bw = Math.max(x(longest.end) - bx, 10);
-            return (
-              <Surveyor
-                x={bx + 6}
-                y={yWork(longest.row) + 14}
-                travel={Math.max(bw - 16, 12)}
-                duration={22}
-              />
-            );
-          })()}
         </svg>
       </div>
     </figure>

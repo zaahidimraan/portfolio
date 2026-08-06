@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { Fingerpost } from "@/components/society/glyphs";
 
-/** Off the edge of the town map. */
+/** Off the map. */
 export default function NotFound() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-5 px-5 py-24 text-center">
       <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">404 — off the map</p>
 
       <div className="lost-scene" aria-hidden>
-        <Fingerpost />
+        <svg viewBox="0 0 34 38" className="signpost-404" focusable="false">
+          <line x1="17" y1="38" x2="17" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <path d="M17 10 h14 l-5 5 h-9 z" stroke="currentColor" strokeWidth="1.4" fill="none" />
+          <path d="M17 20 h-13 l5 5 h8 z" stroke="currentColor" strokeWidth="1.4" fill="none" />
+        </svg>
         <svg viewBox="0 0 24 44" className="lost-figure" focusable="false">
           <circle cx="12" cy="6" r="3.6" fill="currentColor" />
           <line x1="12" y1="9.6" x2="12" y2="26" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
