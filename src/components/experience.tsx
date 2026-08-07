@@ -1,21 +1,14 @@
 import { education, experience, volunteering } from "@/content/profile";
 import { degreeAnchor, roleAnchor } from "@/lib/slug";
-import { BannerPlane } from "./cast/visitors";
 
 export function Experience() {
   return (
     <div>
-      <ol className="exp-list relative space-y-10 border-l border-border pl-6">
-        {/* Its own clipping track: putting overflow:hidden on the list itself
-            cropped the timeline dots, which sit outside its left edge. */}
-        <span aria-hidden className="exp-plane-track">
-          <BannerPlane />
-        </span>
+      <ol className="relative space-y-10 border-l border-border pl-6">
         {experience.map((role) => (
           <li
             key={`${role.company}-${role.dates}`}
             id={roleAnchor(role.company)}
-            data-perch="hop"
             className="relative"
           >
             <span

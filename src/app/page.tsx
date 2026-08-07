@@ -16,11 +16,14 @@ import { StatCounters } from "@/components/stat-counters";
 import { Certificates, Skills } from "@/components/skills";
 import { TechMatrix } from "@/components/tech-matrix";
 import { TimelinePanel } from "@/components/timeline-panel";
-import { getRepos } from "@/lib/github";
+import { CommitChart } from "@/components/commit-chart";
+import { Office } from "@/components/office";
+import { getCommitHistory, getRepos } from "@/lib/github";
 import { homeSchema } from "@/lib/seo";
 
 export default async function Home() {
   const repos = await getRepos();
+  const commits = await getCommitHistory(repos);
 
   return (
     <>
@@ -44,8 +47,22 @@ export default async function Home() {
         </Section>
 
         <Section
-          id="projects"
+          id="office"
           number="02"
+          title="The office"
+          intro="Scrub the timeline — what I was doing, month by month, from CV and git dates"
+        >
+          <Reveal>
+            <Office
+              repos={repos.map(({ name, createdAt, pushedAt }) => ({ name, createdAt, pushedAt }))}
+              commits={commits}
+            />
+          </Reveal>
+        </Section>
+
+        <Section
+          id="projects"
+          number="03"
           title="Selected projects"
           intro="Three flagship builds with their architectures, then everything else"
         >
@@ -57,13 +74,14 @@ export default async function Home() {
           <h3 className="mb-2 mt-14 text-lg font-semibold tracking-tight">More from GitHub</h3>
           <Reveal>
             <GitHubSection repos={repos} />
+            <CommitChart commits={commits} />
             <RepoTimeline repos={repos} />
           </Reveal>
         </Section>
 
         <Section
           id="experience"
-          number="03"
+          number="04"
           title="Experience"
           intro="Click any bar to open the full entry — concurrent roles show in parallel"
         >
@@ -78,7 +96,7 @@ export default async function Home() {
 
         <Section
           id="skills"
-          number="04"
+          number="05"
           title="Skills"
           intro="Chips with a count are clickable — they light up the work that proves them"
         >
@@ -95,7 +113,7 @@ export default async function Home() {
 
         <Section
           id="certificates"
-          number="05"
+          number="06"
           title="Certificates"
           intro="Fifteen certificates across three tracks — the lanes show where the focus went"
         >
@@ -107,7 +125,7 @@ export default async function Home() {
 
         <Section
           id="mcp"
-          number="06"
+          number="07"
           title="Ask my portfolio"
           intro="A live MCP server — connect an AI client and question my CV directly"
         >

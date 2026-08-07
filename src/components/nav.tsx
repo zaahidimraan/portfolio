@@ -19,8 +19,6 @@ export function Nav() {
           <a
             href={identity.cvPath}
             download
-            data-perch="jump"
-            data-perch-home="fallback"
             className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-background transition-opacity hover:opacity-85"
           >
             CV

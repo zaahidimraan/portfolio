@@ -17,9 +17,10 @@ export function Skills() {
       '[id^="proj-"], [id^="exp-"], [id^="edu-"]',
     );
     const targets = active ? new Set(skillLinks[active]) : null;
+    // Only ever *light* the matches. Dimming everything else made the page
+    // look broken (ST-4) — absence of a highlight already says "not this one".
     entities.forEach((el) => {
       el.classList.toggle("matrix-lit", targets?.has(el.id) ?? false);
-      el.classList.toggle("matrix-dim", targets !== null && !targets.has(el.id));
     });
 
     // The work a chip proves is almost always far off screen — measured at
@@ -28,7 +29,7 @@ export function Skills() {
     // the time you scroll there. So arm it instead, and let it run as each
     // lit entry actually arrives in view.
     const lit = [...entities].filter((el) => el.classList.contains("matrix-lit"));
-    if (!lit.length) return () => entities.forEach((el) => el.classList.remove("matrix-lit", "matrix-dim"));
+    if (!lit.length) return () => entities.forEach((el) => el.classList.remove("matrix-lit"));
 
     const surge = new IntersectionObserver(
       (entries) => {
@@ -47,9 +48,7 @@ export function Skills() {
 
     return () => {
       surge.disconnect();
-      entities.forEach((el) =>
-        el.classList.remove("matrix-lit", "matrix-dim", "matrix-surge"),
-      );
+      entities.forEach((el) => el.classList.remove("matrix-lit", "matrix-surge"));
     };
   }, [active]);
 

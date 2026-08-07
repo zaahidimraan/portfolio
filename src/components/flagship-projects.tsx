@@ -1,7 +1,6 @@
 import { flagships } from "@/content/profile";
 import { projectAnchor } from "@/lib/slug";
 import { FlagshipDiagram } from "./arch-diagrams";
-import { CardClimber, CardVisitor, type VisitorKind } from "./cast/visitors";
 import { Reveal } from "./reveal";
 
 /** Badge label → skill-chip element id, where the skill grid has that chip (DTL-2.3). */
@@ -15,9 +14,6 @@ const BADGE_TO_SKILL: Record<string, string> = {
   "Fine-tuning": "skill-fine-tuning-lora-qlora",
 };
 
-/** One arrival per card, in card order — deliberately never repeated. */
-const ARRIVALS: VisitorKind[] = ["sling", "jet", "leap"];
-
 export function FlagshipProjects() {
   return (
     <div className="grid gap-6">
@@ -25,10 +21,8 @@ export function FlagshipProjects() {
         <Reveal key={p.title}>
           <article
             id={projectAnchor(p.title)}
-            className="flagship-card glow-hover relative rounded-lg border border-border bg-card p-6 hover:border-foreground/60"
+            className="glow-hover relative rounded-lg border border-border bg-card p-6 hover:border-foreground/60"
           >
-            <CardClimber />
-            <CardVisitor kind={ARRIVALS[i % ARRIVALS.length]} />
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-xl font-semibold tracking-tight">{p.title}</h3>
               {p.repoUrl && (

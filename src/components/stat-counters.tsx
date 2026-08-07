@@ -84,7 +84,6 @@ export function StatCounters() {
         <a
           key={stat.label}
           href={stat.href}
-          data-perch="walk"
           className="group block border-t border-border pt-4 transition-colors hover:border-foreground"
         >
           <div

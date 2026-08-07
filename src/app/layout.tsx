@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Stage } from "@/components/cast/stage";
 import { identity } from "@/content/profile";
 import "./globals.css";
 
@@ -93,7 +92,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         {children}
-        <Stage />
         {cfBeaconToken && (
           <script
             defer
