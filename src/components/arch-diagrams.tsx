@@ -179,10 +179,14 @@ function PiiRedactionDiagram() {
       <defs>
         <ArrowMarker id="ah-pii" />
       </defs>
+      {/* The boundary must CONTAIN the whole flow — the output box used to poke
+          through its right edge, which read as a drawing error and contradicted
+          the "nothing leaves" claim (E32). Now centred in the viewBox with
+          every element inside. */}
       <rect
-        x={100}
+        x={80}
         y={12}
-        width={455}
+        width={500}
         height={116}
         rx={8}
         fill="none"
@@ -191,14 +195,14 @@ function PiiRedactionDiagram() {
         strokeDasharray="6 4"
         opacity={0.7}
       />
-      <text x={118} y={32} fontSize={10} fill="currentColor" opacity={0.7} className="font-mono">
+      <text x={98} y={32} fontSize={10} fill="currentColor" opacity={0.7} className="font-mono">
         LOCAL MACHINE — NOTHING LEAVES
       </text>
-      <Box x={120} y={60} w={110} h={36} title="Document" bullet={0} />
-      <Box x={270} y={54} w={160} h={48} title="Fine-tuned Phi-3" sub="PII detect + redact" bullet={1} />
-      <Box x={470} y={60} w={110} h={36} title="Redacted output" bullet={0} />
-      <Arrow x1={230} y1={78} x2={268} y2={78} marker="ah-pii" />
-      <Arrow x1={430} y1={78} x2={468} y2={78} marker="ah-pii" />
+      <Box x={100} y={60} w={110} h={36} title="Document" bullet={0} />
+      <Box x={250} y={54} w={160} h={48} title="Fine-tuned Phi-3" sub="PII detect + redact" bullet={1} />
+      <Box x={450} y={60} w={110} h={36} title="Redacted output" bullet={0} />
+      <Arrow x1={210} y1={78} x2={248} y2={78} marker="ah-pii" />
+      <Arrow x1={410} y1={78} x2={448} y2={78} marker="ah-pii" />
       <text
         x={330}
         y={144}

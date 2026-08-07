@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Lighthouse CI run artifacts
 .lighthouseci/
+
+# local screenshot verification output
+.shots/

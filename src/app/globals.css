@@ -774,130 +774,87 @@ main > section[id]:not(#top) {
   flex: none;
 }
 
-/* ================= ZAHID IMRAN STREET (E24/E25) ================= */
+/* ================= THE HOME (E29/E30) ================= */
 
-/* ---- the nameplate: white plate, heavy border, spaced caps ---- */
-
-.street-sign {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  border: 3px solid var(--foreground);
-  border-radius: 2px;
-  padding: 0.55rem 1.1rem 0.5rem;
-  background: var(--background);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--foreground) 25%, transparent);
+/* the camera: one moving element; zoom is a scene transform */
+/* The camera crops at the frame — a zoomed scene must never spill over the
+   page (it drew across the section heading). .office-svg sets overflow
+   visible later in this sheet, so the compound selector out-specifies it. */
+.office-svg.home-svg {
+  max-width: 44rem;
+  cursor: default;
+  overflow: hidden;
 }
 
-.street-sign-name {
-  font-family: var(--font-geist-mono);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
+.home-scene {
+  transition: transform 0.8s cubic-bezier(0.3, 0.05, 0.25, 1);
+  transform-origin: 0 0;
 }
 
-.street-sign-sub {
-  font-family: var(--font-geist-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--muted);
+.home-dev {
+  transition: transform 0.7s ease;
 }
 
-/* ---- shop fascias: every section header is a signboard ---- */
-
-.shop-fascia {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  gap: 0.9rem;
-  border: 1px solid var(--border);
-  border-bottom-width: 3px;
-  border-radius: 2px;
-  padding: 0.85rem 1rem 0.7rem;
-  transition:
-    border-color 0.35s ease,
-    background-color 0.35s ease;
-}
-
-/* corbels at each end of the board */
-.shop-fascia::before,
-.shop-fascia::after {
-  content: "";
-  position: absolute;
-  bottom: -9px;
-  width: 6px;
-  height: 6px;
-  background: var(--border);
-  transition: background 0.35s ease;
-}
-
-.shop-fascia::before {
-  left: 0.6rem;
-}
-
-.shop-fascia::after {
-  right: 0.6rem;
-}
-
-/* hover previews the light; a lit shop keeps it (STR-2.3/2.4) */
-.shop-fascia:hover,
-.shop.lit .shop-fascia {
-  border-color: color-mix(in srgb, var(--foreground) 55%, var(--border));
-  background:
-    radial-gradient(
-      130% 240% at 92% 0%,
-      color-mix(in srgb, var(--foreground) 9%, transparent) 0%,
-      transparent 55%
-    );
-}
-
-.shop-fascia:hover::before,
-.shop-fascia:hover::after,
-.shop.lit .shop-fascia::before,
-.shop.lit .shop-fascia::after {
-  background: color-mix(in srgb, var(--foreground) 55%, var(--border));
-}
-
-.shop-lamp {
-  margin-left: auto;
-  align-self: center;
-  padding: 0.2rem;
-  border-radius: 6px;
-  color: var(--muted);
+.home-rack {
   cursor: pointer;
-  transition: color 0.35s ease;
 }
 
-.shop-lamp-svg {
-  width: 34px;
-  height: 30px;
-  overflow: visible;
-  display: block;
+.home-rack:hover rect:first-of-type {
+  stroke-width: 2.6;
 }
 
-/* the halo: invisible until the light is on or previewed */
-.shop-glow {
-  opacity: 0;
-  transition: opacity 0.4s ease;
+.rack-unit rect {
+  transition: stroke-width 0.2s ease, fill 0.2s ease;
 }
 
-.shop-fascia:hover .shop-glow,
-.shop.lit .shop-glow {
-  opacity: 0.16;
+.rack-unit:hover rect,
+.rack-unit-hot rect {
+  stroke-width: 1.8;
+  fill: color-mix(in srgb, var(--foreground) 10%, transparent);
 }
 
-.shop.lit .shop-lamp {
-  color: var(--foreground);
+.office-inspect {
+  margin-top: 0.9rem;
 }
 
-.shop.lit .shop-lamp-glass {
-  fill: color-mix(in srgb, var(--foreground) 30%, transparent);
+@media (prefers-reduced-motion: no-preference) {
+  .rack-led {
+    animation: rack-blink 1.6s steps(1, end) infinite;
+  }
+
+  .home-steam {
+    animation: home-steam-rise 2.8s ease-in-out infinite;
+  }
 }
 
-.shop.lit .shop-lamp-svg {
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--foreground) 60%, transparent));
+@keyframes rack-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes home-steam-rise {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-4px);
+  }
+}
+
+/* the game degrades to a cut, not a broken glide */
+@media (prefers-reduced-motion: reduce) {
+  .home-scene,
+  .home-dev {
+    transition: none;
+  }
 }
 
 /* ---- the office (E25) ---- */
@@ -1097,8 +1054,7 @@ main > section[id]:not(#top) {
 
 /* Recruiters print. Force ink-on-paper, drop chrome, keep content compact. */
 @media (prefers-reduced-motion: reduce) {
-  .cert-stamp,
-  .shop-glow {
+  .cert-stamp {
     display: none;
   }
 }

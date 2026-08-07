@@ -49,8 +49,8 @@ export default async function Home() {
         <Section
           id="office"
           number="02"
-          title="The office"
-          intro="Scrub the timeline — what I was doing, month by month, from CV and git dates"
+          title="The home office"
+          intro="Scrub the timeline, then click the server — what was running, month by month, from CV and git dates"
         >
           <Reveal>
             <Office

@@ -21,6 +21,7 @@
     "@types/pdfkit": "^0.17.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "chrome-remote-interface": "^0.34.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "pdfkit": "^0.19.1",

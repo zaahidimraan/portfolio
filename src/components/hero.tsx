@@ -1,5 +1,4 @@
 import { identity } from "@/content/profile";
-import { StreetSign } from "./street";
 import { StatusNow } from "./status-now";
 
 const seq = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
@@ -13,9 +12,12 @@ export function Hero() {
     >
       <div className="grid items-center gap-x-12 gap-y-10 sm:grid-cols-[1fr_auto]">
         <div>
-          <div className="hero-seq" style={seq(0)}>
-            <StreetSign />
-          </div>
+          <p
+            className="hero-seq font-mono text-xs uppercase tracking-[0.3em] text-muted"
+            style={seq(0)}
+          >
+            ◆ {identity.location}
+          </p>
           <h1 className="display-name mt-5">
             <span className="hero-seq-text block" style={seq(80)}>
               {firstName}
