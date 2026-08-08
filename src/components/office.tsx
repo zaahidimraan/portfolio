@@ -1,23 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { certificates, education, experience, volunteering } from "@/content/profile";
 import type { CommitHistory, Repo } from "@/lib/github";
 
 /**
- * The home (E29) and the server room (E30).
+ * The living home (E34–E37).
  *
- * A cutaway of Zahid's home — bedroom, kitchen, office — where he appears in
- * the room his month dictates: at the office desk when working or building, at
- * the bedroom desk with a book when studying, in the kitchen when the record
- * is quiet. In the office stands a server rack: click it and the camera zooms
- * in, game-style, to show what was "plugged in" that month — one unit per
- * active role and repo — and hovering a unit says what he was doing on it.
+ * A top-down plan of Zahid's home — bedroom, kitchen, drawing room, office —
+ * where he lives a compressed 24-hour routine on his own: asleep at night, in
+ * the kitchen at sunrise, at the desk through the day, in the drawing room in
+ * the evening. The page's theme follows the scene's sun by default (the
+ * toggle can pin it). The month timeline underneath answers *what* was
+ * running — with a ▶ button that plays the whole career automatically and
+ * celebrates the months where something new began. The server rack still
+ * zooms in for inspection.
  *
- * Same honest data model the timeline was approved with: month granularity,
- * every claim traced to profile.ts (the CV/LinkedIn extraction) or git dates.
- * The domain ends at the latest *data* month, not Date.now(), which keeps
- * server and client renders byte-identical.
+ * The walker is driven imperatively through refs at requestAnimationFrame
+ * rate; React state only changes once per in-scene minute, so the page is not
+ * re-rendered 60 times a second for one moving figure.
  */
 
 const MONTHS: Record<string, number> = {
@@ -46,19 +47,85 @@ function indexToLabel(idx: number): string {
   return `${MONTH_NAMES[idx % 12]} ${Math.floor(idx / 12)}`;
 }
 
-type Span = { start: number; end: number | null; head: string; sub: string };
+type Span = {
+  start: number;
+  end: number | null;
+  head: string;
+  sub: string;
+  detail: string[];
+};
 type Point = { at: number; head: string; sub: string };
 
-function parseSpan(dates: string, head: string, sub: string): Span | null {
+function parseSpan(dates: string, head: string, sub: string, detail: string[]): Span | null {
   const [from, to] = dates.split("–").map((part) => part.trim());
   const start = monthIndex(from);
   if (start === null) return null;
   const end = to === "Present" ? null : monthIndex(to ?? "");
-  return { start, end, head, sub };
+  return { start, end, head, sub, detail };
 }
 
-/** One slot in the rack: a thing that was running this month. */
 type Unit = { id: string; label: string; detail: string };
+
+/* ---------------- the daily routine ---------------- */
+
+type P = { x: number; y: number };
+
+// Standing spots and door gaps in the plan (viewBox 640×300).
+const SPOT = {
+  bed: { x: 94, y: 80 },
+  kitchen: { x: 500, y: 100 },
+  desk: { x: 470, y: 234 },
+  sofa: { x: 105, y: 214 },
+  doorT: { x: 320, y: 90 },
+  doorL: { x: 170, y: 150 },
+  doorR: { x: 470, y: 150 },
+  doorB: { x: 320, y: 215 },
+} as const;
+
+// One day, as phase fractions. Stations sit still; walks follow door paths.
+const DAY: Array<
+  | { until: number; at: P; pose: "sleep" | "stand" }
+  | { until: number; path: P[] }
+> = [
+  { until: 0.28, at: SPOT.bed, pose: "sleep" },
+  { until: 0.315, path: [SPOT.bed, SPOT.doorT, SPOT.kitchen] },
+  { until: 0.4, at: SPOT.kitchen, pose: "stand" },
+  { until: 0.43, path: [SPOT.kitchen, SPOT.doorR, SPOT.desk] },
+  { until: 0.7, at: SPOT.desk, pose: "stand" },
+  { until: 0.73, path: [SPOT.desk, SPOT.doorR, SPOT.kitchen] },
+  { until: 0.79, at: SPOT.kitchen, pose: "stand" },
+  { until: 0.835, path: [SPOT.kitchen, SPOT.doorR, SPOT.doorB, SPOT.sofa] },
+  { until: 0.93, at: SPOT.sofa, pose: "stand" },
+  { until: 0.965, path: [SPOT.sofa, SPOT.doorL, SPOT.bed] },
+  { until: 1.0, at: SPOT.bed, pose: "sleep" },
+];
+
+const SUNRISE = 0.29;
+const SUNSET = 0.79;
+const DAY_MS = 120_000; // the whole 24h in two minutes
+
+function poseAt(phase: number): { x: number; y: number; angle: number; walking: boolean; sleeping: boolean } {
+  let from = 0;
+  for (const seg of DAY) {
+    if (phase < seg.until) {
+      if ("at" in seg) {
+        return { x: seg.at.x, y: seg.at.y, angle: 0, walking: false, sleeping: seg.pose === "sleep" };
+      }
+      const t = (phase - from) / (seg.until - from);
+      const legs = seg.path.length - 1;
+      const leg = Math.min(Math.floor(t * legs), legs - 1);
+      const lt = t * legs - leg;
+      const a = seg.path[leg];
+      const b = seg.path[leg + 1];
+      const x = a.x + (b.x - a.x) * lt;
+      const y = a.y + (b.y - a.y) * lt;
+      const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI + 90;
+      return { x, y, angle, walking: true, sleeping: false };
+    }
+    from = seg.until;
+  }
+  return { x: SPOT.bed.x, y: SPOT.bed.y, angle: 0, walking: false, sleeping: true };
+}
 
 const line = { stroke: "currentColor", fill: "none", strokeLinecap: "round" as const };
 
@@ -66,18 +133,18 @@ export function Office({
   repos,
   commits,
 }: {
-  repos: Pick<Repo, "name" | "createdAt" | "pushedAt">[];
+  repos: Pick<Repo, "name" | "createdAt" | "pushedAt" | "description">[];
   commits: CommitHistory | null;
 }) {
   const model = useMemo(() => {
     const work = experience
-      .map((r) => parseSpan(r.dates, r.title, r.company))
+      .map((r) => parseSpan(r.dates, r.title, r.company, r.bullets.slice(0, 2)))
       .filter((s): s is Span => s !== null);
     const study = education
-      .map((e) => parseSpan(e.dates, e.degree, e.school))
+      .map((e) => parseSpan(e.dates, e.degree, e.school, e.detail ? [e.detail] : []))
       .filter((s): s is Span => s !== null);
     const volunteer = volunteering
-      .map((v) => parseSpan(v.dates, v.role, v.org))
+      .map((v) => parseSpan(v.dates, v.role, v.org, v.detail ? [v.detail] : []))
       .filter((s): s is Span => s !== null);
     const certs = certificates
       .map((c): Point | null => {
@@ -89,8 +156,8 @@ export function Office({
       name: r.name,
       start: isoToIndex(r.createdAt),
       end: isoToIndex(r.pushedAt),
+      description: r.description,
     }));
-
     const starts = [
       ...work.map((s) => s.start),
       ...study.map((s) => s.start),
@@ -113,6 +180,7 @@ export function Office({
   const [pos, setPos] = useState(total - 1);
   const [zoomed, setZoomed] = useState(false);
   const [inspected, setInspected] = useState<Unit | null>(null);
+  const [playing, setPlaying] = useState(false);
 
   const idx = model.min + pos;
   const inSpan = (s: { start: number; end: number | null }) =>
@@ -127,11 +195,27 @@ export function Office({
   const building = commits
     ? Object.entries(commits.byRepo)
         .filter(([, byMonth]) => (byMonth[monthKey] ?? 0) > 0)
-        .map(([name, byMonth]) => ({ name, n: byMonth[monthKey] }))
+        .map(([name, byMonth]) => ({
+          name,
+          n: byMonth[monthKey],
+          description: model.repoSpans.find((r) => r.name === name)?.description ?? null,
+        }))
         .sort((a, b) => b.n - a.n)
-    : model.repoSpans.filter(inSpan).map((r) => ({ name: r.name, n: 0 }));
+    : model.repoSpans
+        .filter(inSpan)
+        .map((r) => ({ name: r.name, n: 0, description: r.description }));
 
-  // What's plugged into the rack this month: roles first, then repos by commits.
+  // The celebration list: everything that BEGAN this month.
+  const startedNow = [
+    ...model.work.filter((w) => w.start === idx).map((w) => `Joined ${w.sub.split("·")[0].trim()} — ${w.head}`),
+    ...model.study.filter((s) => s.start === idx).map((s) => `Started ${s.head}`),
+    ...earned.map((c) => `Earned ${c.head}`),
+  ];
+  const hasNew = (at: number) =>
+    model.work.some((w) => w.start === at) ||
+    model.study.some((s) => s.start === at) ||
+    model.certs.some((c) => c.at === at);
+
   const units: Unit[] = [
     ...working.map((w) => ({
       id: `role-${w.sub}`,
@@ -145,121 +229,181 @@ export function Office({
     })),
   ].slice(0, 6);
 
-  const mode = working.length || building.length ? "work" : studying.length ? "study" : "rest";
   const jump = (months: number) => setPos((p) => Math.min(Math.max(p + months, 0), total - 1));
 
-  // The camera: zooming means transforming the whole scene so the rack fills
-  // the frame — one moving element, smoothly transitioned (instant under
-  // reduced motion via CSS). Rack centre is (563, 168); frame centre (320, 130).
-  // 2×, not 3×: the rack (with its SRV-01 label) is 127 user-units tall, and
-  // 2 × 127 = 254 fits the 260-unit frame exactly — at 3× the top unit was
-  // clipped. The desk and figure stay in frame for context.
-  const ZOOM = 2;
+  /* -------- auto-play through the career (E36) -------- */
+  useEffect(() => {
+    if (!playing) return;
+    // Dwell longer on months where something begins, so the celebration lands.
+    const dwell = hasNew(model.min + pos) ? 1400 : 300;
+    // Both state writes happen in the timer callback, never synchronously in
+    // the effect body — a synchronous write here would cascade a re-render.
+    const t = setTimeout(() => {
+      if (pos >= total - 1) setPlaying(false);
+      else setPos(pos + 1);
+    }, dwell);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, pos, total]);
+
+  /* -------- the day loop: walker, clock, sun, theme (E34/E35) -------- */
+  const figRef = useRef<SVGGElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const clockRef = useRef<SVGTextElement>(null);
+  const lastMinute = useRef(-1);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const applyTheme = (dark: boolean) => {
+      // A pinned choice always wins over the sun.
+      if (localStorage.getItem("theme")) return;
+      document.documentElement.classList.toggle("dark", dark);
+    };
+
+    if (reduced) {
+      // No loop: figure at the desk, theme by the visitor's real clock.
+      const now = new Date();
+      const h = now.getHours();
+      applyTheme(h < 7 || h >= 19);
+      figRef.current?.setAttribute("transform", `translate(${SPOT.desk.x} ${SPOT.desk.y})`);
+      svgRef.current?.setAttribute("data-day", String(h >= 7 && h < 19));
+      svgRef.current?.setAttribute("data-sleeping", "false");
+      if (clockRef.current) {
+        clockRef.current.textContent =
+          `${String(h).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      }
+      return;
+    }
+
+    // The scene's day starts at the visitor's real time of day, then runs fast.
+    const now = new Date();
+    const startPhase = (now.getHours() * 60 + now.getMinutes()) / 1440;
+    const t0 = performance.now() - startPhase * DAY_MS;
+    let raf = 0;
+
+    const tick = (t: number) => {
+      const phase = ((t - t0) % DAY_MS) / DAY_MS;
+      const pose = poseAt(phase);
+      const fig = figRef.current;
+      if (fig) {
+        fig.setAttribute("transform", `translate(${pose.x} ${pose.y}) rotate(${pose.angle})`);
+        fig.setAttribute("data-walking", String(pose.walking));
+        fig.setAttribute("data-sleeping", String(pose.sleeping));
+      }
+      // The zzz belongs to *sleeping*, not to night — he is awake in the
+      // evening, and floating z's over an empty bed looked like a bug.
+      svgRef.current?.setAttribute("data-sleeping", String(pose.sleeping));
+      const minute = Math.floor(phase * 1440);
+      if (minute !== lastMinute.current) {
+        lastMinute.current = minute;
+        const hh = String(Math.floor(minute / 60)).padStart(2, "0");
+        const mm = String(minute % 60).padStart(2, "0");
+        if (clockRef.current) clockRef.current.textContent = `${hh}:${mm}`;
+        const isDay = phase >= SUNRISE && phase < SUNSET;
+        svgRef.current?.setAttribute("data-day", String(isDay));
+        applyTheme(!isDay);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  /* -------- the camera (rack zoom, kept from E30) -------- */
+  const ZOOM = 2.5;
+  const RACK = { cx: 580, cy: 221 };
   const sceneTransform = zoomed
-    ? `matrix(${ZOOM}, 0, 0, ${ZOOM}, ${320 - ZOOM * 563}, ${130 - ZOOM * 168})`
+    ? `matrix(${ZOOM}, 0, 0, ${ZOOM}, ${320 - ZOOM * RACK.cx}, ${150 - ZOOM * RACK.cy})`
     : "matrix(1, 0, 0, 1, 0, 0)";
-
-  // Where Zahid stands or sits, by month.
-  const dev =
-    mode === "work" ? { x: 448, y: 148, sit: true }
-    : mode === "study" ? { x: 128, y: 152, sit: true }
-    : { x: 300, y: 128, sit: false };
-
-  const screenLabel = (units[0]?.label ?? (studying.length ? "revision" : "idle")).slice(0, 10);
 
   return (
     <div className="office">
-      <svg viewBox="0 0 640 260" className="office-svg home-svg" data-mode={mode} aria-hidden focusable="false">
+      <svg
+        ref={svgRef}
+        viewBox="0 0 640 306"
+        className="office-svg home-svg"
+        data-day="true"
+        data-sleeping="false"
+        aria-hidden
+        focusable="false"
+      >
         <g className="home-scene" style={{ transform: sceneTransform }}>
-          {/* the house shell */}
-          <path d="M20 72 L320 16 L620 72" strokeWidth="2.4" {...line} />
-          <path d="M540 28 v14 h14 v-19" strokeWidth="2" {...line} />
-          <line x1="36" y1="68" x2="36" y2="238" strokeWidth="2" {...line} />
-          <line x1="604" y1="68" x2="604" y2="238" strokeWidth="2" {...line} />
-          <line x1="16" y1="238" x2="624" y2="238" strokeWidth="2.4" {...line} />
-          {/* room dividers */}
-          <line x1="225" y1="94" x2="225" y2="238" strokeWidth="1.6" opacity="0.6" {...line} />
-          <line x1="410" y1="82" x2="410" y2="238" strokeWidth="1.6" opacity="0.6" {...line} />
-          {/* room labels — part of the map, always faintly on */}
-          <text x="130" y="110" textAnchor="middle" fontSize="9" letterSpacing="2" fill="currentColor" opacity="0.4" className="font-mono">BEDROOM</text>
-          <text x="317" y="110" textAnchor="middle" fontSize="9" letterSpacing="2" fill="currentColor" opacity="0.4" className="font-mono">KITCHEN</text>
-          <text x="505" y="98" textAnchor="middle" fontSize="9" letterSpacing="2" fill="currentColor" opacity="0.4" className="font-mono">OFFICE</text>
+          {/* outer walls */}
+          <rect x="24" y="20" width="592" height="260" rx="3" strokeWidth="2.5" {...line} />
+          {/* interior walls with door gaps */}
+          <line x1="320" y1="20" x2="320" y2="70" strokeWidth="1.8" {...line} />
+          <line x1="320" y1="110" x2="320" y2="150" strokeWidth="1.8" {...line} />
+          <line x1="320" y1="150" x2="320" y2="195" strokeWidth="1.8" {...line} />
+          <line x1="320" y1="235" x2="320" y2="280" strokeWidth="1.8" {...line} />
+          <line x1="24" y1="150" x2="150" y2="150" strokeWidth="1.8" {...line} />
+          <line x1="190" y1="150" x2="450" y2="150" strokeWidth="1.8" {...line} />
+          <line x1="490" y1="150" x2="616" y2="150" strokeWidth="1.8" {...line} />
 
-          {/* bedroom: bed + study desk */}
-          <path d="M52 238 v-30 h8 v14 h74 v16" strokeWidth="1.8" {...line} />
-          <line x1="60" y1="224" x2="134" y2="224" strokeWidth="1.4" opacity="0.6" {...line} />
-          <line x1="150" y1="182" x2="205" y2="182" strokeWidth="2" {...line} />
-          <line x1="155" y1="182" x2="155" y2="238" strokeWidth="1.6" {...line} />
-          <line x1="200" y1="182" x2="200" y2="238" strokeWidth="1.6" {...line} />
-          {/* the book lives on the bedroom desk */}
-          <g className="office-book">
-            <path d="M162 178 q8 -5 16 0 q8 -5 16 0 v3 q-8 -4 -16 0 q-8 -4 -16 0 z" strokeWidth="1.3" {...line} />
-            <line className="office-page" x1="178" y1="176" x2="178" y2="179" strokeWidth="1.1" {...line} />
-          </g>
+          {/* room names */}
+          <text x="172" y="42" textAnchor="middle" fontSize="9" letterSpacing="2" fill="currentColor" opacity="0.35" className="font-mono">BEDROOM</text>
+          <text x="430" y="90" textAnchor="middle" fontSize="9" letterSpacing="2" fill="currentColor" opacity="0.35" className="font-mono">KITCHEN</text>
+          <text x="120" y="172" textAnchor="middle" fontSize="9" letterSpacing="2" fill="currentColor" opacity="0.35" className="font-mono">DRAWING ROOM</text>
+          <text x="420" y="172" textAnchor="middle" fontSize="9" letterSpacing="2" fill="currentColor" opacity="0.35" className="font-mono">OFFICE</text>
 
-          {/* kitchen: counter, kettle, shelf */}
-          <line x1="240" y1="186" x2="340" y2="186" strokeWidth="2" {...line} />
-          <line x1="245" y1="186" x2="245" y2="238" strokeWidth="1.6" {...line} />
-          <line x1="335" y1="186" x2="335" y2="238" strokeWidth="1.6" {...line} />
-          <path d="M300 186 v-12 q0 -6 8 -6 h6 q8 0 8 6 v12" strokeWidth="1.5" {...line} />
-          <path d="M322 172 q6 0 6 6" strokeWidth="1.3" {...line} />
-          <g className="home-steam">
-            <path d="M310 164 q3 -5 0 -10" strokeWidth="1.2" opacity="0.5" {...line} />
-          </g>
-          <line x1="250" y1="140" x2="330" y2="140" strokeWidth="1.4" {...line} />
-          {[258, 270, 282, 300, 312].map((x, i) => (
-            <line key={x} x1={x} y1={140} x2={x} y2={i % 2 ? 130 : 128} strokeWidth="2.2" opacity="0.6" {...line} />
+          {/* bedroom: bed with pillow + rug */}
+          <rect x="48" y="52" width="94" height="58" rx="4" strokeWidth="1.8" {...line} />
+          <line x1="66" y1="52" x2="66" y2="110" strokeWidth="1.2" opacity="0.6" {...line} />
+          <rect x="51" y="62" width="12" height="38" rx="4" strokeWidth="1.2" opacity="0.7" {...line} />
+          <circle cx="200" cy="112" r="14" strokeWidth="1" opacity="0.35" {...line} />
+          {/* zzz — CSS shows it only while the figure is asleep */}
+          <text className="home-zzz font-mono" x="150" y="66" fontSize="10" fill="currentColor" stroke="none">
+            z z
+          </text>
+
+          {/* kitchen: counter along the top wall, hob, sink, table */}
+          <rect x="356" y="26" width="244" height="34" strokeWidth="1.6" {...line} />
+          <circle cx="552" cy="43" r="7" strokeWidth="1.3" {...line} />
+          <circle cx="576" cy="43" r="7" strokeWidth="1.3" {...line} />
+          <rect x="384" y="34" width="34" height="18" rx="3" strokeWidth="1.3" {...line} />
+          <circle cx="470" cy="104" r="17" strokeWidth="1.5" {...line} />
+          <circle cx="447" cy="96" r="3.5" strokeWidth="1.2" {...line} />
+          <circle cx="492" cy="96" r="3.5" strokeWidth="1.2" {...line} />
+
+          {/* drawing room: sofa, table, shelf */}
+          <rect x="56" y="196" width="96" height="30" rx="6" strokeWidth="1.8" {...line} />
+          <line x1="56" y1="204" x2="152" y2="204" strokeWidth="1.2" opacity="0.6" {...line} />
+          <circle cx="110" cy="252" r="13" strokeWidth="1.4" {...line} />
+          <rect x="230" y="256" width="70" height="12" strokeWidth="1.4" {...line} />
+          {[240, 250, 260, 274, 284].map((x, i) => (
+            <line key={x} x1={x} y1={268} x2={x} y2={i % 2 ? 259 : 258} strokeWidth="2" opacity="0.6" {...line} />
           ))}
 
-          {/* office: desk, monitor with live screen, chair */}
-          <line x1="420" y1="176" x2="520" y2="176" strokeWidth="2.2" {...line} />
-          <line x1="426" y1="176" x2="426" y2="238" strokeWidth="1.6" {...line} />
-          <line x1="514" y1="176" x2="514" y2="238" strokeWidth="1.6" {...line} />
-          <g className="office-monitor">
-            <rect x="462" y="140" width="50" height="32" rx="2" strokeWidth="1.8" {...line} />
-            <line x1="487" y1="172" x2="487" y2="176" strokeWidth="1.8" {...line} />
-            <text x="468" y="153" fontSize="7" fill="currentColor" className="font-mono" stroke="none">
-              &gt; {screenLabel}
-            </text>
-            <line className="office-cursor" x1="468" y1="160" x2="482" y2="160" strokeWidth="1.4" {...line} />
-          </g>
+          {/* office: desk with monitor from above, chairless */}
+          <rect x="420" y="192" width="100" height="30" rx="3" strokeWidth="1.8" {...line} />
+          <rect x="452" y="197" width="36" height="12" rx="2" strokeWidth="1.4" {...line} />
+          <line x1="470" y1="209" x2="470" y2="214" strokeWidth="1.2" {...line} />
 
-          {/* Zahid — slides to the room the month puts him in */}
-          <g className="home-dev" style={{ transform: `translate(${dev.x}px, ${dev.y}px)` }}>
-            {dev.sit ? (
-              <g>
-                <circle cx="0" cy="-38" r="6" fill="currentColor" />
-                <path d="M0 -32 v20" strokeWidth="2.8" {...line} />
-                <g className="office-arm">
-                  <path d="M0 -26 q12 5 20 12" strokeWidth="2.2" {...line} />
-                </g>
-                <path d="M0 -12 q-2 10 -10 14" strokeWidth="2.4" {...line} />
-                <line x1="-13" y1="-34" x2="-13" y2="6" strokeWidth="1.6" {...line} />
-                <line x1="-20" y1="6" x2="-2" y2="6" strokeWidth="1.6" {...line} />
-                <line x1="-11" y1="6" x2="-11" y2="30" strokeWidth="1.4" {...line} />
-              </g>
-            ) : (
-              <g>
-                <circle cx="0" cy="-30" r="6" fill="currentColor" />
-                <path d="M0 -24 v26" strokeWidth="2.8" {...line} />
-                <path d="M0 -16 q10 2 16 -4" strokeWidth="2.2" {...line} />
-                <path d="M0 -16 q-8 6 -12 2" strokeWidth="2.2" {...line} />
-                <line x1="0" y1="2" x2="-6" y2="30" strokeWidth="2.4" {...line} />
-                <line x1="0" y1="2" x2="6" y2="30" strokeWidth="2.4" {...line} />
-              </g>
-            )}
+          {/* clock + sun/moon, on the hall wall */}
+          <text ref={clockRef} x="300" y="14" textAnchor="end" fontSize="12" fill="currentColor" opacity="0.75" className="font-mono" stroke="none">
+            12:00
+          </text>
+          <g className="home-sun">
+            <circle cx="328" cy="10" r="5.5" strokeWidth="1.4" {...line} />
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+              <line
+                key={a}
+                x1={328 + 8 * Math.cos((a * Math.PI) / 180)}
+                y1={10 + 8 * Math.sin((a * Math.PI) / 180)}
+                x2={328 + 10.5 * Math.cos((a * Math.PI) / 180)}
+                y2={10 + 10.5 * Math.sin((a * Math.PI) / 180)}
+                strokeWidth="1.2"
+                {...line}
+              />
+            ))}
           </g>
+          <path className="home-moon" d="M324 4 a7 7 0 1 0 8 11 a5.5 5.5 0 1 1 -8 -11" strokeWidth="1.4" {...line} />
 
-          {/* THE SERVER — click to zoom in and inspect (E30) */}
-          <g
-            className="home-rack"
-            onClick={() => setZoomed((z) => !z)}
-            role="presentation"
-          >
-            <rect x="540" y="112" width="46" height="118" rx="2" strokeWidth="1.8" {...line} />
-            <text x="563" y="108" textAnchor="middle" fontSize="6.5" fill="currentColor" opacity="0.6" className="font-mono" stroke="none">
+          {/* THE SERVER — click to zoom (kept from E30) */}
+          <g className="home-rack" onClick={() => setZoomed((z) => !z)} role="presentation">
+            <text x="580" y="176" textAnchor="middle" fontSize="6.5" fill="currentColor" opacity="0.6" className="font-mono" stroke="none">
               SRV-01
             </text>
+            <rect x="560" y="180" width="40" height="82" rx="2" strokeWidth="1.8" {...line} />
             {units.map((u, i) => (
               <g
                 key={u.id}
@@ -267,25 +411,69 @@ export function Office({
                 onMouseEnter={() => setInspected(u)}
                 onMouseLeave={() => setInspected(null)}
               >
-                <rect x="544" y={117 + i * 18} width="38" height="14" rx="1.5" strokeWidth="1" {...line} />
-                <circle className="rack-led" cx="549" cy={124 + i * 18} r="1.6" fill="currentColor" style={{ animationDelay: `${i * 0.35}s` }} />
-                <text x="554" y={126.5 + i * 18} fontSize="4.6" fill="currentColor" className="font-mono" stroke="none">
+                <rect x="564" y={186 + i * 13} width="32" height="11" rx="1.5" strokeWidth="0.9" {...line} />
+                <circle className="rack-led" cx="568" cy={191.5 + i * 13} r="1.4" fill="currentColor" style={{ animationDelay: `${i * 0.35}s` }} />
+                <text x="572" y={193.5 + i * 13} fontSize="4.2" fill="currentColor" className="font-mono" stroke="none">
                   {u.label}
                 </text>
                 <title>{u.detail}</title>
               </g>
             ))}
             {units.length === 0 && (
-              <text x="563" y="175" textAnchor="middle" fontSize="5" fill="currentColor" opacity="0.5" className="font-mono" stroke="none">
+              <text x="580" y="224" textAnchor="middle" fontSize="4.6" fill="currentColor" opacity="0.5" className="font-mono" stroke="none">
                 powered down
               </text>
             )}
+          </g>
+
+          {/* celebration — bursts when the selected month began something (E36) */}
+          {startedNow.length > 0 && (
+            <g key={idx} className="fx-confetti">
+              {[...Array(10)].map((_, i) => {
+                const a = (i / 10) * Math.PI * 2;
+                return (
+                  <line
+                    key={i}
+                    x1={470 + 14 * Math.cos(a)}
+                    y1={207 + 14 * Math.sin(a)}
+                    x2={470 + 30 * Math.cos(a)}
+                    y2={207 + 30 * Math.sin(a)}
+                    strokeWidth="2"
+                    {...line}
+                    style={{ animationDelay: `${(i % 5) * 0.05}s` }}
+                  />
+                );
+              })}
+            </g>
+          )}
+
+          {/* Zahid — standing, walking his day on his own (E34) */}
+          <g ref={figRef} className="home-fig" transform={`translate(${SPOT.desk.x} ${SPOT.desk.y})`} data-walking="false" data-sleeping="false">
+            <line className="fig-foot-a" x1="-4" y1="8" x2="-4" y2="13" strokeWidth="2.6" {...line} />
+            <line className="fig-foot-b" x1="4" y1="8" x2="4" y2="13" strokeWidth="2.6" {...line} />
+            <ellipse cx="0" cy="1" rx="9" ry="10.5" strokeWidth="2" {...line} />
+            <circle cx="0" cy="-1" r="5.6" fill="currentColor" />
           </g>
         </g>
       </svg>
 
       <div className="office-controls">
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="office-btn"
+            aria-pressed={playing}
+            onClick={() => {
+              if (playing) {
+                setPlaying(false);
+              } else {
+                if (pos >= total - 1) setPos(0);
+                setPlaying(true);
+              }
+            }}
+          >
+            {playing ? "◼ Stop" : "▶ Play my career"}
+          </button>
           <button type="button" className="office-btn" onClick={() => jump(-12)} aria-label="Back one year">−1y</button>
           <input
             type="range"
@@ -293,19 +481,17 @@ export function Office({
             max={total - 1}
             step={1}
             value={pos}
-            onChange={(e) => setPos(Number(e.target.value))}
+            onChange={(e) => {
+              setPlaying(false);
+              setPos(Number(e.target.value));
+            }}
             className="office-range"
             aria-label="Career timeline, one step per month"
             aria-valuetext={indexToLabel(idx)}
           />
           <button type="button" className="office-btn" onClick={() => jump(12)} aria-label="Forward one year">+1y</button>
           <button type="button" className="office-btn" onClick={() => setPos(total - 1)}>Latest</button>
-          <button
-            type="button"
-            className="office-btn"
-            aria-pressed={zoomed}
-            onClick={() => setZoomed((z) => !z)}
-          >
+          <button type="button" className="office-btn" aria-pressed={zoomed} onClick={() => setZoomed((z) => !z)}>
             {zoomed ? "← Back to the house" : "Inspect the server"}
           </button>
         </div>
@@ -314,7 +500,14 @@ export function Office({
         </p>
       </div>
 
-      {/* The inspect panel — the readable truth behind the scene. */}
+      {startedNow.length > 0 && (
+        <p className="office-banner" aria-live="polite">
+          {startedNow.map((s) => (
+            <span key={s} className="office-banner-item">✳ {s}</span>
+          ))}
+        </p>
+      )}
+
       {zoomed ? (
         <div className="office-inspect" aria-live="polite">
           <p className="font-mono text-[10px] uppercase tracking-wider text-muted">
@@ -331,35 +524,54 @@ export function Office({
           </ul>
         </div>
       ) : (
-        <ul className="office-activities" aria-live="polite">
+        /* What exactly was happening (E37): real CV bullets and repo detail. */
+        <div className="office-detail" aria-live="polite">
           {working.map((w) => (
-            <li key={`w-${w.head}-${w.sub}`}><span className="office-tag">working</span>{w.head} · {w.sub}</li>
+            <div key={`w-${w.head}-${w.sub}`} className="office-card">
+              <p><span className="office-tag">working</span><strong>{w.head}</strong> · {w.sub}</p>
+              <ul>
+                {w.detail.map((b) => <li key={b}>{b}</li>)}
+              </ul>
+            </div>
           ))}
           {studying.map((s) => (
-            <li key={`s-${s.head}`}><span className="office-tag">studying</span>{s.head} · {s.sub}</li>
+            <div key={`s-${s.head}`} className="office-card">
+              <p><span className="office-tag">studying</span><strong>{s.head}</strong> · {s.sub}</p>
+              <ul>
+                {s.detail.map((b) => <li key={b}>{b}</li>)}
+              </ul>
+            </div>
           ))}
           {building.length > 0 && (
-            <li>
-              <span className="office-tag">building</span>
-              {building.map((b) => (b.n > 0 ? `${b.name} (${b.n} commit${b.n === 1 ? "" : "s"})` : b.name)).join(", ")}
-            </li>
+            <div className="office-card">
+              <p><span className="office-tag">building</span><strong>{building.length === 1 ? building[0].name : `${building.length} projects in flight`}</strong></p>
+              <ul>
+                {building.map((b) => (
+                  <li key={b.name}>
+                    {b.name}
+                    {b.n > 0 && ` — ${b.n} commit${b.n === 1 ? "" : "s"} this month`}
+                    {b.description && ` · ${b.description}`}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
           {volunteeringNow.map((v) => (
-            <li key={`v-${v.head}`}><span className="office-tag">volunteering</span>{v.head} · {v.sub}</li>
+            <div key={`v-${v.head}`} className="office-card">
+              <p><span className="office-tag">volunteering</span><strong>{v.head}</strong> · {v.sub}</p>
+              {v.detail.length > 0 && <ul>{v.detail.map((b) => <li key={b}>{b}</li>)}</ul>}
+            </div>
           ))}
           {earned.map((c) => (
-            <li key={`c-${c.head}`}><span className="office-tag">earned</span>{c.head} · {c.sub}</li>
+            <div key={`c-${c.head}`} className="office-card">
+              <p><span className="office-tag">earned</span><strong>{c.head}</strong> · {c.sub}</p>
+            </div>
           ))}
           {!working.length && !studying.length && !building.length && !volunteeringNow.length && !earned.length && (
-            <li className="text-muted">A quiet month — nothing on record.</li>
+            <p className="text-muted text-sm">A quiet month — nothing on record.</p>
           )}
-        </ul>
+        </div>
       )}
-
-      <p className="mt-4 font-mono text-[10px] uppercase tracking-wider text-muted">
-        Month granularity, because that is what the sources carry — roles and study from the CV,
-        commits from git{commits ? " (fetched at build)" : ""}. Nothing here is invented.
-      </p>
     </div>
   );
 }

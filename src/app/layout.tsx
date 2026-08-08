@@ -58,8 +58,14 @@ export const metadata: Metadata = {
   },
 };
 
-/** Runs before paint: applies stored/system theme (no FOUC) and flags JS
- *  availability so scroll-reveal CSS only hides content when JS can reveal it. */
+/** Runs before paint: no FOUC, and flags JS availability so scroll-reveal CSS
+ *  only hides content when JS can reveal it.
+ *
+ *  A pinned choice wins; otherwise the theme comes from the visitor's real
+ *  local hour (light 07:00-19:00), which is both a sensible first paint and
+ *  the right starting point for the home scene's day loop — it picks up from
+ *  the same clock and then runs fast (E35). Deliberately NOT
+ *  prefers-color-scheme: the scene's sun is the source of truth now. */
 /**
  * Cloudflare Web Analytics (PORT-6.4).
  *
@@ -74,7 +80,7 @@ export const metadata: Metadata = {
  */
 export const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN ?? "";
 
-const themeInit = `(function(){try{document.documentElement.classList.add("js");var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+const themeInit = `(function(){try{document.documentElement.classList.add("js");var t=localStorage.getItem("theme");var h=new Date().getHours();var d=t?t==="dark":(h<7||h>=19);if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
 
 export default function RootLayout({
   children,

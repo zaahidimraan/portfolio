@@ -12,6 +12,10 @@ if (!url || !outdir) {
 }
 mkdirSync(outdir, { recursive: true });
 
+// NOTE: serve the built site from a server you can stop. A lingering
+// `python -m http.server` in out/ holds the directory open on Windows and the
+// NEXT build then fails with EBUSY on rmdir — that cost three builds before
+// it was diagnosed. Prefer: start server, shoot, stop server.
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const PORT = 9333;
 const chrome = spawn(CHROME, [

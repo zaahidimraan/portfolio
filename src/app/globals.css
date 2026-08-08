@@ -27,6 +27,20 @@
   --accent-soft: #1c1c1c;
 }
 
+/* The theme now follows the home scene's sun (E35), so it changes while the
+   visitor is reading — an instant flip would be a jolt. Fading the page
+   colours makes sunrise and sunset feel like the light changing rather than
+   a switch being thrown. Only body-level colours transition; components
+   inherit through var() and follow along for free. */
+@media (prefers-reduced-motion: no-preference) {
+  html,
+  body {
+    transition:
+      background-color 1.6s ease,
+      color 1.6s ease;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -774,14 +788,13 @@ main > section[id]:not(#top) {
   flex: none;
 }
 
-/* ================= THE HOME (E29/E30) ================= */
+/* ================= THE LIVING HOME (E34-E37) =================
+   Top-down plan, a figure that walks its own compressed day, and a page
+   theme that follows the scene's sun. The walker is positioned imperatively
+   at rAF rate; only these CSS states react to it. */
 
-/* the camera: one moving element; zoom is a scene transform */
-/* The camera crops at the frame — a zoomed scene must never spill over the
-   page (it drew across the section heading). .office-svg sets overflow
-   visible later in this sheet, so the compound selector out-specifies it. */
 .office-svg.home-svg {
-  max-width: 44rem;
+  max-width: 46rem;
   cursor: default;
   overflow: hidden;
 }
@@ -791,16 +804,12 @@ main > section[id]:not(#top) {
   transform-origin: 0 0;
 }
 
-.home-dev {
-  transition: transform 0.7s ease;
-}
-
 .home-rack {
   cursor: pointer;
 }
 
-.home-rack:hover rect:first-of-type {
-  stroke-width: 2.6;
+.home-rack:hover rect {
+  stroke-width: 2.4;
 }
 
 .rack-unit rect {
@@ -809,21 +818,82 @@ main > section[id]:not(#top) {
 
 .rack-unit:hover rect,
 .rack-unit-hot rect {
-  stroke-width: 1.8;
-  fill: color-mix(in srgb, var(--foreground) 10%, transparent);
+  stroke-width: 1.6;
+  fill: color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 
-.office-inspect {
-  margin-top: 0.9rem;
+/* the walker: stepping feet only while actually walking */
+.fig-foot-a,
+.fig-foot-b {
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+
+.home-fig[data-sleeping="true"] ellipse,
+.home-fig[data-sleeping="true"] circle {
+  opacity: 0.45;
+}
+
+.home-fig[data-sleeping="true"] .fig-foot-a,
+.home-fig[data-sleeping="true"] .fig-foot-b {
+  opacity: 0;
+}
+
+/* zzz and sun/moon: shown by scene state, never both at once */
+.home-zzz,
+.home-moon,
+.home-sun {
+  transition: opacity 0.6s ease;
+}
+
+.home-zzz {
+  opacity: 0;
+}
+
+.home-svg[data-sleeping="true"] .home-zzz {
+  opacity: 0.5;
+}
+
+.home-svg[data-day="true"] .home-moon {
+  opacity: 0;
+}
+
+.home-svg[data-day="false"] .home-sun {
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .home-fig[data-walking="true"] .fig-foot-a {
+    animation: fig-step 0.42s ease-in-out infinite;
+  }
+
+  .home-fig[data-walking="true"] .fig-foot-b {
+    animation: fig-step 0.42s ease-in-out -0.21s infinite;
+  }
+
   .rack-led {
     animation: rack-blink 1.6s steps(1, end) infinite;
   }
 
-  .home-steam {
-    animation: home-steam-rise 2.8s ease-in-out infinite;
+  .home-zzz {
+    animation: zzz-drift 3.4s ease-in-out infinite;
+  }
+
+  /* the celebration burst (E36) */
+  .fx-confetti line {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: confetti-pop 0.9s ease-out both;
+  }
+}
+
+@keyframes fig-step {
+  0%,
+  100% {
+    transform: translateY(-2px);
+  }
+  50% {
+    transform: translateY(2px);
   }
 }
 
@@ -837,7 +907,7 @@ main > section[id]:not(#top) {
   }
 }
 
-@keyframes home-steam-rise {
+@keyframes zzz-drift {
   0%,
   100% {
     opacity: 0.2;
@@ -849,12 +919,72 @@ main > section[id]:not(#top) {
   }
 }
 
-/* the game degrades to a cut, not a broken glide */
+@keyframes confetti-pop {
+  from {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .home-scene,
-  .home-dev {
+  .home-scene {
     transition: none;
   }
+
+  .fx-confetti {
+    display: none;
+  }
+}
+
+/* the "what exactly" panel (E37) */
+.office-banner {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  font-family: var(--font-geist-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.office-banner-item {
+  border: 1px solid var(--foreground);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+}
+
+.office-detail {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.office-card {
+  border-left: 2px solid var(--border);
+  padding-left: 0.9rem;
+}
+
+.office-card p {
+  font-size: 0.92rem;
+}
+
+.office-card ul {
+  margin-top: 0.3rem;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.office-card li::before {
+  content: "▸ ";
+  opacity: 0.6;
 }
 
 /* ---- the office (E25) ---- */

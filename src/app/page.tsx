@@ -50,11 +50,11 @@ export default async function Home() {
           id="office"
           number="02"
           title="The home office"
-          intro="Scrub the timeline, then click the server — what was running, month by month, from CV and git dates"
+          intro="He walks his day on his own — press play to run the years, or scrub to any month"
         >
           <Reveal>
             <Office
-              repos={repos.map(({ name, createdAt, pushedAt }) => ({ name, createdAt, pushedAt }))}
+              repos={repos.map(({ name, createdAt, pushedAt, description }) => ({ name, createdAt, pushedAt, description }))}
               commits={commits}
             />
           </Reveal>
