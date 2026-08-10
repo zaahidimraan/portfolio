@@ -50,7 +50,7 @@ export default async function Home() {
           id="office"
           number="02"
           title="The house"
-          intro="He lives here on his real daily schedule — click a room to step inside; the timeline below runs the years"
+          intro="A day in his house, in 3D — drag to orbit, click a room to step inside; the timeline below runs the years"
         >
           <Reveal>
             <Office

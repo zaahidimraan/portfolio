@@ -1,9 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { certificates, education, experience, volunteering } from "@/content/profile";
 import type { CommitHistory, Repo } from "@/lib/github";
-import { House } from "./house/house";
+
+// Three.js only ever loads on the client, and only when the section nears
+// the viewport (the component gates the engine behind an IntersectionObserver).
+const House3D = dynamic(() => import("./house3d/house3d").then((m) => m.House3D), {
+  ssr: false,
+  loading: () => <div className="h3d-shell-loading">building the house…</div>,
+});
 
 /**
  * Section 02: the isometric house (E38–E44) with the career timeline under it.
@@ -160,9 +167,15 @@ export function Office({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing, pos, total]);
 
+  const lastPush = useMemo(() => {
+    if (!repos.length) return null;
+    const r = [...repos].sort((a, b) => b.pushedAt.localeCompare(a.pushedAt))[0];
+    return { name: r.name, at: r.pushedAt };
+  }, [repos]);
+
   return (
     <div className="office">
-      <House repos={repos} commits={commits} burst={startedNow.length > 0 ? monthKey : null} />
+      <House3D lastPush={lastPush} />
 
       <div className="office-controls">
         <div className="flex flex-wrap items-center gap-2">
