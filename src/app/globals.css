@@ -788,96 +788,295 @@ main > section[id]:not(#top) {
   flex: none;
 }
 
-/* ================= THE LIVING HOME (E34-E37) =================
-   Top-down plan, a figure that walks its own compressed day, and a page
-   theme that follows the scene's sun. The walker is positioned imperatively
-   at rAF rate; only these CSS states react to it. */
+/* ================= THE ISOMETRIC HOUSE (E38–E44) =================
+   Two-storey cutaway, a voxel avatar on his real daily schedule, a sun that
+   re-themes the scene and the page, two-level zoom and a dock. The avatar,
+   sun, moon and glow are positioned imperatively at rAF rate; these CSS
+   states carry every visual transition so nothing re-renders per frame. */
 
-.office-svg.home-svg {
-  max-width: 46rem;
-  cursor: default;
-  overflow: hidden;
+.house {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
 }
 
-.home-scene {
-  transition: transform 0.8s cubic-bezier(0.3, 0.05, 0.25, 1);
+.house-dock {
+  flex: none;
+  width: 15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--background);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.house-dock-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.house-dock-name span {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-geist-mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.house-now {
+  border: 1px solid var(--foreground);
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+}
+
+.house-now-head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-geist-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.house-now-body {
+  margin-top: 0.45rem;
+  font-family: var(--font-geist-mono);
+  font-size: 0.7rem;
+  line-height: 1.9;
+}
+
+.house-now-src {
+  margin-top: 0.55rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-geist-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.house-day {
+  flex: 1;
+  display: flex;
+  gap: 0.7rem;
+  min-height: 11rem;
+}
+
+.house-sunbar {
+  width: 8px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #1a2740, #5b6f8f 18%, #f7efd8 38%, #fdf8e8 55%, #e8a04e 80%, #1a2740);
+  position: relative;
+}
+
+.house-sunbar span {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--foreground);
+}
+
+.house-day ul {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: var(--font-geist-mono);
+  font-size: 0.66rem;
+}
+
+.house-day button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.house-day button:hover {
+  color: var(--foreground);
+}
+
+.house-day button.is-now {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.house-dock-note {
+  font-family: var(--font-geist-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.house-stage {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.house-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: opacity 0.9s ease;
+}
+
+.hs-camera {
+  transition: transform 0.6s cubic-bezier(0.3, 0.05, 0.25, 1);
   transform-origin: 0 0;
 }
 
-.home-rack {
+.house-back {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  background: var(--background);
+  font-family: var(--font-geist-mono);
+  font-size: 0.72rem;
   cursor: pointer;
 }
 
-.home-rack:hover rect {
-  stroke-width: 2.4;
+/* --- night: everything keyed off data-day; the long transitions ARE the
+       sunrise/sunset, so the scene never snaps (E39) --- */
+
+.hs-sky-night,
+.hs-night,
+.hs-stars,
+.hs-clouds,
+.hs-glow-warm,
+.hs-glow-cold,
+.hs-bulb {
+  transition: opacity 2.8s ease;
 }
 
-.rack-unit rect {
-  transition: stroke-width 0.2s ease, fill 0.2s ease;
+.hs-sky-night { opacity: 0; }
+.house-svg[data-day="false"] .hs-sky-night { opacity: 1; }
+
+.hs-night {
+  opacity: 0;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.house-svg[data-day="false"] .hs-night { opacity: 0.55; }
+
+.hs-stars { opacity: 0; }
+.house-svg[data-day="false"] .hs-stars { opacity: 1; }
+.house-svg[data-day="false"] .hs-clouds { opacity: 0; }
+
+.hs-sun,
+.hs-moon {
+  transition: opacity 1.6s ease;
+}
+.house-svg[data-day="true"] .hs-moon { opacity: 0; }
+.house-svg[data-day="false"] .hs-sun { opacity: 0; }
+
+.hs-glow-warm { opacity: 0; }
+.house-svg[data-day="false"] .hs-glow-warm { opacity: 0.9; }
+.hs-glow-cold { opacity: 0; }
+.house-svg[data-day="false"] .hs-glow-cold { opacity: 0.85; }
+
+.hs-glass { transition: fill 2.8s ease; }
+.house-svg[data-day="false"] .hs-glass { fill: #1b2740; }
+
+.hs-bulb { opacity: 0.25; }
+.house-svg[data-day="false"] .hs-bulb { opacity: 1; }
+
+/* --- labels: infographic leader lines, recoloured at night, gone in zoom --- */
+
+.hs-label {
+  color: #4a4536;
+  font-family: var(--font-geist-mono);
+  transition: color 2.8s ease, opacity 0.4s ease;
+}
+.house-svg[data-day="false"] .hs-label { color: #8fa0c0; }
+.house[data-zoom="in"] .hs-label { opacity: 0; }
+
+/* --- rooms are buttons (E44) --- */
+
+.hs-hit polygon {
+  fill: transparent;
+  pointer-events: fill;
+  cursor: pointer;
+  outline: none;
+}
+.hs-hit polygon:hover { fill: rgba(255, 255, 255, 0.13); }
+.hs-hit polygon:focus-visible {
+  stroke: #f2c14e;
+  stroke-width: 2.5;
+  fill: rgba(255, 255, 255, 0.1);
 }
 
-.rack-unit:hover rect,
-.rack-unit-hot rect {
-  stroke-width: 1.6;
-  fill: color-mix(in srgb, var(--foreground) 12%, transparent);
+.hs-spot circle { transition: fill-opacity 0.2s ease; }
+.hs-spot:hover circle { fill-opacity: 0.85; }
+
+/* --- the avatar (E40): pose is a data attribute --- */
+
+.house-avatar {
+  transition: opacity 0.9s ease;
 }
 
-/* the walker: stepping feet only while actually walking */
-.fig-foot-a,
-.fig-foot-b {
+.hv-up,
+.hv-legs {
+  transition: transform 0.35s ease;
+}
+
+/* the loop stamps pose/facing on the wrapper the ref points at */
+.house-avatar[data-facing="-1"] .hv { transform: scaleX(-1); }
+
+.house-avatar[data-pose="sit"] .hv-up { transform: translateY(-9px); }
+.house-avatar[data-pose="sit"] .hv-legs { transform: scaleY(0.55); transform-box: fill-box; transform-origin: center top; }
+.house-avatar[data-pose="squat"] .hv-up { transform: translateY(4px); }
+.house-avatar[data-pose="squat"] .hv-legs { transform: scaleY(0.4); transform-box: fill-box; transform-origin: center bottom; }
+.house-avatar[data-pose="lean"] .hv-up { transform: rotate(9deg); }
+.house-avatar[data-pose="sleep"] .hv-up { transform: translateY(-21px) rotate(-90deg); }
+.house-avatar[data-pose="sleep"] .hv-shadow { opacity: 0; }
+.house-avatar[data-pose="sleep"] .hv-eye { opacity: 0; }
+
+.hv-zzz { opacity: 0; transition: opacity 0.6s ease; }
+.house-avatar[data-pose="sleep"] .hv-zzz { opacity: 0.8; }
+
+.hv-leg-a,
+.hv-leg-b,
+.hv-arm-a,
+.hv-arm-b {
   transform-box: fill-box;
   transform-origin: center top;
 }
 
-.home-fig[data-sleeping="true"] ellipse,
-.home-fig[data-sleeping="true"] circle {
-  opacity: 0.45;
-}
-
-.home-fig[data-sleeping="true"] .fig-foot-a,
-.home-fig[data-sleeping="true"] .fig-foot-b {
-  opacity: 0;
-}
-
-/* zzz and sun/moon: shown by scene state, never both at once */
-.home-zzz,
-.home-moon,
-.home-sun {
-  transition: opacity 0.6s ease;
-}
-
-.home-zzz {
-  opacity: 0;
-}
-
-.home-svg[data-sleeping="true"] .home-zzz {
-  opacity: 0.5;
-}
-
-.home-svg[data-day="true"] .home-moon {
-  opacity: 0;
-}
-
-.home-svg[data-day="false"] .home-sun {
-  opacity: 0;
-}
-
 @media (prefers-reduced-motion: no-preference) {
-  .home-fig[data-walking="true"] .fig-foot-a {
-    animation: fig-step 0.42s ease-in-out infinite;
-  }
+  .house-avatar[data-pose="walk"] .hv-leg-a { animation: hv-step 0.4s ease-in-out infinite; }
+  .house-avatar[data-pose="walk"] .hv-leg-b { animation: hv-step 0.4s ease-in-out -0.2s infinite; }
+  .house-avatar[data-pose="walk"] .hv-arm-a { animation: hv-step 0.4s ease-in-out -0.2s infinite; }
+  .house-avatar[data-pose="walk"] .hv-arm-b { animation: hv-step 0.4s ease-in-out infinite; }
+  .house-avatar[data-pose="stir"] .hv-arm-a { animation: hv-stir 0.8s ease-in-out infinite; }
+  .house-avatar[data-pose="sleep"] .hv-zzz { animation: zzz-drift 3.4s ease-in-out infinite; }
 
-  .home-fig[data-walking="true"] .fig-foot-b {
-    animation: fig-step 0.42s ease-in-out -0.21s infinite;
-  }
-
-  .rack-led {
-    animation: rack-blink 1.6s steps(1, end) infinite;
-  }
-
-  .home-zzz {
-    animation: zzz-drift 3.4s ease-in-out infinite;
-  }
+  .hs-led { animation: rack-blink 1.7s steps(1, end) infinite; }
+  .hs-led:nth-child(3n) { animation-delay: 0.6s; }
+  .hs-led:nth-child(3n + 1) { animation-delay: 1.1s; }
 
   /* the celebration burst (E36) */
   .fx-confetti line {
@@ -887,52 +1086,138 @@ main > section[id]:not(#top) {
   }
 }
 
-@keyframes fig-step {
-  0%,
-  100% {
-    transform: translateY(-2px);
-  }
-  50% {
-    transform: translateY(2px);
-  }
+@keyframes hv-step {
+  0%, 100% { transform: rotate(16deg); }
+  50% { transform: rotate(-16deg); }
+}
+
+@keyframes hv-stir {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-22deg); }
 }
 
 @keyframes rack-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.25;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
 }
 
 @keyframes zzz-drift {
-  0%,
-  100% {
-    opacity: 0.2;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 0.6;
-    transform: translateY(-4px);
-  }
+  0%, 100% { opacity: 0.2; transform: translateY(0); }
+  50% { opacity: 0.8; transform: translateY(-4px); }
 }
 
 @keyframes confetti-pop {
-  from {
-    opacity: 1;
-    transform: scale(0.2);
+  from { opacity: 1; transform: scale(0.2); }
+  to { opacity: 0; transform: scale(1.6); }
+}
+
+/* --- intro beats (E43): the stage attribute walks dark → walls → furnish →
+       enter → done; each layer just transitions its opacity --- */
+
+.house-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #0f1622;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.9s ease, visibility 0.9s;
+}
+
+.house-cover p {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #e6ecf7;
+}
+
+.house-cover span {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.8rem;
+  font-family: var(--font-geist-mono);
+  font-size: 0.62rem;
+  color: #5f7398;
+}
+
+.house[data-intro="dark"] .house-cover {
+  opacity: 1;
+  visibility: visible;
+}
+
+.i-furn,
+.hs-labels {
+  transition: opacity 0.9s ease;
+}
+
+.house[data-intro="dark"] .house-svg { opacity: 0; }
+
+.house[data-intro="dark"] .i-furn,
+.house[data-intro="walls"] .i-furn { opacity: 0; }
+
+.house[data-intro="dark"] .house-avatar,
+.house[data-intro="walls"] .house-avatar,
+.house[data-intro="furnish"] .house-avatar { opacity: 0; }
+
+.hs-glows { transition: opacity 0.9s ease; }
+.house[data-intro="dark"] .hs-glows,
+.house[data-intro="walls"] .hs-glows { opacity: 0; }
+
+.house[data-intro="dark"] .hs-labels,
+.house[data-intro="walls"] .hs-labels,
+.house[data-intro="furnish"] .hs-labels,
+.house[data-intro="enter"] .hs-labels { opacity: 0; }
+
+.house[data-intro="dark"] .house-dock,
+.house[data-intro="walls"] .house-dock,
+.house[data-intro="furnish"] .house-dock,
+.house[data-intro="enter"] .house-dock {
+  opacity: 0;
+  transform: translateX(-14px);
+}
+
+/* --- mobile (E42): house first, dock stacks under it --- */
+
+@media (max-width: 920px) {
+  .house {
+    flex-direction: column-reverse;
   }
-  to {
-    opacity: 0;
-    transform: scale(1.6);
+
+  .house-dock {
+    width: 100%;
+  }
+
+  .house-day {
+    min-height: 0;
+  }
+
+  .house-day ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+
+  .house-sunbar {
+    display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-scene {
+  .hs-camera,
+  .house-svg,
+  .house-dock,
+  .i-furn,
+  .hs-labels,
+  .house-avatar {
     transition: none;
+  }
+
+  .house-cover {
+    display: none;
   }
 
   .fx-confetti {
@@ -987,105 +1272,11 @@ main > section[id]:not(#top) {
   opacity: 0.6;
 }
 
-/* ---- the office (E25) ---- */
+/* ---- the section shell + time control ---- */
 
 .office {
   color: var(--foreground);
 }
-
-.office-svg {
-  display: block;
-  width: 100%;
-  max-width: 34rem;
-  height: auto;
-  margin: 0 auto;
-  overflow: visible;
-}
-
-/* scene state: what is out on the desk follows the timeline */
-.office-monitor,
-.office-book {
-  transition: opacity 0.4s ease;
-}
-
-.office-svg[data-mode="study"] .office-monitor {
-  opacity: 0.25;
-}
-
-.office-svg[data-mode="work"] .office-book,
-.office-svg[data-mode="rest"] .office-book {
-  opacity: 0.15;
-}
-
-.office-arm,
-.office-page {
-  transform-box: fill-box;
-}
-
-.office-arm {
-  transform-origin: top left;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .office-svg[data-mode="work"] .office-arm {
-    animation: office-type 0.5s ease-in-out infinite;
-  }
-
-  .office-svg[data-mode="work"] .office-cursor {
-    animation: office-blink 1.1s steps(1, end) infinite;
-  }
-
-  .office-svg[data-mode="study"] .office-page {
-    animation: office-flip 2.6s ease-in-out infinite;
-    transform-origin: bottom center;
-  }
-
-  .office-lamp {
-    animation: office-lamp-warm 3.5s ease-in-out infinite;
-  }
-}
-
-@keyframes office-type {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(4deg);
-  }
-}
-
-@keyframes office-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
-@keyframes office-flip {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(-24deg);
-  }
-}
-
-@keyframes office-lamp-warm {
-  0%,
-  100% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* ---- the time control ---- */
 
 .office-controls {
   margin-top: 1.25rem;
@@ -1113,14 +1304,6 @@ main > section[id]:not(#top) {
   min-width: 10rem;
   accent-color: var(--foreground);
   cursor: pointer;
-}
-
-.office-activities {
-  margin-top: 0.9rem;
-  display: grid;
-  gap: 0.45rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
 }
 
 .office-tag {

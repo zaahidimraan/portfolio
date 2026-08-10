@@ -49,8 +49,8 @@ export default async function Home() {
         <Section
           id="office"
           number="02"
-          title="The home office"
-          intro="He walks his day on his own — press play to run the years, or scrub to any month"
+          title="The house"
+          intro="He lives here on his real daily schedule — click a room to step inside; the timeline below runs the years"
         >
           <Reveal>
             <Office
