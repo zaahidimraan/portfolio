@@ -8,7 +8,7 @@
  * upper slab/floors → walls → windows → upper furniture → string lights.
  */
 
-import { UPPER_H, WALL_H, box, floorPts, iso, pts, wallU, wallV, type Face } from "./iso";
+import { UPPER_H, WALL_H, box, floorPts, iso, pts, shade, wallU, wallV, type Face } from "./iso";
 import { ROOMS, type RoomKey } from "./plan";
 
 const H = UPPER_H;
@@ -111,19 +111,46 @@ const groundRooms = ROOMS.filter((r) => r.h === 0);
 const upperRooms = ROOMS.filter((r) => r.h === H);
 
 function Stairs() {
-  // Eight shallow treads, alternating shades so each step reads as a step
-  // rather than one solid mass (E46); the run tops out at the slab edge.
-  const steps = [];
+  // A real staircase (E47): a side stringer cut to the step profile, then a
+  // riser + tread pair per step, drawn top-first so nearer steps overlap.
+  const u1 = 15.8;
+  const u2 = 19.2;
   const N = 8;
-  const vBottom = 21.2;
-  const dv = (vBottom - 13.6) / N;
+  const vB = 21.2;
+  const vT = 13.6;
+  const dh = H / N;
+  const dv = (vB - vT) / N;
+  const wood = "#c9a06a";
+
+  const profile: [number, number][] = [[vB, 0]];
   for (let i = 0; i < N; i++) {
-    const v1 = vBottom - (i + 1) * dv;
+    profile.push([vB - i * dv, i * dh], [vB - i * dv, (i + 1) * dh]);
+  }
+  profile.push([vT, H], [vT, 0]);
+
+  const steps = [];
+  for (let i = N - 1; i >= 0; i--) {
+    const vFront = vB - i * dv;
+    const vBack = vFront - dv;
     steps.push(
-      <B key={i} f={box(15.5, v1, 19.5, v1 + dv, 0, ((i + 1) * H) / N, i % 2 ? "#c9a06a" : "#b98f57")} />,
+      <g key={i}>
+        <Q
+          p={[iso(u1, vFront, i * dh), iso(u2, vFront, i * dh), iso(u2, vFront, (i + 1) * dh), iso(u1, vFront, (i + 1) * dh)]}
+          fill={shade(wood, 0.8)}
+        />
+        <Q
+          p={[iso(u1, vBack, (i + 1) * dh), iso(u2, vBack, (i + 1) * dh), iso(u2, vFront, (i + 1) * dh), iso(u1, vFront, (i + 1) * dh)]}
+          fill={i % 2 ? wood : shade(wood, 1.06)}
+        />
+      </g>,
     );
   }
-  return <g>{steps}</g>;
+  return (
+    <g>
+      <polygon points={pts(profile.map(([v, h]) => iso(u2, v, h)))} fill={shade(wood, 0.62)} />
+      {steps}
+    </g>
+  );
 }
 
 function BookSpines() {
@@ -297,8 +324,11 @@ export function HouseShell() {
         <B f={box(28.7, 2.4, 30.7, 3, H + 2.82, H + 3, "#434750")} />
         <B f={box(31.2, 2.5, 31.7, 2.95, H + 2.82, H + 3, "#5c6270")} />
         <B f={box(26.8, 2.5, 27.3, 3, H + 2.82, H + 3.4, "#c95f4f")} />
-        <B f={box(29, 4.9, 30.8, 6.4, H + 1.5, H + 1.9, "#8b3631")} />
-        <B f={box(29, 6.2, 30.8, 6.6, H + 1.9, H + 4.4, "#ac534e")} />
+        {/* a chair that reads as a chair (E47): base, post, seat, backrest */}
+        <ellipse cx={iso(29.9, 5.65, H)[0]} cy={iso(29.9, 5.65, H)[1]} rx="5.2" ry="2.6" fill="#23262b" />
+        <B f={box(29.75, 5.5, 30.1, 5.85, H, H + 1.5, "#3a3d44")} />
+        <B f={box(28.9, 4.7, 30.9, 6.3, H + 1.5, H + 1.95, "#8b3631")} />
+        <B f={box(28.9, 6.2, 30.9, 6.6, H + 1.95, H + 4.7, "#ac534e")} />
 
         {/* the half divider paints before the server furniture, which sits
             nearer the camera (spec t6/§3: wall at u34, v4.2–7 only) */}

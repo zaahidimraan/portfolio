@@ -85,8 +85,8 @@ try {
   await shot("02-day");
   await Page.removeScriptToEvaluateOnNewDocument({ identifier: id });
 
-  // 2b · mid-walk (kitchen → office commute)
-  id = await boot(`localStorage.setItem("houseIntroSeen","1"); localStorage.removeItem("theme"); sessionStorage.setItem("houseClock","518")`);
+  // 2b · mid-walk (desk → kitchen, rounding the sofa in the drawing room)
+  id = await boot(`localStorage.setItem("houseIntroSeen","1"); localStorage.removeItem("theme"); sessionStorage.setItem("houseClock","757")`);
   await shot("02b-walk");
   await Page.removeScriptToEvaluateOnNewDocument({ identifier: id });
 
