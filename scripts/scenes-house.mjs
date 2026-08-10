@@ -110,6 +110,36 @@ try {
   await shot("05-zoom-server");
   await Page.removeScriptToEvaluateOnNewDocument({ identifier: id });
 
+  // 7 · hover label + scrub check (E46)
+  if (process.argv.includes("--polish")) {
+    id = await boot(`localStorage.setItem("houseIntroSeen","1"); localStorage.removeItem("theme"); sessionStorage.setItem("houseClock","690")`);
+    await Runtime.evaluate({
+      expression: `document.querySelector('.hs-hit polygon[aria-label^="bedroom"]')?.dispatchEvent(new MouseEvent("mouseover",{bubbles:true}))`,
+    });
+    await wait(600);
+    await shot("07-hover-bedroom");
+    const { result } = await Runtime.evaluate({
+      returnByValue: true,
+      awaitPromise: true,
+      expression: `(async () => {
+        const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        const sl = document.querySelector(".house-scrub input");
+        const fig = document.querySelector(".house-avatar");
+        const before = fig.getAttribute("transform") + "|" + fig.getAttribute("data-pose");
+        const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+        set.call(sl, "1420"); sl.dispatchEvent(new Event("input", { bubbles: true }));
+        await wait(600);
+        const after = fig.getAttribute("transform") + "|" + fig.getAttribute("data-pose");
+        const clock = document.querySelector(".house-now-head span:last-child").textContent;
+        return JSON.stringify({ moved: before !== after, pose: after.split("|")[1], clock });
+      })()`,
+    });
+    console.log("scrub:", result.value);
+    await wait(400);
+    await shot("08-scrubbed-night");
+    await Page.removeScriptToEvaluateOnNewDocument({ identifier: id });
+  }
+
   // 6 · mobile, day — dock stacked under the house
   if (FULL) {
     await boot(

@@ -9,7 +9,7 @@
  */
 
 import { UPPER_H, WALL_H, box, floorPts, iso, pts, wallU, wallV, type Face } from "./iso";
-import { ROOMS } from "./plan";
+import { ROOMS, type RoomKey } from "./plan";
 
 const H = UPPER_H;
 
@@ -87,8 +87,10 @@ function Tree({ cx, cy, s }: { cx: number; cy: number; s: number }) {
 export function Garden() {
   return (
     <g>
-      <ellipse cx="90" cy="250" rx="470" ry="130" fill="#cec79f" opacity="0.9" />
-      <ellipse cx="54" cy="175" rx="340" ry="98" fill="rgba(60,80,40,.3)" />
+      {/* the lawn reaches behind the house and the shadow hugs the slab, so
+          the house sits IN the garden instead of floating over it (E46) */}
+      <ellipse cx="54" cy="165" rx="480" ry="178" fill="#cec79f" opacity="0.9" />
+      <ellipse cx="54" cy="160" rx="335" ry="100" fill="rgba(60,80,40,.3)" />
       <Tree cx={-330} cy={20} s={1.2} />
       <Tree cx={-255} cy={-60} s={0.9} />
       <Tree cx={470} cy={-15} s={1.1} />
@@ -109,10 +111,17 @@ const groundRooms = ROOMS.filter((r) => r.h === 0);
 const upperRooms = ROOMS.filter((r) => r.h === H);
 
 function Stairs() {
+  // Eight shallow treads, alternating shades so each step reads as a step
+  // rather than one solid mass (E46); the run tops out at the slab edge.
   const steps = [];
-  for (let i = 0; i < 6; i++) {
-    const v1 = 20 - (i + 1) * 0.95;
-    steps.push(<B key={i} f={box(15.5, v1, 19.5, v1 + 0.95, 0, (i + 1) * (H / 6), "#c9a06a")} />);
+  const N = 8;
+  const vBottom = 21.2;
+  const dv = (vBottom - 13.6) / N;
+  for (let i = 0; i < N; i++) {
+    const v1 = vBottom - (i + 1) * dv;
+    steps.push(
+      <B key={i} f={box(15.5, v1, 19.5, v1 + dv, 0, ((i + 1) * H) / N, i % 2 ? "#c9a06a" : "#b98f57")} />,
+    );
   }
   return <g>{steps}</g>;
 }
@@ -232,10 +241,11 @@ export function HouseShell() {
 
       <Stairs />
 
-      {/* interior ground dividers (door gaps where he walks) */}
-      <DividerU u={14.5} v1={0} v2={14} h0={0} h1={WALL_H} gap={[5.8, 8.5]} />
-      <DividerU u={30.5} v1={0} v2={10} h0={0} h1={WALL_H} gap={[3.8, 6.5]} />
-      <DividerU u={14.5} v1={14} v2={28} h0={0} h1={WALL_H} gap={[18.8, 21.5]} />
+      {/* interior ground dividers — LOW walls (E46: the rooms stay visible),
+          with door gaps where he walks */}
+      <DividerU u={14.5} v1={0} v2={14} h0={0} h1={2.8} gap={[5.8, 8.5]} />
+      <DividerU u={30.5} v1={0} v2={10} h0={0} h1={2.8} gap={[3.8, 6.5]} />
+      <DividerU u={14.5} v1={14} v2={28} h0={0} h1={2.8} gap={[18.8, 21.5]} />
       <DividerU u={30} v1={14} v2={28} h0={0} h1={1.8} gap={[18.8, 21.5]} />
 
       {/* upper slab: fascia + top (the corridor the avatar walks) */}
@@ -292,7 +302,7 @@ export function HouseShell() {
 
         {/* the half divider paints before the server furniture, which sits
             nearer the camera (spec t6/§3: wall at u34, v4.2–7 only) */}
-        <DividerU u={34.5} v1={4.2} v2={7} h0={H} h1={H + 8.8} />
+        <DividerU u={34.5} v1={4.2} v2={7} h0={H} h1={H + 2.6} />
 
         {/* server nook: rack + CRT side desk, cabled to the office desk */}
         <path
@@ -312,9 +322,9 @@ export function HouseShell() {
         />
       </g>
 
-      {/* upper interior dividers (the server half wall paints earlier) */}
-      <DividerU u={16.5} v1={0} v2={10} h0={H} h1={H + 8.8} />
-      <DividerU u={24.5} v1={0} v2={10} h0={H} h1={H + 8.8} />
+      {/* upper interior dividers — low too (E46) */}
+      <DividerU u={16.5} v1={0} v2={10} h0={H} h1={H + 2.6} />
+      <DividerU u={24.5} v1={0} v2={10} h0={H} h1={H + 2.6} />
 
       {/* string lights: balcony post up to the slab corner, lit at night */}
       <path
@@ -338,16 +348,16 @@ export function HouseShell() {
 
 /* ---------------- leader-line labels (the infographic look) ---------------- */
 
-const LABELS: { room: string; ax: number; ay: number; side: "l" | "r"; ty: number }[] = [
-  { room: "BEDROOM", ...anchor(4, 8, H + 4), side: "l", ty: -144.5 },
-  { room: "KITCHEN", ...anchor(4, 4, 6), side: "l", ty: -48.5 },
-  { room: "GARAGE / WORKSHOP", ...anchor(4, 18, 4), side: "l", ty: 69.5 },
-  { room: "BATHROOM", ...anchor(20.5, 3, H + 4), side: "r", ty: -126.5 },
-  { room: "OFFICE", ...anchor(29, 2, H + 5), side: "r", ty: -74.5 },
-  { room: "SERVER", ...anchor(37, 2, H + 5), side: "r", ty: -20.5 },
-  { room: "LIBRARY", ...anchor(36, 4, 6), side: "r", ty: 91.5 },
-  { room: "DRAWING ROOM", ...anchor(24, 11, 3), side: "r", ty: 121.5 },
-  { room: "BALCONY / GARDEN", ...anchor(35, 22, 2), side: "r", ty: 209.5 },
+const LABELS: { key: RoomKey; text: string; ax: number; ay: number; side: "l" | "r"; ty: number }[] = [
+  { key: "bedroom", text: "BEDROOM", ...anchor(4, 8, H + 4), side: "l", ty: -144.5 },
+  { key: "kitchen", text: "KITCHEN", ...anchor(4, 4, 6), side: "l", ty: -48.5 },
+  { key: "garage", text: "GARAGE / WORKSHOP", ...anchor(4, 18, 4), side: "l", ty: 69.5 },
+  { key: "bath", text: "BATHROOM", ...anchor(20.5, 3, H + 4), side: "r", ty: -126.5 },
+  { key: "office", text: "OFFICE", ...anchor(29, 2, H + 5), side: "r", ty: -74.5 },
+  { key: "server", text: "SERVER", ...anchor(37, 2, H + 5), side: "r", ty: -20.5 },
+  { key: "library", text: "LIBRARY", ...anchor(36, 4, 6), side: "r", ty: 91.5 },
+  { key: "drawing", text: "DRAWING ROOM", ...anchor(24, 11, 3), side: "r", ty: 121.5 },
+  { key: "balcony", text: "BALCONY / GARDEN", ...anchor(35, 22, 2), side: "r", ty: 209.5 },
 ];
 
 function anchor(u: number, v: number, h: number): { ax: number; ay: number } {
@@ -355,18 +365,19 @@ function anchor(u: number, v: number, h: number): { ax: number; ay: number } {
   return { ax, ay };
 }
 
-export function Labels() {
+/** Leader-line labels, revealed one at a time as rooms are hovered (E46). */
+export function Labels({ show }: { show: RoomKey | null }) {
   return (
     <g className="hs-labels">
       {LABELS.map((l) => {
         const tx = l.side === "l" ? -268 : 452;
         const lx = l.side === "l" ? -262 : 446;
         return (
-          <g key={l.room} className="hs-label">
+          <g key={l.key} className={`hs-label${show === l.key ? " hs-label-on" : ""}`}>
             <line x1={l.ax} y1={l.ay} x2={lx} y2={l.ty + 3.5} stroke="currentColor" strokeWidth="1" opacity="0.45" />
             <circle cx={l.ax} cy={l.ay} r="2.6" fill="currentColor" />
             <text x={tx} y={l.ty} fontSize="10.5" letterSpacing="1.2" textAnchor={l.side === "l" ? "end" : "start"} fill="currentColor">
-              {l.room}
+              {l.text}
             </text>
           </g>
         );

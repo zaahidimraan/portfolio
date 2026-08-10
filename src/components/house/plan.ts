@@ -46,7 +46,9 @@ type NodeDef = { u: number; v: number; h: number; room: RoomKey; pose?: Pose };
  * spine and the stair run (h interpolates 0 → 13.2 between stairTop/Bottom).
  */
 export const NODES = {
-  bed: { u: 4.2, v: 7.5, h: UPPER_H, room: "bedroom", pose: "sleep" },
+  // The sleep pose pivots here and lies along the bed's u-axis, so this spot
+  // is the foot end of the mattress, centred on its v-extent.
+  bed: { u: 6.2, v: 6.8, h: UPPER_H, room: "bedroom", pose: "sleep" },
   bedDoor: { u: 8, v: 12, h: UPPER_H, room: "bedroom" },
   bathSpot: { u: 20.5, v: 4.5, h: UPPER_H, room: "bath", pose: "idle" },
   bathDoor: { u: 20.5, v: 12, h: UPPER_H, room: "bath" },

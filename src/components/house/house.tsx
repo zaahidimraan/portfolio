@@ -54,6 +54,7 @@ const HOTSPOTS: { room: RoomKey; u: number; v: number; h: number; href: string; 
 export function House({ repos, commits, burst }: HouseProps) {
   const [now, setNow] = useState<{ room: RoomKey; doing: string } | null>(null);
   const [zoom, setZoom] = useState<RoomKey | null>(null);
+  const [hoverRoom, setHoverRoom] = useState<RoomKey | null>(null);
   const [intro, setIntro] = useState<IntroStage | null>(null);
   const [pushDays, setPushDays] = useState<number | null>(null);
 
@@ -64,6 +65,9 @@ export function House({ repos, commits, burst }: HouseProps) {
   const moonRef = useRef<SVGGElement>(null);
   const clockRef = useRef<HTMLSpanElement>(null);
   const markerRef = useRef<HTMLSpanElement>(null);
+  const scrubRef = useRef<HTMLInputElement>(null);
+  /** Set by the loop effect; the scrubber calls it to jump the scene clock. */
+  const clockCtl = useRef<((minute: number) => void) | null>(null);
   const nowRef = useRef<string>("");
   const introRef = useRef<IntroStage | null>(null);
   useEffect(() => {
@@ -154,6 +158,8 @@ export function House({ repos, commits, burst }: HouseProps) {
 
       if (clockRef.current) clockRef.current.textContent = fmt(m);
       if (markerRef.current) markerRef.current.style.top = `${(m / 1440) * 100}%`;
+      const sl = scrubRef.current;
+      if (sl && document.activeElement !== sl) sl.value = String(m);
 
       const key = `${st.room}|${st.doing}`;
       if (key !== nowRef.current) {
@@ -173,13 +179,23 @@ export function House({ repos, commits, burst }: HouseProps) {
     if (reduced) {
       // Static scene at the real current hour; theme by the real clock. The
       // deferred call keeps the setState out of the synchronous effect body.
+      // The scrubber still works — it just repositions the static scene.
+      clockCtl.current = (m) => place(m, false);
       const t = setTimeout(() => place(startMin, false), 0);
-      return () => clearTimeout(t);
+      return () => {
+        clearTimeout(t);
+        clockCtl.current = null;
+      };
     }
 
     let acc = startMin;
     let last = performance.now();
     let raf = 0;
+    // Dragging the day scrubber jumps the clock; the day keeps running from
+    // wherever it lands.
+    clockCtl.current = (m) => {
+      acc = m;
+    };
     const tick = (t: number) => {
       // Clamping the delta pauses scene time while the tab is hidden.
       const dt = Math.min(t - last, 120);
@@ -190,7 +206,10 @@ export function House({ repos, commits, burst }: HouseProps) {
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      clockCtl.current = null;
+    };
   }, []);
 
   /* -------- zoom (E41) -------- */
@@ -285,8 +304,23 @@ export function House({ repos, commits, burst }: HouseProps) {
           </ul>
         </div>
 
+        <label className="house-scrub">
+          <span>drag his day</span>
+          <input
+            ref={scrubRef}
+            type="range"
+            min={0}
+            max={1439}
+            step={1}
+            defaultValue={720}
+            aria-label="Scrub the day — the character moves to that time"
+            onChange={(e) => clockCtl.current?.(Number(e.currentTarget.value))}
+            onPointerUp={(e) => e.currentTarget.blur()}
+          />
+        </label>
+
         <p className="house-dock-note">
-          {zoom ? "esc or click outside to step back" : "click a room to step inside"}
+          {zoom ? "esc or click outside to step back" : "click a room to step inside · hover to name it"}
         </p>
       </div>
 
@@ -404,7 +438,7 @@ export function House({ repos, commits, burst }: HouseProps) {
               </g>
             )}
 
-            <Labels />
+            <Labels show={hoverRoom} />
 
             {/* invisible room hit areas — the accessible way in (E44) */}
             <g className="hs-hit">
@@ -430,6 +464,10 @@ export function House({ repos, commits, burst }: HouseProps) {
                         toggleRoom(r.key);
                       }
                     }}
+                    onMouseEnter={() => setHoverRoom(r.key)}
+                    onMouseLeave={() => setHoverRoom(null)}
+                    onFocus={() => setHoverRoom(r.key)}
+                    onBlur={() => setHoverRoom(null)}
                   />
                 );
               })}

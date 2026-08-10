@@ -925,6 +925,26 @@ main > section[id]:not(#top) {
   color: var(--muted);
 }
 
+.house-scrub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.house-scrub span {
+  font-family: var(--font-geist-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.house-scrub input {
+  width: 100%;
+  accent-color: var(--foreground);
+  cursor: ew-resize;
+}
+
 .house-stage {
   flex: 1;
   min-width: 0;
@@ -1004,15 +1024,18 @@ main > section[id]:not(#top) {
 .hs-bulb { opacity: 0.25; }
 .house-svg[data-day="false"] .hs-bulb { opacity: 1; }
 
-/* --- labels: infographic leader lines, recoloured at night, gone in zoom --- */
+/* --- labels: infographic leader lines, hidden until the room is hovered or
+       focused (E46) — the house should just look like a house --- */
 
 .hs-label {
   color: #4a4536;
   font-family: var(--font-geist-mono);
-  transition: color 2.8s ease, opacity 0.4s ease;
+  opacity: 0;
+  transition: color 2.8s ease, opacity 0.3s ease;
+  pointer-events: none;
 }
+.hs-label.hs-label-on { opacity: 1; }
 .house-svg[data-day="false"] .hs-label { color: #8fa0c0; }
-.house[data-zoom="in"] .hs-label { opacity: 0; }
 
 /* --- rooms are buttons (E44) --- */
 
@@ -1051,7 +1074,8 @@ main > section[id]:not(#top) {
 .house-avatar[data-pose="squat"] .hv-up { transform: translateY(4px); }
 .house-avatar[data-pose="squat"] .hv-legs { transform: scaleY(0.4); transform-box: fill-box; transform-origin: center bottom; }
 .house-avatar[data-pose="lean"] .hv-up { transform: rotate(9deg); }
-.house-avatar[data-pose="sleep"] .hv-up { transform: translateY(-21px) rotate(-90deg); }
+/* lying ALONG the bed's iso axis (≈−63°), lifted onto the mattress */
+.house-avatar[data-pose="sleep"] .hv-up { transform: translateY(-19px) rotate(-63deg); }
 .house-avatar[data-pose="sleep"] .hv-shadow { opacity: 0; }
 .house-avatar[data-pose="sleep"] .hv-eye { opacity: 0; }
 
