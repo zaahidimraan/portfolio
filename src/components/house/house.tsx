@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CommitHistory, Repo } from "@/lib/github";
 import { Avatar } from "./avatar";
-import { Garden, HouseShell, Labels } from "./scene";
-import { UPPER_H, iso } from "./iso";
+import { Garden, Labels, SceneView } from "./scene";
+import { UPPER_H, makeProj, type Rot } from "./iso";
 import {
   DAY_REAL_MS, NODES, ROOMS, ROOM_BY_KEY, SCHEDULE, SUNRISE_MIN, SUNSET_MIN,
   roomBBox, stateAt, type RoomKey,
@@ -57,6 +57,9 @@ export function House({ repos, commits, burst }: HouseProps) {
   const [hoverRoom, setHoverRoom] = useState<RoomKey | null>(null);
   const [intro, setIntro] = useState<IntroStage | null>(null);
   const [pushDays, setPushDays] = useState<number | null>(null);
+  const [rot, setRot] = useState<Rot>(0);
+  const [zoomF, setZoomF] = useState(1);
+  const p = useMemo(() => makeProj(rot), [rot]);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const avRef = useRef<SVGGElement>(null);
@@ -73,6 +76,14 @@ export function House({ repos, commits, burst }: HouseProps) {
   useEffect(() => {
     introRef.current = intro;
   }, [intro]);
+  const rotRef = useRef<Rot>(0);
+  useEffect(() => {
+    rotRef.current = rot;
+  }, [rot]);
+  /** Repaints the avatar/sun for the current minute — used on rotation. */
+  const repaintRef = useRef<(() => void) | null>(null);
+  const lastXRef = useRef<number | null>(null);
+  const facingRef = useRef<1 | -1>(1);
 
   /* -------- what the CRT and NOW card can say truthfully -------- */
   const lastPush = useMemo(() => {
@@ -135,12 +146,20 @@ export function House({ repos, commits, burst }: HouseProps) {
 
     const place = (minute: number, gateNight: boolean) => {
       const st = stateAt(minute);
-      const [x, y] = iso(st.u, st.v, st.h);
+      const pr = makeProj(rotRef.current);
+      const [x, y] = pr(st.u, st.v, st.h);
+      // Facing comes from SCREEN direction so he never moonwalks, whatever
+      // the camera angle (E48).
+      if (st.pose === "walk" && lastXRef.current !== null) {
+        const dx = x - lastXRef.current;
+        if (Math.abs(dx) > 0.3) facingRef.current = dx >= 0 ? 1 : -1;
+      }
+      lastXRef.current = x;
       const av = avRef.current;
       if (av) {
         av.setAttribute("transform", `translate(${x} ${y})`);
         av.setAttribute("data-pose", st.pose);
-        av.setAttribute("data-facing", String(st.facing));
+        av.setAttribute("data-facing", String(st.pose === "walk" ? facingRef.current : st.facing));
       }
       glowRef.current?.setAttribute("transform", `translate(${x} ${y - 10})`);
 
@@ -180,11 +199,17 @@ export function House({ repos, commits, burst }: HouseProps) {
       // Static scene at the real current hour; theme by the real clock. The
       // deferred call keeps the setState out of the synchronous effect body.
       // The scrubber still works — it just repositions the static scene.
-      clockCtl.current = (m) => place(m, false);
+      let cur = startMin;
+      clockCtl.current = (m) => {
+        cur = m;
+        place(m, false);
+      };
+      repaintRef.current = () => place(cur, false);
       const t = setTimeout(() => place(startMin, false), 0);
       return () => {
         clearTimeout(t);
         clockCtl.current = null;
+        repaintRef.current = null;
       };
     }
 
@@ -195,6 +220,10 @@ export function House({ repos, commits, burst }: HouseProps) {
     // wherever it lands.
     clockCtl.current = (m) => {
       acc = m;
+    };
+    repaintRef.current = () => {
+      const stage = introRef.current;
+      place(acc, stage !== null && stage !== "done" && stage !== "enter");
     };
     const tick = (t: number) => {
       // Clamping the delta pauses scene time while the tab is hidden.
@@ -209,8 +238,16 @@ export function House({ repos, commits, burst }: HouseProps) {
     return () => {
       cancelAnimationFrame(raf);
       clockCtl.current = null;
+      repaintRef.current = null;
     };
   }, []);
+
+  /* -------- orbit (E48): reproject the living layer on turn -------- */
+  useEffect(() => {
+    lastXRef.current = null;
+    const t = setTimeout(() => repaintRef.current?.(), 0);
+    return () => clearTimeout(t);
+  }, [rot]);
 
   /* -------- zoom (E41) -------- */
   useEffect(() => {
@@ -223,15 +260,41 @@ export function House({ repos, commits, burst }: HouseProps) {
   }, [zoom]);
 
   const camera = useMemo(() => {
-    if (!zoom) return "translate(0px, 0px) scale(1)";
-    const b = roomBBox(ROOM_BY_KEY[zoom]);
-    const s = Math.min(3.4, Math.max(1.7, Math.min(860 / b.w, 500 / b.h)));
-    const cx = b.x + b.w / 2;
-    const cy = b.y + b.h / 2;
-    return `translate(${95 - s * cx}px, ${30 - s * cy}px) scale(${s})`;
-  }, [zoom]);
+    if (zoom) {
+      const b = roomBBox(ROOM_BY_KEY[zoom], p);
+      const s = Math.min(3.4, Math.max(1.7, Math.min(860 / b.w, 500 / b.h)));
+      const cx = b.x + b.w / 2;
+      const cy = b.y + b.h / 2;
+      return `translate(${95 - s * cx}px, ${30 - s * cy}px) scale(${s})`;
+    }
+    return `translate(${95 * (1 - zoomF)}px, ${40 * (1 - zoomF)}px) scale(${zoomF})`;
+  }, [zoom, zoomF, p]);
 
   const toggleRoom = (key: RoomKey) => setZoom((z) => (z === key ? null : key));
+  const orbit = (dir: 1 | -1) => setRot((r) => (((r + dir + 4) % 4) as Rot));
+
+  /* -------- drag sideways on the scene to orbit (E48) -------- */
+  const dragRef = useRef<{ x: number; done: boolean } | null>(null);
+  const onPointerDown = (e: React.PointerEvent) => {
+    dragRef.current = { x: e.clientX, done: false };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current;
+    if (!d || d.done) return;
+    const dx = e.clientX - d.x;
+    if (Math.abs(dx) > 55) {
+      d.done = true;
+      orbit(dx > 0 ? -1 : 1);
+    }
+  };
+  const onPointerUp = () => {
+    // A drag that rotated must not fall through as a click-to-unzoom.
+    const rotated = dragRef.current?.done ?? false;
+    setTimeout(() => {
+      dragRef.current = null;
+    }, 0);
+    return rotated;
+  };
 
   // "N days ago" needs the real clock, so it resolves on the client only.
   useEffect(() => {
@@ -320,7 +383,9 @@ export function House({ repos, commits, burst }: HouseProps) {
         </label>
 
         <p className="house-dock-note">
-          {zoom ? "esc or click outside to step back" : "click a room to step inside · hover to name it"}
+          {zoom
+            ? "esc or click outside to step back"
+            : "click a room to step inside · drag sideways to orbit · hover to name it"}
         </p>
       </div>
 
@@ -331,8 +396,13 @@ export function House({ repos, commits, burst }: HouseProps) {
           className="house-svg"
           data-day="true"
           role="img"
-          aria-label="An isometric cutaway of Zahid's house — he moves between rooms on his real daily schedule"
-          onClick={() => setZoom(null)}
+          aria-label="An isometric cutaway of Zahid's house — he moves between rooms on his real daily schedule; drag sideways to orbit"
+          onClick={() => {
+            if (!dragRef.current?.done) setZoom(null);
+          }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
         >
           <defs>
             <linearGradient id="hs-sky-day" x1="0" y1="0" x2="0" y2="1">
@@ -381,7 +451,10 @@ export function House({ repos, commits, burst }: HouseProps) {
           <g className="hs-camera" style={{ transform: camera }}>
             <g aria-hidden>
               <Garden />
-              <HouseShell />
+            </g>
+            <g className="hs-world" key={rot}>
+            <g aria-hidden>
+              <SceneView rot={rot} />
             </g>
 
             {/* night falls over the scene, then the lights punch through it */}
@@ -390,8 +463,8 @@ export function House({ repos, commits, burst }: HouseProps) {
               <circle ref={glowRef} className="hs-glow-warm" r="52" fill="url(#hs-glow-warm)" />
               <circle
                 className="hs-glow-cold"
-                cx={iso(37, 2.2, UPPER_H + 3.5)[0]}
-                cy={iso(37, 2.2, UPPER_H + 3.5)[1]}
+                cx={p(37, 2.2, UPPER_H + 3.5)[0]}
+                cy={p(37, 2.2, UPPER_H + 3.5)[1]}
                 r="42"
                 fill="url(#hs-glow-cold)"
               />
@@ -405,7 +478,7 @@ export function House({ repos, commits, burst }: HouseProps) {
                 lastPush ? `> push: ${lastPush.name.slice(0, 12)}` : "> push: —",
                 `> units: ${liveUnits.length} live`,
               ].map((t, i) => (
-                <text key={i} x={iso(36.15, 7.84, UPPER_H + 4.15 - i * 0.62)[0]} y={iso(36.15, 7.84, UPPER_H + 4.15 - i * 0.62)[1]} fontSize="2.4" fill="#58d08a" fontFamily="ui-monospace,monospace">
+                <text key={i} x={p(36.15, 7.84, UPPER_H + 4.15 - i * 0.62)[0]} y={p(36.15, 7.84, UPPER_H + 4.15 - i * 0.62)[1]} fontSize="2.4" fill="#58d08a" fontFamily="ui-monospace,monospace">
                   {t}
                 </text>
               ))}
@@ -438,19 +511,19 @@ export function House({ repos, commits, burst }: HouseProps) {
               </g>
             )}
 
-            <Labels show={hoverRoom} />
+            <Labels show={hoverRoom} rot={rot} />
 
             {/* invisible room hit areas — the accessible way in (E44) */}
             <g className="hs-hit">
               {ROOMS.filter((r) => r.key !== "hall").map((r) => {
-                const p = [iso(r.u1, r.v1, r.h), iso(r.u2, r.v1, r.h), iso(r.u2, r.v2, r.h), iso(r.u1, r.v2, r.h)]
+                const hit = [p(r.u1, r.v1, r.h), p(r.u2, r.v1, r.h), p(r.u2, r.v2, r.h), p(r.u1, r.v2, r.h)]
                   .map(([x, y]) => `${x},${y}`)
                   .join(" ");
                 const active = now?.room === r.key;
                 return (
                   <polygon
                     key={r.key}
-                    points={p}
+                    points={hit}
                     role="button"
                     tabIndex={0}
                     aria-label={`${r.label.toLowerCase()}${active && now ? ` — currently ${now.doing}` : ""}${zoom === r.key ? " — press to step back" : " — press to step inside"}`}
@@ -476,7 +549,7 @@ export function House({ repos, commits, burst }: HouseProps) {
             {/* hotspots appear inside a zoomed room */}
             <g className="hs-spots">
               {HOTSPOTS.filter((s) => s.room === zoom).map((s) => {
-                const [x, y] = iso(s.u, s.v, s.h);
+                const [x, y] = p(s.u, s.v, s.h);
                 return (
                   <a key={s.href} href={s.href} className="hs-spot" aria-label={s.label} onClick={(e) => e.stopPropagation()}>
                     <circle cx={x} cy={y} r="7" fill="#1a1a1a" fillOpacity="0.55" />
@@ -486,8 +559,17 @@ export function House({ repos, commits, burst }: HouseProps) {
                 );
               })}
             </g>
+            </g>
           </g>
         </svg>
+
+        {/* orbit + zoom (E48) */}
+        <div className="house-ctl" role="group" aria-label="Camera controls">
+          <button type="button" onClick={() => orbit(-1)} aria-label="Rotate the house left">⟲</button>
+          <button type="button" onClick={() => orbit(1)} aria-label="Rotate the house right">⟳</button>
+          <button type="button" onClick={() => setZoomF((f) => Math.max(0.7, Math.round(f / 1.25 * 100) / 100))} aria-label="Zoom out">−</button>
+          <button type="button" onClick={() => setZoomF((f) => Math.min(2.4, Math.round(f * 1.25 * 100) / 100))} aria-label="Zoom in">+</button>
+        </div>
 
         {zoom && (
           <button type="button" className="house-back" onClick={() => setZoom(null)}>

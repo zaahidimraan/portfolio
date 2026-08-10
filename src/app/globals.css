@@ -979,6 +979,51 @@ main > section[id]:not(#top) {
   cursor: pointer;
 }
 
+/* --- orbit + zoom cluster (E48) --- */
+
+.house-ctl {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.house-ctl button {
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.house-ctl button:hover {
+  border-color: var(--foreground);
+}
+
+/* the quarter-turn settle: the new angle fades and eases into place */
+@media (prefers-reduced-motion: no-preference) {
+  .hs-world {
+    animation: hs-settle 0.4s ease-out;
+    transform-origin: 95px 40px;
+  }
+}
+
+@keyframes hs-settle {
+  from {
+    opacity: 0.35;
+    transform: scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* --- night: everything keyed off data-day; the long transitions ARE the
        sunrise/sunset, so the scene never snaps (E39) --- */
 

@@ -110,6 +110,21 @@ try {
   await shot("05-zoom-server");
   await Page.removeScriptToEvaluateOnNewDocument({ identifier: id });
 
+  // 9 · the orbit: day at 90°, 180°, 270° (E48)
+  if (process.argv.includes("--orbit")) {
+    id = await boot(`localStorage.setItem("houseIntroSeen","1"); localStorage.removeItem("theme"); sessionStorage.setItem("houseClock","690")`);
+    for (let r = 1; r <= 3; r++) {
+      await click('.house-ctl button[aria-label="Rotate the house right"]');
+      await wait(900);
+      await shot(`09-rot${r}`);
+    }
+    await click('.house-ctl button[aria-label="Zoom in"]');
+    await click('.house-ctl button[aria-label="Zoom in"]');
+    await wait(800);
+    await shot("10-rot3-zoomed");
+    await Page.removeScriptToEvaluateOnNewDocument({ identifier: id });
+  }
+
   // 7 · hover label + scrub check (E46)
   if (process.argv.includes("--polish")) {
     id = await boot(`localStorage.setItem("houseIntroSeen","1"); localStorage.removeItem("theme"); sessionStorage.setItem("houseClock","690")`);

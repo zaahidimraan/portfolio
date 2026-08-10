@@ -16,6 +16,44 @@ export function iso(u: number, v: number, h = 0): [number, number] {
   return [(u - v) * S, ((u + v) / 2 - h) * S];
 }
 
+/* ---------------- the orbit (E48) ---------------- */
+
+/** Quarter-turn camera angles, clockwise. */
+export type Rot = 0 | 1 | 2 | 3;
+
+const CU = 20;
+const CV = 14;
+
+/** Rotate a plot point around the plot centre into view space. */
+export function mapUV(rot: Rot, u: number, v: number): [number, number] {
+  switch (rot) {
+    case 0: return [u, v];
+    case 1: return [CU + (v - CV), CV - (u - CU)];
+    case 2: return [2 * CU - u, 2 * CV - v];
+    default: return [CU - (v - CV), CV + (u - CU)];
+  }
+}
+
+/** Rotate a direction (e.g. a wall's outward normal) into view space. */
+export function mapDir(rot: Rot, du: number, dv: number): [number, number] {
+  switch (rot) {
+    case 0: return [du, dv];
+    case 1: return [dv, -du];
+    case 2: return [-du, -dv];
+    default: return [-dv, du];
+  }
+}
+
+/** Projection for a given camera angle: plot coords → screen px. */
+export function makeProj(rot: Rot) {
+  return (u: number, v: number, h = 0): [number, number] => {
+    const [mu, mv] = mapUV(rot, u, v);
+    return iso(mu, mv, h);
+  };
+}
+
+export type Proj = ReturnType<typeof makeProj>;
+
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
 export function pts(list: [number, number][]): string {

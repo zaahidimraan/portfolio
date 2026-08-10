@@ -15,7 +15,7 @@
  * the reduced-motion static scene.
  */
 
-import { UPPER_H, iso } from "./iso";
+import { UPPER_H, type Proj } from "./iso";
 
 export type RoomKey =
   | "kitchen" | "drawing" | "library" | "garage" | "hall" | "balcony"
@@ -437,11 +437,11 @@ export function stateAt(minute: number): AvatarState {
 
 /* ---------------- camera framing ---------------- */
 
-/** Projected bounding box of a room (floor plus wall height), for the zoom. */
-export function roomBBox(room: Room): { x: number; y: number; w: number; h: number } {
+/** Projected bounding box of a room at the current camera angle (zoom). */
+export function roomBBox(room: Room, p: Proj): { x: number; y: number; w: number; h: number } {
   const corners: [number, number][] = [];
   for (const h of [room.h, room.h + 9]) {
-    corners.push(iso(room.u1, room.v1, h), iso(room.u2, room.v1, h), iso(room.u2, room.v2, h), iso(room.u1, room.v2, h));
+    corners.push(p(room.u1, room.v1, h), p(room.u2, room.v1, h), p(room.u2, room.v2, h), p(room.u1, room.v2, h));
   }
   const xs = corners.map((c) => c[0]);
   const ys = corners.map((c) => c[1]);
