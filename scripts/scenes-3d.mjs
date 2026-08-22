@@ -82,17 +82,17 @@ try {
     })()`);
   };
 
-  // 1 · midday overview
+  // 1 · midday overview — WALLS defaults to line (v2)
   await setTime(11);
   await wait(1500);
-  await shot("01-day");
+  await shot("01-day-line");
 
   // 2 · night — lamps, screens, rack glow, page theme dark
   await setTime(23.4);
   await wait(2600);
   await shot("02-night");
 
-  // 3 · office focus (chip + fly-to + upper floor isolation)
+  // 3 · office focus (chip + section link + fly-to)
   await setTime(10);
   await run(`document.querySelector('[data-room="office"]').click()`);
   await wait(1800);
@@ -103,28 +103,46 @@ try {
   await wait(1700);
   await shot("04-office-inside");
 
-  // 5 · reset, walls full, floor split
+  // 5 · reset, walls cutaway (camera-facing hide), palette dusk
   await run(`document.querySelector('[data-h3d="reset"]').click()`);
   await wait(1400);
-  await run(`document.querySelector('[data-wall="full"]').click()`);
-  await run(`document.querySelector('[data-floor="split"]').click()`);
-  await wait(1600);
-  await shot("05-split-full");
+  await run(`document.querySelector('[data-wall="cutaway"]').click()`);
+  await run(`document.querySelector('[data-pal="dusk"]').click()`);
+  await wait(1200);
+  await shot("05-cutaway-dusk");
 
-  // functional: schedule row jumps time + focus
+  // functional: schedule row jumps time + focus; chip carries the section link
   const func = await run(`(async () => {
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-    document.querySelector('[data-floor="both"]').click();
-    document.querySelector('[data-wall="cutaway"]').click();
+    document.querySelector('[data-wall="line"]').click();
+    document.querySelector('[data-pal="clay"]').click();
     const rows = [...document.querySelectorAll(".h3d-schedrow")];
     rows[3].click(); // 09:00 office
     await wait(1500);
     const clock = document.querySelector('[data-h3d="clock"]').textContent;
     const room = document.querySelector('[data-h3d="nowRoom"]').textContent;
-    const chip = getComputedStyle(document.querySelector('[data-h3d="chip"]')).display;
-    return JSON.stringify({ clock, room, chip });
+    const sec = document.querySelector('[data-h3d="nowSec"]').textContent;
+    const chipSec = document.querySelector('[data-h3d="chipSec"]');
+    const link = chipSec.style.display !== "none" ? chipSec.getAttribute("href") : "hidden";
+    return JSON.stringify({ clock, room, sec, link });
   })()`);
   console.log("schedule-row check:", func);
+
+  // functional: SiteMotion — hover a card, expect a transform + shadow
+  const motion = await run(`(async () => {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const card = [...document.querySelectorAll("main article, main a[href]")].find(
+      (el) => el.offsetHeight > 60 && el.offsetHeight < 600,
+    );
+    if (!card) return JSON.stringify({ motion: "no-card" });
+    card.dispatchEvent(new PointerEvent("pointerenter", { bubbles: false }));
+    await wait(150);
+    return JSON.stringify({
+      fx: card.dataset.fxLast ?? "none",
+      transformed: (card.style.transform || "").length > 0,
+    });
+  })()`);
+  console.log("site-motion check:", motion);
 
   await c.close();
 } finally {

@@ -88,7 +88,9 @@ export default async function Home() {
           <Reveal>
             <CareerTimeline />
           </Reveal>
-          <TimelinePanel />
+          <Reveal>
+            <TimelinePanel />
+          </Reveal>
           <div className="mt-12">
             <Experience />
           </div>

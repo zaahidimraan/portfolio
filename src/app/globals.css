@@ -962,8 +962,20 @@ main > section[id]:not(#top) {
 }
 
 .h3d-chip-txt { flex: 1; }
-.h3d-chip-name { font-size: 1.05rem; font-weight: 700; line-height: 1.1; }
+.h3d-chip-name { font-size: 1.05rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
 .h3d-chip-act { font-family: var(--font-geist-mono); font-size: 9.5px; line-height: 1.5; color: #6e6759; }
+
+/* the section→room map's payoff: one click from a room to its site section */
+.h3d-chip-sec {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--font-geist-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #c96b4a;
+}
+
+.h3d-chip-sec:hover { color: #a4512f; }
 
 .h3d-viewbtns {
   position: absolute;

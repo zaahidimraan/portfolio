@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { identity } from "@/content/profile";
+import { SiteMotion } from "@/components/site-motion";
 import "./globals.css";
 
 /* Vendored latin-subset variable fonts: builds must never depend on a
@@ -98,6 +99,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         {children}
+        {/* Zahid's drop-in motion layer (E50) at his settled tweak values. */}
+        <SiteMotion motion={1.3} depth={1.1} />
         {cfBeaconToken && (
           <script
             defer

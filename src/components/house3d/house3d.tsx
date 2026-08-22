@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import type { House3DHandle } from "./engine";
 
 /**
- * The 3D house shell (E49): Zahid's House3D dock + stage, rendered by React,
- * driven by the ported engine. Three.js and the engine load lazily when the
+ * The 3D house shell, v2 (E50): Zahid's one-storey House3D dock + stage per
+ * his SYNC.md handoff. Three.js and the engine still load lazily when the
  * section approaches the viewport, so the main bundle and LCP stay untouched.
  *
- * Truthfulness: the NOW card shows the schedule the scene actually runs plus
- * the real last GitHub push (build-time data, aged client-side); the footer
- * names what feeds it — no unwired integration name-dropping.
+ * Truthfulness: the NOW card shows the schedule the scene actually runs, the
+ * site section the current room stands for (his section→room map), and the
+ * real last GitHub push; the footer names what feeds it.
  */
 
 type Props = {
@@ -22,9 +22,9 @@ type Status = "idle" | "loading" | "ready" | "unsupported";
 const ROOM_BUTTONS: [string, string][] = [
   ["office", "Office"], ["server", "Server"],
   ["bedroom", "Bedroom"], ["bath", "Bathroom"],
-  ["lounge", "Drawing rm"], ["kitchen", "Kitchen"],
+  ["drawing", "Drawing rm"], ["kitchen", "Kitchen"],
   ["library", "Library"], ["garage", "Workshop"],
-  ["balcony", "Balcony"], ["hall", "Hall"],
+  ["balcony", "Balcony"], ["hall", "Corridor"],
 ];
 
 export function House3D({ lastPush }: Props) {
@@ -83,7 +83,7 @@ export function House3D({ lastPush }: Props) {
       <aside className="h3d-dock">
         <div>
           <p className="h3d-name">Zahid Imran</p>
-          <p className="h3d-lbl">AI ENGINEER</p>
+          <p className="h3d-lbl">AI ENGINEER · AGENTIC SYSTEMS, RAG, MCP</p>
         </div>
 
         <div className="h3d-card h3d-now">
@@ -93,6 +93,7 @@ export function House3D({ lastPush }: Props) {
           </div>
           <div className="h3d-nowroom" data-h3d="nowRoom">…</div>
           <div className="h3d-nowact" data-h3d="nowAct">waking the house up</div>
+          <div className="h3d-push" data-h3d="nowSec">→ section office</div>
           {lastPush && pushDays !== null && (
             <div className="h3d-push">
               pushed to /{lastPush.name} · {pushDays === 0 ? "today" : `${pushDays}d ago`}
@@ -113,19 +114,45 @@ export function House3D({ lastPush }: Props) {
         <div>
           <div className="h3d-lbl" style={{ marginBottom: 5 }}>WALLS</div>
           <div className="h3d-seg">
-            <button type="button" data-wall="cutaway">cutaway</button>
+            <button type="button" data-wall="line">line</button>
             <button type="button" data-wall="low">low</button>
+            <button type="button" data-wall="cutaway">cutaway</button>
             <button type="button" data-wall="full">full</button>
           </div>
         </div>
 
         <div>
-          <div className="h3d-lbl" style={{ marginBottom: 5 }}>FLOOR</div>
+          <div className="h3d-lbl" style={{ marginBottom: 5 }}>LIGHT</div>
           <div className="h3d-seg">
-            <button type="button" data-floor="both">both</button>
-            <button type="button" data-floor="split">split</button>
-            <button type="button" data-floor="ground">ground</button>
-            <button type="button" data-floor="upper">upper</button>
+            <button type="button" data-light="soft" data-k="0.8">soft</button>
+            <button type="button" data-light="studio" data-k="1">studio</button>
+            <button type="button" data-light="bright" data-k="1.35">bright</button>
+          </div>
+        </div>
+
+        <div>
+          <div className="h3d-lbl" style={{ marginBottom: 5 }}>PALETTE</div>
+          <div className="h3d-seg">
+            <button type="button" data-pal="clay">clay</button>
+            <button type="button" data-pal="nord">nord</button>
+            <button type="button" data-pal="dusk">dusk</button>
+          </div>
+        </div>
+
+        <div>
+          <div className="h3d-row" style={{ marginBottom: 5 }}>
+            <span className="h3d-lbl">DAY LENGTH</span>
+            <span className="h3d-lbl h3d-lbl-dark" data-h3d="dayLenVal">190 s / day</span>
+          </div>
+          <input type="range" min={40} max={600} step={10} defaultValue={190} data-h3d="dayLen" aria-label="Seconds per scene day" />
+        </div>
+
+        <div>
+          <div className="h3d-lbl" style={{ marginBottom: 5 }}>SHOW</div>
+          <div className="h3d-seg">
+            <button type="button" data-h3d="togChar">character</button>
+            <button type="button" data-h3d="togGarden">garden</button>
+            <button type="button" data-h3d="togOrbit">auto-orbit</button>
           </div>
         </div>
 
@@ -139,7 +166,7 @@ export function House3D({ lastPush }: Props) {
         </div>
 
         <p className="h3d-help">
-          drag = orbit · right-drag / two-finger = pan · wheel / pinch = zoom · click a room to zoom in, again to step inside · esc = overview
+          one storey · walls are floor lines by default · drag = orbit · right-drag / two-finger = pan · wheel / pinch = zoom · click a room to zoom, again to step inside · esc = overview
         </p>
       </aside>
 
@@ -148,6 +175,7 @@ export function House3D({ lastPush }: Props) {
           <div className="h3d-chip-txt">
             <div className="h3d-chip-name" data-h3d="chipName">Office</div>
             <div className="h3d-chip-act" data-h3d="chipAct" />
+            <a className="h3d-chip-sec" data-h3d="chipSec" href="#office">open office ↗</a>
           </div>
           <button type="button" data-h3d="walkBtn">walk here</button>
           <button type="button" data-h3d="closeChip">← out</button>
@@ -167,7 +195,7 @@ export function House3D({ lastPush }: Props) {
             ) : (
               <>
                 <p className="h3d-loading-big">building the house…</p>
-                <p className="h3d-loading-sub">walls, stairs, furniture, one small resident</p>
+                <p className="h3d-loading-sub">walls, furniture, one small resident</p>
               </>
             )}
           </div>
