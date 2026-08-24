@@ -21,6 +21,16 @@ export function Experience() {
               </h3>
               <span className="font-mono text-xs text-muted">{role.dates}</span>
             </div>
+            {role.spotlight && (
+              <a
+                href={role.spotlight.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block font-mono text-xs text-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+              >
+                {role.spotlight.label} ↗
+              </a>
+            )}
             <ul className="mt-3 space-y-2">
               {role.bullets.map((b) => (
                 <li key={b} className="flex gap-2 text-sm leading-relaxed text-foreground/85">

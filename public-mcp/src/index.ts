@@ -12,6 +12,11 @@
 
 import { PROFILE, SITE_URL } from "./profile";
 
+export interface Env {
+  /** Service binding to the site-pulse Worker (aggregate analytics). */
+  PULSE_SVC: Fetcher;
+}
+
 const PROTOCOL_VERSION = "2024-11-05";
 
 type JsonRpcRequest = {
@@ -25,7 +30,7 @@ type ToolDefinition = {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  handler: (args: Record<string, unknown>) => string;
+  handler: (args: Record<string, unknown>, env: Env) => string | Promise<string>;
 };
 
 const noArgs = { type: "object", properties: {} } as const;
@@ -155,13 +160,53 @@ const TOOLS: ToolDefinition[] = [
         email: PROFILE.identity.email,
       }),
   },
+  {
+    name: "site_overview",
+    description:
+      "How Zahid's portfolio website looks and what to explore on it — every section with its direct link, including the interactive 3D house. Use this to guide someone around the site.",
+    inputSchema: noArgs,
+    handler: () =>
+      text({
+        url: SITE_URL,
+        what_it_is:
+          "A monochrome editorial single-page portfolio. Section 02 is an interactive Three.js house: a character lives a daily schedule inside it, rooms map to the site's sections, and you can orbit, change wall rendering, palette and lighting.",
+        preview_image: `${SITE_URL}/opengraph-image`,
+        sections: [
+          { id: "01 impact", url: `${SITE_URL}/#impact`, shows: "measured results with links to proof" },
+          { id: "02 the house", url: `${SITE_URL}/#office`, shows: "the interactive 3D house (drag to orbit, click rooms)" },
+          { id: "03 projects", url: `${SITE_URL}/#projects`, shows: "three flagship AI systems + further work and live GitHub data" },
+          { id: "04 experience", url: `${SITE_URL}/#experience`, shows: "work history; the POWWR entry links the employer's public team spotlight" },
+          { id: "05 skills", url: `${SITE_URL}/#skills`, shows: "skills matrix — every skill links to where it was used" },
+          { id: "06 certificates", url: `${SITE_URL}/#certificates`, shows: "15 certificates across three tracks" },
+          { id: "07 ask my portfolio", url: `${SITE_URL}/#mcp`, shows: "this MCP server, documented on the page" },
+          { id: "08 contact", url: `${SITE_URL}/services`, shows: "services, engagement modes and contact" },
+        ],
+        cv_pdf: `${SITE_URL}/Zahid-Imran-CV.pdf`,
+        tip: "Open the URL in a browser to see it; site_analytics reports how visitors actually engage.",
+      }),
+  },
+  {
+    name: "site_analytics",
+    description:
+      "Live aggregate engagement for the portfolio site: views, time spent, per-section attention and top referrers over the last 30 days. Aggregate-only by design — no visitor identifiers exist.",
+    inputSchema: noArgs,
+    handler: async (_args, env) => {
+      try {
+        const res = await env.PULSE_SVC.fetch("https://site-pulse.zaahidimraan.workers.dev/summary");
+        if (!res.ok) return `Analytics endpoint returned ${res.status}.`;
+        return text(await res.json());
+      } catch {
+        return "Analytics endpoint unreachable right now — try again shortly.";
+      }
+    },
+  },
 ];
 
 function result(id: JsonRpcRequest["id"], value: unknown) {
   return { jsonrpc: "2.0", id, result: value };
 }
 
-function handleRpc(request: JsonRpcRequest) {
+function handleRpc(request: JsonRpcRequest, env: Env) {
   const { method, id, params = {} } = request;
 
   switch (method) {
@@ -169,7 +214,7 @@ function handleRpc(request: JsonRpcRequest) {
       return result(id, {
         protocolVersion: PROTOCOL_VERSION,
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "ask-about-zahid", version: "1.0.0" },
+        serverInfo: { name: "ask-about-zahid", version: "1.1.0" },
         instructions:
           "Answer questions about Zahid Imran, an AI Engineer in Manchester UK, using these tools. " +
           "Every fact mirrors his CV — never embellish beyond what the tools return. " +
@@ -199,14 +244,15 @@ function handleRpc(request: JsonRpcRequest) {
           isError: true,
         });
       }
-      try {
-        return result(id, { content: [{ type: "text", text: tool.handler(args) }] });
-      } catch (error) {
-        return result(id, {
-          content: [{ type: "text", text: `Tool failed: ${(error as Error).message}` }],
-          isError: true,
-        });
-      }
+      return Promise.resolve()
+        .then(() => tool.handler(args, env))
+        .then((value) => result(id, { content: [{ type: "text", text: value }] }))
+        .catch((error: Error) =>
+          result(id, {
+            content: [{ type: "text", text: `Tool failed: ${error.message}` }],
+            isError: true,
+          }),
+        );
     }
 
     case "ping":
@@ -248,7 +294,7 @@ Everything returned mirrors his CV. Portfolio: ${SITE_URL}
 }
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
     if (request.method === "GET") return landingPage();
     if (request.method !== "POST") {
@@ -266,7 +312,9 @@ export default {
     }
 
     const batch = Array.isArray(payload) ? payload : [payload];
-    const responses = batch.map(handleRpc).filter((r) => r !== null);
+    const responses = (await Promise.all(batch.map((r) => handleRpc(r, env)))).filter(
+      (r) => r !== null,
+    );
     if (!responses.length) return new Response(null, { status: 202, headers: CORS });
 
     return Response.json(Array.isArray(payload) ? responses : responses[0], {

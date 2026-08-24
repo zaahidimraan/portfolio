@@ -20,7 +20,7 @@ export const identity = {
   linkedin: "https://www.linkedin.com/in/zahid-imran/",
   cvPath: "/Zahid-Imran-CV.pdf",
   blurb:
-    "I build production AI systems that have to be right: document-AI pipelines with deterministic verification, agentic workflows with human-in-the-loop control, and LLM evaluation that keeps models honest. Currently an AI Engineer at POWWR in Manchester, working on document AI, agentic tooling and the cost engineering that makes both viable at scale.",
+    "I build production AI systems that have to be right: document-AI pipelines with deterministic verification, agentic workflows with human-in-the-loop control, and LLM evaluation that keeps models honest. Currently a Software Engineer at POWWR in Manchester, working on document AI, agentic tooling and the cost engineering that makes both viable at scale.",
 } as const;
 
 export type Flagship = {
@@ -210,13 +210,22 @@ export type Role = {
   company: string;
   dates: string;
   bullets: string[];
+  /** A public post by the employer featuring this role — social proof. */
+  spotlight?: { label: string; href: string };
 };
 
 export const experience: Role[] = [
   {
-    title: "AI Engineer",
+    // Official POWWR title (the AI-specialised work shows in the bullets and
+    // the site's own headline; the employer's public spotlight post uses the
+    // Software Engineering title).
+    title: "Software Engineer",
     company: "POWWR",
     dates: "Mar 2026 – Present",
+    spotlight: {
+      label: "POWWR team spotlight",
+      href: "https://lnkd.in/p/eRp4PGkp",
+    },
     bullets: [
       "Build production document-AI pipelines that turn unstructured business documents into validated, structured records.",
       "Design deterministic verification around model output — grounding to source text, plausibility bounds, self-consistency — so extractions can be trusted without additional model calls.",

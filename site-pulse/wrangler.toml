@@ -1,0 +1,9 @@
+name = "site-pulse"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+# Aggregate-only visit counters for zahid-imran.pages.dev. One KV value per
+# day; no IPs, no user agents, no identifiers of any kind ever stored.
+kv_namespaces = [
+  { binding = "PULSE", id = "5ef8e343863942969a51d791af92b63d" },
+]

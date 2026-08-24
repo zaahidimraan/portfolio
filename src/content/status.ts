@@ -4,7 +4,7 @@
  * or the daily /career-run pipeline — never invent content here.
  */
 export const status = {
-  focus: "Building document-AI and agentic pipelines as an AI Engineer at POWWR",
+  focus: "Building document-AI and agentic pipelines as a Software Engineer at POWWR",
   availability: "Open to AI engineering roles & collaborations",
   updated: "2026-07-31",
 } as const;

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { identity } from "@/content/profile";
 import { SiteMotion } from "@/components/site-motion";
+import { Pulse } from "@/components/pulse";
 import "./globals.css";
 
 /* Vendored latin-subset variable fonts: builds must never depend on a
@@ -30,7 +31,9 @@ export const metadata: Metadata = {
   authors: [{ name: identity.name, url: identity.siteUrl }],
   creator: identity.name,
   keywords: [
+    "Zahid Imran",
     "AI Engineer",
+    "Software Engineer",
     "Manchester",
     "agentic AI",
     "RAG",
@@ -38,7 +41,9 @@ export const metadata: Metadata = {
     "MCP server",
     "LLM evaluation",
     "document AI",
+    "hire AI engineer Manchester",
     "freelance AI engineer UK",
+    "GenAI engineer UK",
     "LangGraph",
     "n8n",
   ],
@@ -101,6 +106,7 @@ export default function RootLayout({
         {children}
         {/* Zahid's drop-in motion layer (E50) at his settled tweak values. */}
         <SiteMotion motion={1.3} depth={1.1} />
+        <Pulse />
         {cfBeaconToken && (
           <script
             defer

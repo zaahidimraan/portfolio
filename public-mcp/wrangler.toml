@@ -2,5 +2,10 @@ name = "ask-zahid"
 main = "src/index.ts"
 compatibility_date = "2026-01-01"
 
-# No bindings: the server is pure compute over compiled-in profile data.
-# No storage, no KV, no logs of who asked what.
+# Still no storage of its own — no KV, no logs of who asked what. The single
+# binding below calls the site-pulse Worker for the site_analytics tool
+# (same-account workers.dev subrequests are blocked, so it must be a service
+# binding); site-pulse itself stores aggregate counters only.
+services = [
+  { binding = "PULSE_SVC", service = "site-pulse" },
+]

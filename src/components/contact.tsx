@@ -38,7 +38,7 @@ export function Contact() {
         Cloudflare Pages ·{" "}
         {cfBeaconToken
           ? "no cookies, privacy-first analytics only"
-          : "no cookies, no trackers"}{" "}
+          : "no cookies · self-hosted aggregate analytics, no identifiers stored"}{" "}
         · charts are hand-drawn SVG from real data ·
         deployed {new Date().toISOString().slice(0, 10)}
       </p>

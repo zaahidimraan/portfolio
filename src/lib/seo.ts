@@ -23,7 +23,9 @@ export const personSchema = {
   name: identity.name,
   givenName: "Zahid",
   familyName: "Imran",
-  jobTitle: "AI Engineer",
+  // Both are true and both are on the page: the site's headline identity and
+  // the official title in the POWWR experience entry.
+  jobTitle: ["AI Engineer", "Software Engineer"],
   description:
     "AI Engineer in Manchester, UK specialising in agentic systems, retrieval-augmented generation, Model Context Protocol and LLM evaluation.",
   email: `mailto:${identity.email}`,
@@ -37,6 +39,12 @@ export const personSchema = {
     addressCountry: "GB",
   },
   worksFor: { "@type": "Organization", name: experience[0].company },
+  subjectOf: {
+    "@type": "SocialMediaPosting",
+    url: "https://lnkd.in/p/eRp4PGkp",
+    headline: "POWWR team spotlight on Zahid Imran",
+    publisher: { "@type": "Organization", name: "POWWR" },
+  },
   alumniOf: education.map((e) => ({
     "@type": "EducationalOrganization",
     name: e.school,
