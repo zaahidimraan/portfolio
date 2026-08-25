@@ -24,14 +24,14 @@ type Step = {
 };
 
 const STEPS: Step[] = [
-  { sel: "__top", audio: "/tour/01-hero.mp3", text: "Hi, I'm Zahid Imran — an AI engineer based in Manchester. This is my portfolio. Let me show you around — it takes about two minutes." },
-  { sel: "#impact", audio: "/tour/02-impact.mp3", text: "First, the numbers. Every figure here comes from a real production system, and each one links to its proof — like 85% agreement between my LLM judge and human reviewers." },
-  { sel: "#office", audio: "/tour/03-house.mp3", text: "My favourite part: my day, as a 3D house. The character keeps my real schedule, and the light follows the clock. Drag to orbit — every room stands for a section of this site." },
-  { sel: "#office", focus: "office", audio: "/tour/04-office.mp3", text: "Here's the office — document-AI pipelines and agentic tooling, the work I do at POWWR on the innovation team." },
-  { sel: "#office", focus: "server", audio: "/tour/05-server.mp3", text: "The server room is real too. This site runs a public MCP server — connect any AI client and ask it about my CV. It only answers from the facts." },
-  { sel: "#projects", audio: "/tour/06-projects.mp3", text: "Three flagship systems: an omni-channel AI assistant, an autonomous recruitment judge, and a privacy-preserving PII redaction pipeline that runs entirely on local models." },
-  { sel: "#skills", audio: "/tour/07-skills.mp3", text: "Skills come with receipts — every claim links to where it was used, from agentic orchestration to evaluation and cost engineering." },
-  { sel: "footer", audio: "/tour/08-outro.mp3", text: "That's the tour. If you're hiring for AI engineering in the UK, or you're just curious — say hello. Thanks for stopping by." },
+  { sel: "__top", audio: "/tour/01-hero.mp3", text: "Hi — I'm Zahid Imran, an AI engineer based in Manchester. Recruiters see hundreds of portfolios that all say the same things. So instead of telling you I build production AI — I'd rather show you. Stick with me for two minutes." },
+  { sel: "#impact", audio: "/tour/02-impact.mp3", text: "Let's start with evidence. Every number on this wall comes from a system that actually ran in production, and every one links to its proof. 85% agreement between my LLM judge and human reviewers. 40% fewer false positives in screening. No vanity metrics — receipts." },
+  { sel: "#office", audio: "/tour/03-house.mp3", text: "And this is where it gets fun: my day, rebuilt as a 3D house. The little character is me — he keeps my real daily schedule, and the sunlight follows the actual clock. Drag to orbit; click any room to step inside. Every room stands for a section of this site — the house is a map of everything you're about to see." },
+  { sel: "#office", focus: "office", audio: "/tour/04-office.mp3", text: "Step into the office — three screens, one chair, and the work I do at POWWR on the innovation team: document-AI pipelines that read the messy paperwork of the energy industry, and the agentic tooling and evaluation that make those systems trustworthy." },
+  { sel: "#office", focus: "server", audio: "/tour/05-server.mp3", text: "The server room isn't decoration — it's real. This site runs a live MCP server. Connect Claude, Cursor, or any AI client, and ask it anything about my CV. It answers from the facts, and only the facts. Go on — interrogate my experience. That's exactly what it's for." },
+  { sel: "#projects", audio: "/tour/06-projects.mp3", text: "Three flagship builds tell the story best: an omni-channel AI executive assistant; an autonomous recruitment agent judged by an LLM — that's where the 85% lives; and a privacy-preserving PII redaction pipeline that runs entirely on local models. Architectures included. Nothing hand-waved." },
+  { sel: "#skills", audio: "/tour/07-skills.mp3", text: "Skills pages are usually wish-lists. Mine come with receipts: click any skill, and it lights up the exact projects and roles where it earned its place — from agentic orchestration to evaluation and cost engineering." },
+  { sel: "footer", audio: "/tour/08-outro.mp3", text: "That's the tour — the rest rewards exploring. If you're hiring for AI engineering in the UK, the door is open: grab the CV, connect the MCP server, or just say hello. Thanks for listening." },
 ];
 
 const PULSE_ENDPOINT = "https://site-pulse.zaahidimraan.workers.dev/a";
@@ -151,9 +151,9 @@ export function Tour() {
       {!active && (
         <div className="tour-launch">
           <button type="button" onClick={start}>
-            ▶ Take the 2-minute tour
+            ▶ Take the guided tour
           </button>
-          <span>AI-narrated · captions · esc to leave</span>
+          <span>AI-narrated · ~2½ min · captions · esc to leave</span>
         </div>
       )}
 
