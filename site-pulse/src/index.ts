@@ -31,6 +31,8 @@ type Day = {
   e: number;
   s: Record<string, number>;
   r: Record<string, number>;
+  /** Guided-tour funnel: starts / completes. */
+  t?: { s: number; c: number };
 };
 
 type BeaconBody = {
@@ -39,6 +41,7 @@ type BeaconBody = {
   e?: number;
   s?: Record<string, number>;
   v?: number;
+  tour?: "start" | "complete";
 };
 
 const dayKey = () => `d:${new Date().toISOString().slice(0, 10)}`;
@@ -64,6 +67,14 @@ async function ingest(request: Request, env: Env): Promise<Response> {
   const key = dayKey();
   const cur = ((await env.PULSE.get(key, "json")) as Day | null) ?? { v: 0, e: 0, s: {}, r: {} };
 
+  if (b.tour === "start" || b.tour === "complete") {
+    cur.t = cur.t ?? { s: 0, c: 0 };
+    if (b.tour === "start") cur.t.s += 1;
+    else cur.t.c += 1;
+    await env.PULSE.put(key, JSON.stringify(cur), { expirationTtl: 60 * 60 * 24 * 400 });
+    return new Response(null, { status: 204 });
+  }
+
   cur.v += clampInt(b.v, 1);
   cur.e += clampInt(b.e, 3600);
   const sections = b.s && typeof b.s === "object" ? Object.entries(b.s).slice(0, 12) : [];
@@ -88,6 +99,7 @@ async function summary(env: Env): Promise<Response> {
     .slice(-30);
   const days: { date: string; views: number; engagedSec: number }[] = [];
   const totals = { views: 0, engagedSec: 0 };
+  const tour = { starts: 0, completes: 0 };
   const sections: Record<string, number> = {};
   const referrers: Record<string, number> = {};
 
@@ -99,6 +111,10 @@ async function summary(env: Env): Promise<Response> {
     totals.engagedSec += d.e;
     for (const [id, s] of Object.entries(d.s)) sections[id] = (sections[id] ?? 0) + s;
     for (const [h, n] of Object.entries(d.r)) referrers[h] = (referrers[h] ?? 0) + n;
+    if (d.t) {
+      tour.starts += d.t.s;
+      tour.completes += d.t.c;
+    }
   }
 
   const body = {
@@ -109,6 +125,7 @@ async function summary(env: Env): Promise<Response> {
       avgEngagedSecPerView: totals.views ? Math.round(totals.engagedSec / totals.views) : 0,
     },
     days,
+    tour,
     sectionSeconds: Object.fromEntries(Object.entries(sections).sort((a, b) => b[1] - a[1])),
     topReferrers: Object.fromEntries(
       Object.entries(referrers).sort((a, b) => b[1] - a[1]).slice(0, 10),

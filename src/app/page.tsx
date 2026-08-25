@@ -18,6 +18,7 @@ import { TechMatrix } from "@/components/tech-matrix";
 import { TimelinePanel } from "@/components/timeline-panel";
 import { CommitChart } from "@/components/commit-chart";
 import { Office } from "@/components/office";
+import { Tour } from "@/components/tour";
 import { getCommitHistory, getRepos } from "@/lib/github";
 import { homeSchema } from "@/lib/seo";
 
@@ -34,6 +35,7 @@ export default async function Home() {
       <Nav />
       <main className="mx-auto w-full max-w-4xl flex-1 px-5">
         <Hero />
+        <Tour />
 
         <Section
           id="impact"

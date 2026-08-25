@@ -25,7 +25,13 @@ export type House3DOptions = {
   onDayNight?: (day: boolean) => void;
 };
 
-export type House3DHandle = { dispose: () => void };
+export type House3DHandle = {
+  dispose: () => void;
+  /** Fly the camera to a room (tour choreography uses this). */
+  focusRoom: (key: string) => void;
+  /** Return to the overview framing. */
+  overview: () => void;
+};
 
 /* ---------- constants (metres, y-up) — single-storey bungalow 18 x 11 ---------- */
 const TI = 0.12, TE = 0.2, H = 2.7, CUT = 1.0, F2 = 2.9; // F2 kept: some furniture was authored one floor up
@@ -763,6 +769,8 @@ export function initHouse3D(root: HTMLElement, host: HTMLElement, opts: House3DO
   raf = requestAnimationFrame(frame);
 
   return {
+    focusRoom: (key: string) => focusRoom(key, false),
+    overview,
     dispose() {
       disposed = true;
       cancelAnimationFrame(raf);

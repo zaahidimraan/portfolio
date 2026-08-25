@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { House3DHandle } from "./engine";
+import { setHouseApi } from "./api";
 
 /**
  * The 3D house shell, v2 (E50): Zahid's one-storey House3D dock + stage per
@@ -66,6 +67,7 @@ export function House3D({ lastPush }: Props) {
             },
           });
           setStatus(handle ? "ready" : "unsupported");
+          setHouseApi(handle);
         });
       },
       { rootMargin: "600px" },
@@ -75,6 +77,7 @@ export function House3D({ lastPush }: Props) {
       cancelled = true;
       io.disconnect();
       handle?.dispose();
+      setHouseApi(null);
     };
   }, []);
 
