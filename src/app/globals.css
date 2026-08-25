@@ -1119,6 +1119,20 @@ main > section[id]:not(#top) {
   line-height: 1.55;
 }
 
+.tour-sound {
+  display: block;
+  width: 100%;
+  margin-top: 0.6rem;
+  border: 1px solid var(--foreground);
+  border-radius: 8px;
+  background: var(--foreground);
+  color: var(--background);
+  padding: 0.5rem 0.8rem;
+  font-family: var(--font-geist-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
 .tour-controls {
   display: flex;
   gap: 0.4rem;

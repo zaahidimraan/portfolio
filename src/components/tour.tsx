@@ -84,6 +84,11 @@ export function Tour() {
       const audio = audioRef.current;
       if (audio) {
         audio.src = s.audio;
+        // Defensive: a muted element or zeroed volume would read as "broken
+        // tour" — narration silence must only ever be a policy rejection,
+        // which the visible sound button then recovers from.
+        audio.muted = false;
+        audio.volume = 1;
         audio.play().catch(() => setPaused(true));
       }
     },
@@ -152,8 +157,16 @@ export function Tour() {
         </div>
       )}
 
-      {/* One reusable element keeps the user-activation for every step. */}
-      <audio ref={audioRef} onEnded={onEnded} preload="none" />
+      {/* One reusable element keeps the user-activation for every step; the
+          element's own events are the source of truth for the UI state, so a
+          browser-initiated pause can never leave the controls lying. */}
+      <audio
+        ref={audioRef}
+        onEnded={onEnded}
+        onPlay={() => setPaused(false)}
+        onPause={() => setPaused(true)}
+        preload="none"
+      />
 
       {active && (
         <div className="tour" role="region" aria-label="Guided site tour">
@@ -171,6 +184,11 @@ export function Tour() {
             <p className="tour-caption" aria-live="polite">
               {STEPS[step].text}
             </p>
+            {paused && (
+              <button type="button" className="tour-sound" onClick={togglePause}>
+                🔊 tap to hear the narration
+              </button>
+            )}
             <div className="tour-controls">
               <button type="button" onClick={() => goTo(Math.max(0, step - 1))} disabled={step === 0} aria-label="Previous stop">⏮</button>
               <button type="button" onClick={togglePause} aria-label={paused ? "Play narration" : "Pause narration"}>
